@@ -1,1 +1,1 @@
-# fusion.form.utils - [Fusion Form Validator and Utilities]
+# Fusion Form Validator and Utilities
