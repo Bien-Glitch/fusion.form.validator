@@ -1,0 +1,11 @@
+# Jetbrains Config Folder
+/.idea
+# VS Code Config Folder
+/.vscode
+# Node Modules
+/node_modules
+# Composer Packages
+/vendor
+
+/storage
+/.env
