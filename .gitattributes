@@ -5,7 +5,3 @@
 *.html diff=html
 *.js diff=js
 *.md diff=markdown
-*.php diff=php
-
-/dist/* linguist-documentation=false
-/dist/* linguist-vendored
