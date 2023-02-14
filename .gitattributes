@@ -1,5 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-dist/* linguist-documentation=false
-dist/* linguist-vendored
+*.css diff=css
+*.html diff=html
+*.js diff=js
+*.md diff=markdown
+*.php diff=php
+
+/dist/* linguist-documentation=false
+/dist/* linguist-vendored
