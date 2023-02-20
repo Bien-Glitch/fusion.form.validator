@@ -1107,7 +1107,7 @@ Object.prototype.hasScrollBar = function (direction = 'vertical') {
 /**
  * Create a new instance of Fusion Form Validator using the target element
  *
- * @param form_group {selector}
+ * @param form_group {string|selector}
  * @returns {FBFormValidate}
  */
 Object.prototype.initValidator = function (form_group) {
