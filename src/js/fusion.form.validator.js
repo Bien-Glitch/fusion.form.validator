@@ -1,3 +1,15 @@
+/*!
+* Fusion Form Validator V1.0
+* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.0)
+* Copyright 2023 Fusion Bolt inc.
+*/
+
+/**
+ * ----------------------------------------------------------
+ * Fusion Form Validator (v1.0):
+ * ----------------------------------------------------------
+ * (**Base-Component**)
+ */
 class FBBaseComponent {
 	#_config;
 	#_passwordTogglerWrapper;
@@ -56,7 +68,7 @@ class FBBaseComponent {
 	}
 	
 	get passwordToggler() {
-		return this.#_passwordTogglerWrapper/*(this.#_config.validation_icons.togglePassword)*/;
+		return this.#_passwordTogglerWrapper
 	}
 	
 	get validIcon() {
@@ -76,11 +88,17 @@ class FBBaseComponent {
 	}
 	
 	static get VERSION() {
-		return version;
+		return '1.0';
 	}
 }
 
-class ValidateForm extends FBBaseComponent {
+/**
+ * ----------------------------------------------------------
+ * Fusion Form Validator (v1.0):
+ * ----------------------------------------------------------
+ * (**Validate Form**)
+ */
+class FBFormValidate extends FBBaseComponent {
 	#_regExp;
 	#_padding;
 	#_validationConfig;
@@ -484,22 +502,34 @@ class ValidateForm extends FBBaseComponent {
 	 *----------------------------------------------------------
 	 */
 	
-	/* * *Returns Padding configuration settings* * */
+	/**
+	 * *Returns Padding configuration settings*
+	 * @returns {*}
+	 */
 	get paddingMultipliers() {
 		return this.#_padding;
 	}
 	
-	/* * *Returns Regular Expression configuration settings* * */
+	/**
+	 * *Returns Regular Expression configuration settings*
+	 * @returns {*}
+	 */
 	get regExpConfig() {
 		return this.#_regExp
 	}
 	
-	/* * *Returns Validation configuration settings* * */
+	/**
+	 * *Returns Validation configuration settings*
+	 * @returns {*}
+	 */
 	get validationConfig() {
 		return this.#_validationConfig;
 	}
 	
-	/* * *Returns configuration settings for Validation Icons* * */
+	/**
+	 * *Returns configuration settings for Validation Icons*
+	 * @returns {*}
+	 */
 	get validationIcons() {
 		return this.#_validationIcons;
 	}
@@ -511,39 +541,66 @@ class ValidateForm extends FBBaseComponent {
 	 * ----------------------------------------------------------
 	 */
 	
-	/* Set Padding configuration */
+	/**
+	 * **Set Padding configuration**
+	 *
+	 * @param options
+	 * @returns
+	 */
 	set paddingConfig(options) {
 		const _options = (options && typeof options === 'object') ? options : this.#_padding;
 		this.touchConfig(_options, this.#_padding);
 		return this;
 	}
 	
-	/* Set Regular Expression configuration */
+	/**
+	 * **Set Regular Expressions configuration**
+	 *
+	 * @param options
+	 * @returns
+	 */
 	set regExpConfig(options) {
 		let _options = (options && typeof options === 'object') ? options : this.#_regExp;
 		this.touchConfig(_options, this.#_regExp);
 		return this;
 	}
 	
-	/* Set Validation configuration */
+	/**
+	 * **Set Validation options configuration**
+	 *
+	 * @param options
+	 * @returns
+	 */
 	set validationConfig(options) {
 		let _options = (options && typeof options === 'object') ? options : this.#_validationConfig;
 		this.touchConfig(_options, this.#_validationConfig);
 		return this;
 	}
 	
-	/* Set Validation Icons configuration */
+	/**
+	 * **Set Validation Icons configuration**
+	 *
+	 * @param options
+	 * @returns
+	 */
 	set validationIcons(options) {
 		let _options = (options && typeof options === 'object') ? options : this.#_validationIcons;
 		this.touchConfig(_options, this.#_validationIcons);
 		return this;
 	}
 	
-	static
-	get NAME() {
-		return 'Form Validator';
+	/**
+	 * ***Returns the Original name of the Plugin.***
+	 * @returns {string}
+	 * @constructor
+	 */
+	static get NAME() {
+		return 'FB-FormValidator';
 	}
 }
 
-const validator = new ValidateForm($el('#login-form'), form_group);
-validator.initValidation();
+const loginFormValidator = $el('#login-form').initValidator(form_group);
+loginFormValidator.validationConfig = {
+
+}
+loginFormValidator.initValidation();

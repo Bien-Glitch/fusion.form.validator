@@ -31,9 +31,6 @@ const fa_info = 'fa-info';
 const fa_info_c = 'fa-info-circle';
 const fa_wifi_s = 'fa-wifi-slash';
 
-const version = '1.0.0'
-
-
 window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractionDigits: 2});
 
 /**
@@ -240,7 +237,7 @@ Object.prototype.nodeContains = function (element) {
  * Returns the sibling that matches the selector if the selector is given else the direct previous sibling is returned
  *
  * @param selector
- * @returns {Element}
+ * @returns {HTMLElement|Element}
  */
 Object.prototype.previousSiblings = function (selector) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
@@ -707,7 +704,7 @@ Object.prototype.property = function (key, value) {
  * Set attributes if key is KeyValue pair object
  *
  * @param key {string|object}
- * @param value {string|undefined|null}
+ * @param value
  * @returns {[HTMLElement]}
  */
 Object.prototype.touchAttribute = function (key, value) {
@@ -717,7 +714,7 @@ Object.prototype.touchAttribute = function (key, value) {
 	(key.constructor.name.toUpperCase() === 'OBJECT' && Object.keys(key).length && !value) ?
 		Object.keys(key).forEach(prop => target.forEach(element => element.setAttribute(prop, key[prop]))) :
 		target.forEach(element => element.setAttribute(key, value));
-	return this;
+	return target;
 	
 }
 
@@ -728,8 +725,8 @@ Object.prototype.touchAttribute = function (key, value) {
  * Set attributes if key is KeyValue pair object
  *
  * @param key {string|object}
- * @param value {string|undefined|null}
- * @returns {[HTMLElement]}
+ * @param value
+ * @returns {string|touchAttribute}
  */
 Object.prototype.attribute = function (key, value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
@@ -752,7 +749,7 @@ Object.prototype.touchDataAttribute = function (key, value) {
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => element.dataset[key] = value);
 	// target[0].dataset[key] = value;
-	return this;
+	return target;
 }
 
 /**
@@ -761,8 +758,8 @@ Object.prototype.touchDataAttribute = function (key, value) {
  * Set the given data-* attribute if key and pair is available
  *
  * @param key {string|object}
- * @param value {string|undefined|null}
- * @returns {[HTMLElement]}
+ * @param value
+ * @returns {string|touchDataAttribute}
  */
 Object.prototype.dataAttribute = function (key, value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
@@ -1107,9 +1104,16 @@ Object.prototype.hasScrollBar = function (direction = 'vertical') {
 		new Error('Scroll direction not specified!');
 }
 
+/**
+ * Create a new instance of Fusion Form Validator using the target element
+ *
+ * @param form_group {selector}
+ * @returns {FBFormValidate}
+ */
 Object.prototype.initValidator = function (form_group) {
 	const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
-		? Array.from(this) : (Array.isArray(this) ? this : [this]))[0];
+		? Array.from(this) : (Array.isArray(this) ? this : [this]));
+	return new FBFormValidate(target, form_group);
 }
 
 
@@ -1155,7 +1159,19 @@ function $el(selector, context) {
 	}
 }
 
+//
 window.$fb = {
+	/**
+	 *
+	 * @param uri
+	 * @param method
+	 * @param data
+	 * @param dataType
+	 * @param beforeSend
+	 * @param onComplete
+	 * @param onSuccess
+	 * @param onError
+	 */
 	fetchReq({uri = '', method = 'get', data = null, dataType = 'json', beforeSend, onComplete, onSuccess, onError}) {
 		const allowedErrorStatuses = new Set([401, 402, 422, 423, 426, 451, 511]);
 		let status,
@@ -1185,6 +1201,11 @@ window.$fb = {
 			typeof onComplete === 'function' && onComplete(responseData, status, statusText);
 		}).catch(err => (typeof onError === 'function') && onError(err, status, statusText));
 	},
+	/**
+	 *
+	 * @param buttonElement
+	 * @param processIsDone
+	 */
 	toggleButtonState(buttonElement, processIsDone = false) {
 		const target = ((buttonElement.constructor.name.toUpperCase() === 'NODELIST' || buttonElement.constructor.name.toUpperCase() === 'S')
 			? Array.from(buttonElement) : (Array.isArray(buttonElement) ? buttonElement : [buttonElement]))[0];
@@ -1202,12 +1223,22 @@ window.$fb = {
 			}
 		}
 	},
+	/**
+	 *
+	 * @param form
+	 * @param processIsDone
+	 */
 	manipulateButton(form, processIsDone = false) {
 		const target = ((form.constructor.name.toUpperCase() === 'NODELIST' || form.constructor.name.toUpperCase() === 'S')
 			? Array.from(form) : (Array.isArray(form) ? form : [form]))[0];
 		const submitButton = $el('button[type="submit"]', target).length ? $el('button[type="submit"]', target) : $el(`button[form="${target.id}"]`);
 		this.toggleButtonState(submitButton, processIsDone);
 	},
+	/**
+	 *
+	 * @param JSONString
+	 * @returns {boolean}
+	 */
 	canParseJSON(JSONString) {
 		try {
 			JSON.parse(JSONString)
