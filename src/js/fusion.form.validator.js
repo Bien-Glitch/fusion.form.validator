@@ -115,8 +115,7 @@ class ValidateForm extends FBBaseComponent {
 	}
 	
 	touchConfig(options, config) {
-		const filtered = Object.keys(config).filter(option => config[option] = (option in options && options[option] !== '') && options[option]);
-		config = (options === config) ? options : (filtered.length ? filtered : config);
+		Object.keys(config).filter(option => config[option] = (option in options && options[option] !== '') ? (options[option]) : config[option]);
 		return this;
 	}
 	
@@ -150,8 +149,8 @@ class ValidateForm extends FBBaseComponent {
 						_inputElement = $el(inputElement, target),
 						_element = $el(element, target),
 						elementId = (_element[0] !== undefined) && _element[0].id,
+						element_group = `#${elementId}_group`,
 						requireRefill;
-					
 					
 					target.nodeContains(_element[0]).length && target.setAttribute('id', `${elementId}_group`);
 					_inputElement.length && _inputElement.attribute('type') === 'password' && _inputElement.HTMLAfter(passwordTogglerWrapper(validationIcons.passwordToggleIcon));
@@ -182,7 +181,7 @@ class ValidateForm extends FBBaseComponent {
 										checkValidate(_inputElement, target)
 								
 								if (elementType === 'email' || fbRole === 'email')
-									if (!validationConfig.validateEmail)
+									if (validationConfig.validateEmail)
 										_inputElement.emailValidate(regExp.email, target);
 									else
 										checkValidate(_inputElement, target)
@@ -210,6 +209,8 @@ class ValidateForm extends FBBaseComponent {
 										_inputElement.cardNumberValidate(regExp.cardNumber, target);
 									else
 										checkValidate(_inputElement, target);
+								
+								(filterType.has(elementType) && elementType !== 'email') && _inputElement.validate({context: target});
 							}
 						},
 						keyup: function () {
@@ -244,53 +245,183 @@ class ValidateForm extends FBBaseComponent {
 								}
 						}
 					});
+					_selectElement.upon('change', (e) => $el(e.currentTarget).needsValidation() && $el(e.currentTarget).validate({context: target}));
+					_textAreaElement.upon('input', (e) => $el(e.currentTarget).needsValidation() && $el(e.currentTarget).validate({context: target}));
 					
 					const validatePassword = () => {
 						if (validationConfig.validatePassword) {
 							let config_passwordId = `#${validationConfig.passwordId}`,
 								config_passwordConfirmId = `#${validationConfig.passwordConfirmId}`,
+								_element_group = $el(element_group),
 								_password = $el(config_passwordId, form),
+								_password_group = $el(`${config_passwordId}_group`),
 								_confirmPassword = $el(config_passwordConfirmId, form),
+								_confirmPassword_group = $el(`${config_passwordConfirmId}_group`),
 								minlength = _password[0] && _password[0].attribute('minlength'),
 								maxlength = _password[0] && _password[0].attribute('maxlength');
 							toggler_padding_right = !parseBool(requireRefill) ? $el(toggler, target)[0].getBoundingClientRect().width + 28 : 0;
 							
-							
 							if (elementId !== validationConfig.passwordConfirmId)
-								if (_inputElement[0].value.length < minlength || _inputElement[0].value.length > maxlength) {
-									if ($el(form_group, form).nodeContains(_confirmPassword[0]).length) {
-										//TODO: Check how to implement jQuery's 'parents()'
-										_inputElement.validate({context: target, message: `Password must be between ${minlength} and ${maxlength} characters.`});
-										_confirmPassword.validate({context: _confirmPassword[0].parentElement.parentElement, isPassword: true});
-									} else
-										_inputElement.validate({context: target});
+								if (!!(minlength || maxlength)) {
+									if ((!!minlength && _inputElement[0].value.length < minlength) || (!!maxlength && _inputElement[0].value.length > maxlength)) {
+										if ($el(form_group, form).nodeContains(_confirmPassword[0]).length) {
+											if (!!(minlength && maxlength)) {
+												if (minlength === maxlength) {
+													_inputElement.validate({context: target, message: `Password requires ${maxlength} characters.`});
+													_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+												} else {
+													//TODO: Check how to implement jQuery's 'parents()'
+													_inputElement.validate({context: target, message: `Password must be between ${minlength} and ${maxlength} characters.`});
+													_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+												}
+											} else {
+												if (!!minlength) {
+													if (_inputElement[0].value.length < minlength) {
+														_inputElement.validate({context: target, message: `Password requires a minimum of ${minlength} characters.`});
+														_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+													} else {
+														if (_inputElement[0].value !== _confirmPassword[0].value) {
+															_inputElement.validate({context: target, message: `Passwords do not match.`, isPassword: true});
+															_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+														} else {
+															_inputElement.validate({context: target});
+															_confirmPassword.validate({context: _confirmPassword_group});
+														}
+													}
+												} else if (!!maxlength) {
+													if (_inputElement[0].value.length > maxlength) {
+														_inputElement.validate({context: _element_group, message: `Password requires a maximum of ${maxlength} characters.`});
+														_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+													} else {
+														if (_inputElement[0].value !== _confirmPassword[0].value) {
+															_inputElement.validate({context: target, message: `Passwords do not match.`, isPassword: true});
+															_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+														} else {
+															_inputElement.validate({context: target});
+															_confirmPassword.validate({context: _confirmPassword_group});
+														}
+													}
+												} else {
+													if (!!(_inputElement[0].value.length && _confirmPassword[0].value.length) && (_inputElement[0].value !== _confirmPassword[0].value)) {
+														_inputElement.validate({context: target, message: `Passwords do not match.`, isPassword: true});
+														_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+													} else {
+														_inputElement.validate({context: target});
+														_confirmPassword.validate({context: _confirmPassword_group});
+													}
+												}
+											}
+										} else {
+											if (!!(minlength && maxlength)) {
+												if ((!!minlength && _inputElement[0].value.length < minlength) || !!maxlength && _inputElement[0].value.length > maxlength)
+													if (minlength === maxlength)
+														_inputElement.validate({context: _element_group, message: `Password requires ${maxlength} characters.`});
+													else
+														_inputElement.validate({context: _element_group, message: `Password must be between ${minlength} and ${maxlength} characters.`});
+												else
+													_inputElement.validate({context: target});
+											} else {
+												if (!!minlength) {
+													if (_inputElement[0].value.length < minlength)
+														_inputElement.validate({context: _element_group, message: `Password requires a minimum of ${minlength} characters.`});
+													else
+														_inputElement.validate({context: target});
+												} else if (!!maxlength) {
+													if (_inputElement[0].value.length > maxlength)
+														_inputElement.validate({context: _element_group, message: `Password requires a maximum of ${maxlength} characters.`});
+													else
+														_inputElement.validate({context: target});
+												} else
+													_inputElement.validate({context: target});
+											}
+										}
+									} else {
+										if ($el(form_group, form).nodeContains(_confirmPassword[0]).length) {
+											if (_inputElement[0].value !== _confirmPassword[0].value) {
+												_inputElement.validate({context: target, message: `Passwords do not match.`, isPassword: true});
+												_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
+											} else {
+												_inputElement.validate({context: target});
+												_confirmPassword.validate({context: _confirmPassword_group});
+											}
+										} else
+											_inputElement.validate({context: target});
+									}
 								} else {
 									if ($el(form_group, form).nodeContains(_confirmPassword[0]).length)
-										if (_inputElement[0].value.length && _confirmPassword[0].value.length && _inputElement[0].value !== _confirmPassword[0].value) {
+										if (!!(_inputElement[0].value.length && _confirmPassword[0].value.length) && (_inputElement[0].value !== _confirmPassword[0].value)) {
 											_inputElement.validate({context: target, message: `Passwords do not match.`, isPassword: true});
-											_confirmPassword.validate({context: _confirmPassword[0].parentElement.parentElement, isPassword: true});
+											_confirmPassword.validate({context: _confirmPassword_group, isPassword: true});
 										} else {
 											_inputElement.validate({context: target});
-											_confirmPassword.validate({context: _confirmPassword[0].parentElement.parentElement});
+											_confirmPassword.validate({context: _confirmPassword_group});
 										}
 									else
 										_inputElement.validate({context: target});
 								}
 							else {
-								if (!_password[0].value.length)
-									_inputElement.validate({context: target, message: 'The Password field is required', isPassword: true});
-								else {
-									if (_password[0].value.length < minlength || _password[0].value.length > maxlength) {
-										_inputElement.validate({context: target, isPassword: true});
-										_password.validate({context: _password[0].parentElement.parentElement, message: `Password must be between ${minlength} and ${maxlength} characters.`});
-									} else if (!_inputElement[0].value.length)
+								if (!!(minlength || maxlength)) {
+									if ((!!minlength && _password[0].value.length < minlength) || (!!maxlength && _password[0].value.length > maxlength)) {
+										if (!!(minlength && maxlength)) {
+											if (minlength === maxlength) {
+												_inputElement.validate({context: target, isPassword: true});
+												_password.validate({context: _password_group, message: `Password requires ${maxlength} characters.`});
+											} else {
+												_inputElement.validate({context: target, isPassword: true});
+												_password.validate({context: _password_group, message: `Password must be between ${minlength} and ${maxlength} characters.`});
+											}
+										} else {
+											if (!!minlength) {
+												if (_password[0].value.length < minlength) {
+													_inputElement.validate({context: target, isPassword: true});
+													_password.validate({context: _password_group, message: `Password requires a minimum of ${minlength} characters.`});
+												} else {
+													if (_inputElement[0].value !== _password[0].value) {
+														_inputElement.validate({context: target, isPassword: true});
+														_password.validate({context: _password_group, message: `Passwords do not match.`, isPassword: true});
+													} else {
+														_inputElement.validate({context: target});
+														_password.validate({context: _password_group});
+													}
+												}
+											} else if (!!maxlength) {
+												if (_password[0].value.length > maxlength) {
+													_inputElement.validate({context: target, isPassword: true});
+													_password.validate({context: _password_group, message: `Password requires a maximum of ${maxlength} characters.`});
+												} else {
+													if (_inputElement[0].value !== _password[0].value) {
+														_inputElement.validate({context: target, isPassword: true});
+														_password.validate({context: _password_group, message: `Passwords do not match.`, isPassword: true});
+													} else {
+														_inputElement.validate({context: target});
+														_password.validate({context: _password_group});
+													}
+												}
+											} else {
+												if (!!(_inputElement[0].value.length && _password[0].value.length) && (_inputElement[0].value !== _password[0].value)) {
+													_inputElement.validate({context: target, isPassword: true});
+													_password.validate({context: _password_group, message: `Passwords do not match.`, isPassword: true});
+												} else {
+													_inputElement.validate({context: target});
+													_password.validate({context: _password_group});
+												}
+											}
+										}
+									}
+								} else {
+									if (!_inputElement[0].value.length)
 										_inputElement.validate({context: target});
-									else if (_inputElement[0].value !== _password[0].value) {
+									else if (!_password[0].value.length) {
 										_inputElement.validate({context: target, isPassword: true});
-										_password.validate({context: _password[0].parentElement.parentElement, message: `Passwords do not match.`, isPassword: true});
+										_password.validate({context: _password_group, message: 'The Password field is required', isPassword: true});
 									} else {
-										_inputElement.validate({context: target});
-										_password.validate({context: _password[0].parentElement.parentElement});
+										if (_inputElement[0].value !== _password[0].value) {
+											_inputElement.validate({context: target, isPassword: true});
+											_password.validate({context: _password_group, message: `Passwords do not match.`, isPassword: true});
+										} else {
+											_inputElement.validate({context: target});
+											_password.validate({context: _password_group});
+										}
 									}
 								}
 							}
@@ -298,21 +429,41 @@ class ValidateForm extends FBBaseComponent {
 							_inputElement.validate({context: target});
 					}
 					
-					if (validationConfig.showPassword)
-						$el(toggler, target).upon('click', function (e) {
-							let currentTarget = e.currentTarget,
-								_passwordField = currentTarget.previousSiblings('input');
-							
-							if (_passwordField.isPasswordField())
-								if (_passwordField.type && _passwordField.type.toLowerCase() === 'password') {
-									_passwordField.setAttribute('type', 'text');
-									$el('i', currentTarget).classListAdd('fa-eye-slash').classListRemove('fa-eye')
-								} else {
-									_passwordField.setAttribute('type', 'password');
-									$el('i', currentTarget).classListAdd('fa-eye').classListRemove('fa-eye-slash');
+					if (_element.attribute('id')) {
+						const elementType = _element.attribute('type') && _element.attribute('type').toLowerCase();
+						const tagName = _element[0].tagName.toLowerCase();
+						
+						if (validationConfig.showPassword)
+							$el(toggler, target).upon('click', function (e) {
+								let currentTarget = e.currentTarget,
+									_passwordField = currentTarget.previousSiblings('input');
+								
+								if (_passwordField.isPasswordField()) {
+									if (_passwordField.type && _passwordField.type.toLowerCase() === 'password') {
+										_passwordField.setAttribute('type', 'text');
+										$el('i', currentTarget).classListAdd('fa-eye-slash').classListRemove('fa-eye')
+									} else {
+										_passwordField.setAttribute('type', 'password');
+										$el('i', currentTarget).classListAdd('fa-eye').classListRemove('fa-eye-slash');
+									}
 								}
-							_passwordField.focus({preventScroll: false});
-						});
+								_passwordField.focus({preventScroll: false});
+							});
+						
+						if (_element.needsValidation()) {
+							if (tagName !== 'select') {
+								if ((elementType !== 'checkbox' && !_element[0].value.length)) {
+									errorCount[form.id]++
+									errorBag[form.id][elementId] = 'This field is required.';
+								}
+							} else {
+								if (!_selectElement[0].value) {
+									errorCount[form.id]++
+									errorBag[form.id][elementId] = 'Please select an option.';
+								}
+							}
+						}
+					}
 				});
 				
 				form.upon('reset', (e) => {
@@ -388,17 +539,11 @@ class ValidateForm extends FBBaseComponent {
 		return this;
 	}
 	
-	static get NAME() {
+	static
+	get NAME() {
 		return 'Form Validator';
 	}
 }
 
-$('#login-form').on('submit', function (e) {
-	e.preventDefault();
-	const form = e.currentTarget;
-	form.fetchSubmit({
-		uri: form.getAction(),
-		method: form.attribute('method'),
-		data: {action: 'login'},
-	})
-})
+const validator = new ValidateForm($el('#login-form'), form_group);
+validator.initValidation();
