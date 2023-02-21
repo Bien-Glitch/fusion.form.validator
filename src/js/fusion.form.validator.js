@@ -6,7 +6,7 @@
 
 /**
  * ----------------------------------------------------------
- * Fusion Form Validator (v1.0):
+ * Fusion Form Validator - Validator (v1.0.0):
  * ----------------------------------------------------------
  * (**Base-Component**)
  */
@@ -94,7 +94,7 @@ class FBBaseComponent {
 
 /**
  * ----------------------------------------------------------
- * Fusion Form Validator (v1.0):
+ * Fusion Form Validator (v1.0.0):
  * ----------------------------------------------------------
  * (**Validate Form**)
  */
@@ -598,9 +598,3 @@ class FBFormValidate extends FBBaseComponent {
 		return 'FB-FormValidator';
 	}
 }
-
-const loginFormValidator = $el('#login-form').initValidator(form_group);
-loginFormValidator.validationConfig = {
-
-}
-loginFormValidator.initValidation();

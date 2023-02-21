@@ -28,7 +28,7 @@
 					<div class="form-group">
 						<div class="input-group align-items-stretch flex-nowrap">
 							<div class="form-label-group form-field-group required w-100">
-								<input type="password" id="password" class="form-control" placeholder="Password">
+								<input minlength="8" type="password" id="password" class="form-control" placeholder="Password">
 								<label for="password">Password</label>
 							</div>
 						</div>
@@ -43,4 +43,19 @@
 <script src="plugins/bootstrap/js/bootstrap.bundle.js"></script>
 <script src="src/js/fusion.form.util.js"></script>
 <script src="src/js/fusion.form.validator.js"></script>
+<script>
+	const loginFormValidator = $el('#login-form').upon('submit', function (e) {
+		e.preventDefault();
+		const form = e.currentTarget;
+		
+		form.handleFormSubmit({
+			uri: form.getAction(),
+			method: form.attribute('method'),
+			data: {action: 'login'}
+		}).then(response => console.log(response)).catch(error => console.warn(error));
+	}).initValidator(form_group);
+	console.log(loginFormValidator);
+	loginFormValidator.validationConfig = {validateEmail: true}
+	loginFormValidator.initValidation();
+</script>
 </html>

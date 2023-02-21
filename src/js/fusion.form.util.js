@@ -1,3 +1,15 @@
+/*!
+* Fusion Form Validator V1.0
+* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.0)
+* Copyright 2023 Fusion Bolt inc.
+*/
+
+/**
+ * ----------------------------------------------------------
+ * Fusion Form Validator - Utilities (v1.0.0)
+ * ----------------------------------------------------------
+ * (**Global Variables Declaration**)
+ */
 let valid_right,
 	padding_right,
 	currentAnimation,
@@ -159,7 +171,7 @@ Object.prototype.classListAdd = function (className) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => element.classList.add(className));
-	return this;
+	return target;
 }
 
 /**
@@ -172,7 +184,7 @@ Object.prototype.classListRemove = function (className) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => element.classList.remove(className));
-	return this;
+	return target;
 }
 
 /**
@@ -198,7 +210,7 @@ Object.prototype.addValidationPadding = function () {
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
 	target[0].attribute('type') && (target[0].attribute('type').toLowerCase() !== 'date') && target.touchCssValue({paddingRight: padding_right});
-	return this;
+	return target;
 }
 
 /**
@@ -211,7 +223,7 @@ Object.prototype.removeValidationPadding = function () {
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
 	target[0].attribute('type') && (target[0].attribute('type').toLowerCase() !== 'date') && target.touchCssValue({paddingRight: target.getCssValue('padding-left')});
-	return this;
+	return target;
 }
 
 /**
@@ -237,7 +249,7 @@ Object.prototype.nodeContains = function (element) {
  * Returns the sibling that matches the selector if the selector is given else the direct previous sibling is returned
  *
  * @param selector
- * @returns {HTMLElement|Element}
+ * @returns {HTMLElement|Element|*}
  */
 Object.prototype.previousSiblings = function (selector) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
@@ -360,7 +372,7 @@ Object.prototype.emailValidate = function (regExp, context) {
 }
 
 /**
- * Validates the given input field as a Name field with the given RegExp
+ * Validates the given input field as a Name field with the given RegExp.
  *
  * @param regExp {RegExp}
  * @param context {HTMLElement|[HTMLElement]|undefined}
@@ -371,7 +383,7 @@ Object.prototype.nameValidate = function (regExp, context) {
 }
 
 /**
- * Validates the given input field as a Phone Number field with the given RegExp
+ * Validates the given input field as a Phone Number field with the given RegExp.
  *
  * @param regExp {RegExp}
  * @param context {HTMLElement|[HTMLElement]|undefined}
@@ -382,7 +394,7 @@ Object.prototype.phoneValidate = function (regExp, context) {
 }
 
 /**
- * Validates the given input field as a Card CVV field with the given RegExp
+ * Validates the given input field as a Card CVV field with the given RegExp.
  *
  * @param regExp {RegExp}
  * @param context {HTMLElement|[HTMLElement]|undefined}
@@ -393,7 +405,7 @@ Object.prototype.cardCvvValidate = function (regExp, context) {
 }
 
 /**
- * Validates the given input field as a Card Number field with the given RegExp
+ * Validates the given input field as a Card Number field with the given RegExp.
  *
  * @param regExp {RegExp}
  * @param context {HTMLElement|[HTMLElement]|undefined}
@@ -411,7 +423,7 @@ Object.prototype.cardNumberValidate = function (regExp, context) {
 }
 
 /**
- * Validates the given input field as a Username field with the given RegExp
+ * Validates the given input field as a Username field with the given RegExp.
  *
  * @param regExp {RegExp}
  * @param context {HTMLElement|[HTMLElement]|undefined}
@@ -429,9 +441,9 @@ Object.prototype.usernameValidate = function (regExp, context) {
 }
 
 /**
- * Inserts given HTML string in the target element (inner HTML)
+ * Inserts given HTML string in the target element (inner HTML).
  *
- * @param value {string}
+ * @param value {string|null}
  * @returns {[HTMLElement]}
  */
 Object.prototype.insertHTML = function (value) {
@@ -442,7 +454,7 @@ Object.prototype.insertHTML = function (value) {
 }
 
 /**
- * Inserts given HTML string after the beginning of the target element
+ * Inserts given HTML string after the beginning of the target element.
  *
  * @param value {string}
  * @returns {[HTMLElement]}
@@ -455,7 +467,7 @@ Object.prototype.prependHTML = function (value) {
 }
 
 /**
- * Inserts given HTML string just at the end of the target element
+ * Inserts given HTML string just at the end of the target element.
  *
  * @param value
  * @returns {[HTMLElement]}
@@ -468,7 +480,7 @@ Object.prototype.appendHTML = function (value) {
 }
 
 /**
- * Inserts given HTML string before the beginning of the target element (Before element)
+ * Inserts given HTML string before the beginning of the target element (Before element).
  *
  * @param value {string}
  * @returns {[HTMLElement]}
@@ -482,7 +494,7 @@ Object.prototype.HTMLBefore = function (value) {
 }
 
 /**
- * Inserts given HTML string after the end of the target element (After element)
+ * Inserts given HTML string after the end of the target element (After element).
  *
  * @param value {string}
  * @returns {[HTMLElement]}
@@ -496,7 +508,7 @@ Object.prototype.HTMLAfter = function (value) {
 }
 
 /**
- * Add fadein Animation to target element
+ * Add fadein Animation to target element.
  *
  * @param timeout {number}
  * @param toggleDisplay {boolean}
@@ -528,7 +540,7 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, callb
 }
 
 /**
- * Add fadeout Animation to target element
+ * Add fadeout Animation to target element.
  *
  * @param timeout {number}
  * @param toggleDisplay {boolean}
@@ -562,7 +574,7 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 }
 
 /**
- * Add slidein Animation to target element
+ * Add slidein Animation to target element.
  *
  * @param timeout {number}
  * @param callback
@@ -612,7 +624,7 @@ Object.prototype.slideInDown = function ({timeout = 300, callback} = {}) {
 }
 
 /**
- * Add slideout Animation to target element
+ * Add slideout Animation to target element.
  *
  * @param timeout {number}
  * @param callback
@@ -661,12 +673,12 @@ Object.prototype.slideOutUp = function ({timeout = 300, callback} = {}) {
 }
 
 /**
- * Set the given property / properties for the target element
- * Set property if key and value is a string
- * Set properties if key is KeyValue pair object
+ * Set the given property / properties for the target element.
+ * Set property if key and value is a string.
+ * Set properties if key is KeyValue pair object.
  *
  * @param key {string|object}
- * @param value {string|undefined|null}
+ * @param value
  * @returns {[HTMLElement]}
  */
 Object.prototype.touchProperty = function (key, value) {
@@ -682,11 +694,11 @@ Object.prototype.touchProperty = function (key, value) {
 /**
  * Get the given property of the target element if only the key is given as a string.
  * Set the given property / properties for the target element.
- * Set property if key and value is a string
- * Set properties if key is KeyValue pair object
+ * Set property if key and value is a string.
+ * Set properties if key is KeyValue pair object.
  *
  * @param key {string|object}
- * @param value {string|undefined|null}
+ * @param value
  * @returns {[HTMLElement]}
  */
 Object.prototype.property = function (key, value) {
@@ -699,9 +711,9 @@ Object.prototype.property = function (key, value) {
 }
 
 /**
- * Set the given attribute(s) for the target element
- * Set attribute if key and value is a string
- * Set attributes if key is KeyValue pair object
+ * Set the given attribute(s) for the target element.
+ * Set attribute if key and value is a string.
+ * Set attributes if key is KeyValue pair object.
  *
  * @param key {string|object}
  * @param value
@@ -721,8 +733,8 @@ Object.prototype.touchAttribute = function (key, value) {
 /**
  * Get the given attribute(s) of the target element if only the key is given as a string.
  * Set the given attribute for the target element.
- * Set attribute if key and value is a string
- * Set attributes if key is KeyValue pair object
+ * Set attribute if key and value is a string.
+ * Set attributes if key is KeyValue pair object.
  *
  * @param key {string|object}
  * @param value
@@ -754,8 +766,8 @@ Object.prototype.touchDataAttribute = function (key, value) {
 
 /**
  * Get or set the given data-* attribute value of the target element if only the key is given as a string.
- * Get the given data-* attribute if only key is given
- * Set the given data-* attribute if key and pair is available
+ * Get the given data-* attribute if only key is given.
+ * Set the given data-* attribute if key and pair is available.
  *
  * @param key {string|object}
  * @param value
@@ -768,7 +780,7 @@ Object.prototype.dataAttribute = function (key, value) {
 }
 
 /**
- * Add event listener(s) to the target element and apply callback on them
+ * Add event listener(s) to the target element and apply callback on them.
  *
  * @param events {string|object}
  * @param callback
@@ -789,6 +801,18 @@ Object.prototype.upon = function (events, callback, option = false) {
 	return target;
 }
 
+/**
+ * Displays validation message.
+ *
+ * @param bsAlert {string} Bootstrap alert class
+ * @param faIcon {string} Fa-Icon class
+ * @param message {string} Custom Message
+ * @param id Related form field Id
+ * @param context
+ * @param dismissible {boolean} Toggle dismissible message
+ * @param wait {boolean} Toggle displaying wait message
+ * @returns {Object} target element
+ */
 Object.prototype.renderMessage = function (bsAlert, faIcon, message, id, context = null, dismissible = false, wait = false) {
 	const target = this;
 	const alert = dismissible ? `${bsAlert} alert-dismissible` : bsAlert;
@@ -808,6 +832,11 @@ Object.prototype.renderMessage = function (bsAlert, faIcon, message, id, context
 	return this
 }
 
+/**
+ * Check if the target form element has errors.
+ *
+ * @returns {{count (number), errors: (*|boolean)}|Error}
+ */
 Object.prototype.hasErrors = function () {
 	let target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 			? Array.from(this) : (Array.isArray(this) ? this : [this]))[0],
@@ -823,6 +852,14 @@ Object.prototype.hasErrors = function () {
 	return new Error(`Function hasErrors() accepts only 'form element', '${target.tagName.toLowerCase()} element' given!`);
 }
 
+/**
+ * Display validation errors for the target form.
+ *
+ * @param errors An Object of errors.
+ * @param message {string} Validation message.
+ * @param callback
+ * @returns {[HTMLElement]}
+ */
 Object.prototype.displayValidationErrors = function (errors, message, callback) {
 	let target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 			? Array.from(this) : (Array.isArray(this) ? this : [this])),
@@ -843,8 +880,17 @@ Object.prototype.displayValidationErrors = function (errors, message, callback) 
 	return target
 }
 
+/**
+ * Remove validation errors from target element(s).
+ *
+ * @param context
+ * @param removeAlert {boolean}
+ * @param destroyValidation {boolean}
+ * @returns {[HTMLElement]}
+ */
 Object.prototype.removeValidationMessage = function ({context, removeAlert = false, destroyValidation = false} = {}) {
-	const target = this;
+	const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
+		? Array.from(this) : (Array.isArray(this) ? this : [this]));
 	const validationProps = target.getValidationProps();
 	let validationField = validationProps.validationField,
 		validationIcon = validationProps.validationIcon,
@@ -865,9 +911,18 @@ Object.prototype.removeValidationMessage = function ({context, removeAlert = fal
 	return target
 }
 
+/**
+ * Display validation error for the target element.
+ *
+ * @param context
+ * @param message
+ * @param showIcon {boolean}
+ * @returns {[HTMLElement]|*[]}
+ */
 Object.prototype.showError = function ({context, message, showIcon = true} = {}) {
 	if (this) {
-		const target = this;
+		const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
+			? Array.from(this) : (Array.isArray(this) ? this : [this]));
 		const validationProps = target.getValidationProps();
 		let customMessage = message ?? 'This field is required.';
 		errorBag[target[0].form.id][target[0].id] = customMessage;
@@ -876,14 +931,22 @@ Object.prototype.showError = function ({context, message, showIcon = true} = {})
 		customMessage ? validationProps.validationField.renderMessage(alert_d, fa_exc_c, customMessage, validationProps.id, context, true) : validationProps.validationField.insertHTML(null);
 		target.classListRemove('border-success').classListAdd('border-danger');
 		errorCount[target[0].form.id] = Object.keys(errorBag[target[0].form.id]).length;
-		return this;
+		return target;
 	}
 	return [];
 }
 
+/**
+ * Display validation success for the target element.
+ * @param context
+ * @param message
+ * @param showIcon {boolean}
+ * @returns {[HTMLElement]|*[]}
+ */
 Object.prototype.showSuccess = function ({context, message, showIcon = true} = {}) {
 	if (this) {
-		const target = this;
+		const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
+			? Array.from(this) : (Array.isArray(this) ? this : [this]));
 		const validationProps = target.getValidationProps();
 		delete errorBag[target[0].form.id][target[0].id];
 		errorCount[target[0].form.id] = Object.keys(errorBag[target[0].form.id]).length;
@@ -892,14 +955,20 @@ Object.prototype.showSuccess = function ({context, message, showIcon = true} = {
 		message ? validationProps.validationField.renderMessage(alert_s, fa_check, message, validationProps.id, context, true) : validationProps.validationField.insertHTML(null);
 		target.classListRemove('border-danger').classListAdd('border-success');
 		errorCount[target[0].form.id] = Object.keys(errorBag[target[0].form.id]).length;
-		return this;
+		return target;
 	}
 	return [];
 }
 
+/**
+ * Get the Validation properties for the target element.
+ *
+ * @returns {{validationField: (*[]|NodeListOf<*>|boolean), invalidIcon: (*[]|NodeListOf<*>|boolean), id: string, validIcon: (*[]|NodeListOf<*>|boolean), validationIcon: (*[]|NodeListOf<*>|boolean)}|{}}
+ */
 Object.prototype.getValidationProps = function () {
 	if (this) {
-		const target = this;
+		const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
+			? Array.from(this) : (Array.isArray(this) ? this : [this]));
 		const formId = `#${target[0].form.id}`;
 		const targetId = `#${target[0].id}`;
 		
@@ -914,21 +983,31 @@ Object.prototype.getValidationProps = function () {
 	return {};
 }
 
+/**
+ * Get the initial submission text for the target form.
+ *
+ * @returns {*}
+ */
 Object.prototype.waitText = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	return $el(wait, target[0])[0].innerHTML;
 }
 
+/**
+ * Get the validation message element for the target form.
+ *
+ * @returns {*[]|NodeListOf<*>|boolean}
+ */
 Object.prototype.messageTag = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
-	
 	return $el(_response, target[0]);
 }
 
 /**
- * Returns the value of the elements' action attribute or data-action attribute [Only returns the latter if the initial is unavailable]
+ * Returns the value of the elements' action attribute or data-action attribute.
+ * [Only returns the latter if the initial is unavailable].
  *
  * @returns {string|*}
  */
@@ -939,11 +1018,22 @@ Object.prototype.getAction = function () {
 	return tag === 'form' ? (target[0].action ?? target[0].attribute('action')) : target[0].dataAttribute('action');
 }
 
+/**
+ * Return all elements of the target form element.
+ * Returns an error on the console if the target element is not a form.
+ * @returns {void|*}
+ */
 Object.prototype.allElements = function () {
 	const target = Array.isArray(this) ? this[0] : this
 	return ((target.tagName && target.tagName.toLowerCase() !== 'form') ? console.error(`function 'allElements()' expects 'form element' but '${target.tagName.toLowerCase()} element' was given`) : target.elements);
 }
 
+/**
+ * Disable or Enable the target element.
+ *
+ * @param option {boolean}
+ * @returns {[HTMLElement]}
+ */
 Object.prototype.disable = function (option = true) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -981,6 +1071,18 @@ Object.prototype.onModalClose = function (callback) {
 	});
 }
 
+/**
+ * Handle the submission of the target form using the fetch API (***https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API***)
+ * Returns a promise which can be used to handle actions after response of the resource.
+ *
+ * @param uri {string}
+ * @param method {string}
+ * @param data {Object|null}
+ * @param dataType {string}
+ * @param onSuccess
+ * @param onError
+ * @returns {Promise<unknown>}
+ */
 Object.prototype.handleFormSubmit = function ({uri = '', method = 'get', data = null, dataType = 'json', onSuccess, onError}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -1059,6 +1161,20 @@ Object.prototype.handleFormSubmit = function ({uri = '', method = 'get', data = 
 	});
 }
 
+/**
+ * Loads specified Page/HTML into the target element fro given URI.
+ * If the selector parameter is specified the it will load the content of the specified element for the given URI.
+ *
+ * @param uri {string}
+ * @param selector {selector|string}
+ * @param data {Object|null}
+ * @param overlay {string|null}
+ * @param dataType {string}
+ * @param slug {string}
+ * @param beforeSend
+ * @param callback
+ * @returns {Promise<unknown>}
+ */
 Object.prototype.loadPageData = async function ({uri, selector = null, data = null, overlay = null, dataType = 'text', slug = 'Page', beforeSend, callback}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -1078,7 +1194,7 @@ Object.prototype.loadPageData = async function ({uri, selector = null, data = nu
 					console.error(`${err.status} HTTP error: ${err.statusText} for ${requestType.toUpperCase()} request from URL: ${err.url}`)
 					if (overlay)
 						if ($el(overlay).getCssValue('display').toString().toLowerCase() !== 'none')
-							$el(overlay).fadeout({callback: () => $('body').classListRemove('overlay-shown')}).touchCssValue({display: 'none'});
+							$el(overlay).fadeout({callback: () => $el('body').classListRemove('overlay-shown')}).touchCssValue({display: 'none'});
 					reject(err);
 				},
 				onSuccess: (data) => {
@@ -1091,6 +1207,13 @@ Object.prototype.loadPageData = async function ({uri, selector = null, data = nu
 	});
 }
 
+/**
+ * Check if the target element has a scrollbar in the given direction.
+ * Default direction is vertical.
+ *
+ * @param direction {string}
+ * @returns {boolean|Error}
+ */
 Object.prototype.hasScrollBar = function (direction = 'vertical') {
 	const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]))[0];
@@ -1105,7 +1228,7 @@ Object.prototype.hasScrollBar = function (direction = 'vertical') {
 }
 
 /**
- * Create a new instance of Fusion Form Validator using the target element
+ * Create a new instance of Fusion Form Validator using the target element.
  *
  * @param form_group {string|selector}
  * @returns {FBFormValidate}
@@ -1118,7 +1241,7 @@ Object.prototype.initValidator = function (form_group) {
 
 
 /**
- * Selects the given element either by selector, or object with an optional context
+ * Selects the given element either by selector, or object with an optional context.
  * @param selector
  * @param context
  * @returns {*[]|NodeListOf<*>|boolean}
