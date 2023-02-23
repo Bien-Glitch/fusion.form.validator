@@ -140,8 +140,82 @@ Assuming the form has id `login-form` i.e.
 </form>
 ```
 
+Putting it all together we would have:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	
+	<!-- [Stylesheets] -->
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="plugins/bootstrap/css/bootstrap.css">
+	
+	<!-- Fontawesome -->
+	<link rel="stylesheet" href="plugins/fontawesome/css/all.css">
+	
+	<!-- FB-Formvalidator -->
+	<link rel="stylesheet" href="plugins/fb-formvalidator/css/fusion.form.validator.css">
+</head>
+
+<body>
+	<form action="" method="post" id="login-form">
+		<div class="form-group">
+			<div class="input-group align-items-stretch flex-nowrap">
+				<!-- N.B. The form-label-group class below is only for floating label. It is not needed if floating label is not intended. -->
+				<div class="form-label-group form-field-group required w-100">
+					<input type="email" id="email" class="form-control" placeholder="E-Mail Address">
+					<label for="email">E-Mail Address</label>
+				</div>
+			</div>
+			<!--N.B. This div should be empty. Its 'id' should be set to the id of the input, textarea, or select element with Valid appended.-->
+			<!-- e.g. if the input element id is email; this div should hav an id emailValid and class valid-text -->
+			<div id="emailValid" class="valid-text"></div>
+		</div>
+
+		<div class="form-group">
+			<div class="input-group align-items-stretch flex-nowrap">
+				<!-- N.B. The form-label-group class below is only for floating label. It is not needed if floating label is not intended. -->
+				<div class="form-label-group form-field-group required w-100">
+					<input minlength="8" type="password" id="password" class="form-control" placeholder="Password">
+					<label for="password">Password</label>
+				</div>
+			</div>
+			<!-- N.B. This div should be empty. Its 'id' should be set to the id of the input, textarea, or select element with Valid appended. -->
+			<!-- e.g. if the input element id is password; this div should hav an id passwordValid and class valid-text -->
+			<div id="passwordValid" class="valid-text"></div>
+		</div>
+
+		<div class="form-group">
+			<button type="submit" class="btn btn-sm btn-primary">
+				Submit
+				<!--<i class="ms-1 fa fa-1x fa-spin fa-spinner-third button-loader"></i>-->
+			</button>
+
+			<div class="form-message">
+				<div class="waiting-text d-none">
+					<i class="fa fa-1x fa-exclamation-circle text-danger"></i>
+					<span class="text-primary">Please Wait...</span>
+				</div>
+				<div class="response-text small"></div>
+			</div>
+		</div>
+	</form>
+</body>
+
+<!-- Bootstrap -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.js"></script>
+
+<!-- FB-Formvalidator -->
+<script src="plugins/fb-fomvalidator/js/fusion.form.util.js"></script>
+<script src="plugins/fb-fomvalidator/js/fusion.form.validator.js"></script>
+<script src="plugins/fb-fomvalidator/js/init.js"></script>
+</html>
+```
 \
-Instantiating and initializing the validator:
+Instantiating and initializing the validator (in your JS file):
 
 ```javascript
 // Instantiate the Validator:
