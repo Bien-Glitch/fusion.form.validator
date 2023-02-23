@@ -2,6 +2,8 @@
 > #### Form Validation plugin with fluent chainable utility methods.
 ---
 
+<br>
+
 ## Content
 
 - [Installation - Getting started](#installation)
