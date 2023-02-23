@@ -1,12 +1,9 @@
 # Fusion Form Validator and Utilities
 > #### Form Validation plugin with fluent chainable utility methods.
-
+---
 <br>
 
 ## Installation
-
----
-
 [Bootstrap](https://getbootstrap.com/) ^5.x, and [Fontawesome](https://fontawesome.com/) ^6.x are required.
 
 No worries, the above requirements are shipped along with the Fusion Form Validator package.\
@@ -82,9 +79,6 @@ Now all that is left is to add them into your document as so:
 > - The same goes for the `fusion.form.validator.js`, it must come after `jQuery js (If available)`, `bootstrap js`, and `fusion.form.util.js`.
 
 ## Usage
-
----
-
 *Firstly, ensure the stylesheets and scripts are linked in the correct hierarchy as in the above example. If you have problems getting it correctly, just copy the code in the example above and edit.*
 
 Out of the box, Fusion Form Validator ships with `init.js` file, so you can initialize, configure, and use the fusion form validator without messing up your other JS codes.\
@@ -250,15 +244,9 @@ validator.initValidation();
 > ```
 
 ## About
-
----
-
 Fusion form validator is an easy-to-use JS plugin for front-end form validation and miscellaneous utilities which requires little or no knowledge of JavaScript. Read through this documentation on how to set it up, and you're ready. It's fun to use and hassle-free.
 
 ## Creator
-
----
-
 ### [Bien Nwinate](https://github.com/Bien-Glitch)
 
 - https://twitter.com/nwinate
@@ -270,9 +258,6 @@ Fusion form validator is an easy-to-use JS plugin for front-end form validation 
 	- [Vorldline Team](https://github.com/Vorldline)
 
 ## Acknowledgement
-
----
-
 Thanks to God Almighty for making this project a possible.\
 Also a huge thanks to:
 
@@ -282,16 +267,11 @@ Also a huge thanks to:
 - And many others for their huge support
 
 ## Feedback
-
----
-
 If you discover a vulnerability or bug within the Fusion Form Validator, or have an improvement,\
 Please [open an issue on the Github page](https://github.com/Bien-Glitch/fusion.form.validator/issues) or send an e-mail to Bien Nwinate via [fusionboltinc@gmail.com](mailto:fusionboltinc@gmail.com).\
 All issues will be promptly addressed.
 
 ## Contact
-
----
 
 - E-Mail: [fusionboltinc@gmail.com](mailto:fusionboltinc@gmail.com)
 - Whatsapp DM: +234 815 744 9189
