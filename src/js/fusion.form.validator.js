@@ -83,8 +83,8 @@ class FBBaseComponent {
 		this._element = element
 	}
 	
-	static get DEFAULT_CONFIG() {
-		return this.prototype.config;
+	get DEFAULT_CONFIG() {
+		return this.config;
 	}
 	
 	static get VERSION() {

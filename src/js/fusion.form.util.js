@@ -26,10 +26,6 @@ let valid_right,
 	errorCount = {},
 	paddingMultipliers = {};
 
-
-const newBsAlert = (element) => new bootstrap.Alert(element);
-const newBsModal = (element, options) => new bootstrap.Modal(element, options);
-
 const alert_d = 'alert-danger';
 const alert_i = 'alert-info';
 const alert_s = 'alert-success';
@@ -43,37 +39,14 @@ const fa_info = 'fa-info';
 const fa_info_c = 'fa-info-circle';
 const fa_wifi_s = 'fa-wifi-slash';
 
-window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractionDigits: 2});
-
 /**
- *
- * @param show {NodeList|HTMLElement|[HTMLElement]}
- * @param hide {NodeList|HTMLElement|[HTMLElement]}
- * @param target {NodeList|HTMLElement|Object|Array}
- * @param showIcon {boolean}
+ * ----------------------------------------------------------
+ * (**Utility Methods**)
+ * ----------------------------------------------------------
  */
-window.toggleValidationIcon = ({show, hide}, target, showIcon) => {
-	if (showIcon) {
-		hide.fadeout();
-		target.addValidationPadding();
-		show.touchCssValue({right: valid_right}).fadein()
-	} else
-		target.removeValidationPadding();
-}
 
 /**
- *
- * @param value {string}
- * @returns {string}
- */
-window.spaceToComma = (value) => {
-	return value.trim().split(/[ ,]+/g).filter((val) => {
-		return val !== '';
-	}).join(', ');
-};
-
-/**
- * Validate the given form field element
+ * Validate the given form field element.
  *
  * @param context {HTMLElement|[HTMLElement]|undefined}
  * @param message {string|null}
@@ -121,7 +94,7 @@ Object.prototype.validate = function ({context, message = null, isPassword = fal
 }
 
 /**
- * Check if the form field element should be validated
+ * Check if the form field element should be validated.
  *
  * @returns {boolean|boolean}
  */
@@ -132,7 +105,7 @@ Object.prototype.needsValidation = function () {
 }
 
 /**
- * Set CSS styles to the given element using KeyValue Pairs
+ * Set CSS styles to the given element using KeyValue Pairs.
  *
  * @param keyValuePair {Object}
  * @returns {[HTMLElement]}
@@ -146,7 +119,7 @@ Object.prototype.touchCssValue = function (keyValuePair) {
 }
 
 /**
- * Get CSS style Value
+ * Get CSS style Value.
  *
  * @param property {string}
  * @returns {string|undefined}
@@ -162,7 +135,7 @@ Object.prototype.cssProperty = function () {
 }
 
 /**
- * Add class to the elements' class list
+ * Add class to the elements' class list.
  *
  * @param className {string}
  * @returns {[HTMLElement]}
@@ -175,7 +148,7 @@ Object.prototype.classListAdd = function (className) {
 }
 
 /**
- * Remove class from the elements' class list
+ * Remove class from the elements' class list.
  *
  * @param className {string}
  * @returns {[HTMLElement]}
@@ -188,7 +161,7 @@ Object.prototype.classListRemove = function (className) {
 }
 
 /**
- * Check if element has given class
+ * Check if element has given class.
  *
  * @param className {string}
  * @returns {boolean|undefined}
@@ -201,7 +174,7 @@ Object.prototype.includesClass = function (className) {
 }
 
 /**
- * Adds padding to the right of the element via the {padding_right} variable
+ * Adds padding to the right of the element via the {padding_right} variable.
  *
  * @returns {[HTMLElement]}
  */
@@ -214,7 +187,7 @@ Object.prototype.addValidationPadding = function () {
 }
 
 /**
- * Resets the value of the padding-right CSS property to the value of the padding-left CSS property of the element
+ * Resets the value of the padding-right CSS property to the value of the padding-left CSS property of the element.
  *
  * @returns {[HTMLElement]}
  */
@@ -228,7 +201,8 @@ Object.prototype.removeValidationPadding = function () {
 
 /**
  * Checks if the target element has the given element.
- * Returns an array of the element if true else an empty array is returned
+ *
+ * Returns an array of the element if true else an empty array is returned.
  *
  * @param element {NodeList|HTMLElement|[HTMLElement]}
  * @returns {*[]}
@@ -246,7 +220,8 @@ Object.prototype.nodeContains = function (element) {
 
 /**
  * Returns the Previous sibling of the target element.
- * Returns the sibling that matches the selector if the selector is given else the direct previous sibling is returned
+ *
+ * Returns the sibling that matches the selector if the selector is given else the direct previous sibling is returned.
  *
  * @param selector
  * @returns {HTMLElement|Element|*}
@@ -271,6 +246,7 @@ Object.prototype.previousSiblings = function (selector) {
 
 /**
  * Returns an array of the elements siblings.
+ *
  * An empty array is returned if there are no siblings.
  *
  * @returns {*[]}
@@ -285,7 +261,7 @@ Object.prototype.siblings = function () {
 }
 
 /**
- * Checks the status of given CSS Pseudo selector on the target element
+ * Checks the status of given CSS Pseudo selector on the target element.
  *
  * @param selector
  * @returns {boolean}
@@ -297,7 +273,7 @@ Object.prototype.selectorMatches = function (selector) {
 }
 
 /**
- * Checks if the mouse cursor is over the element
+ * Checks if the mouse cursor is over the element.
  *
  * @returns {Promise<boolean>}
  */
@@ -313,7 +289,7 @@ Object.prototype.mouseIsOver = async function () {
 }
 
 /**
- * Checks if the given form field element is a Phone number field
+ * Checks if the given form field element is a Phone number field.
  *
  * @returns {boolean}
  */
@@ -326,7 +302,7 @@ Object.prototype.isPhoneField = function () {
 }
 
 /**
- * Checks if the given form field element is a Password field
+ * Checks if the given form field element is a Password field.
  *
  * @returns {boolean}
  */
@@ -361,7 +337,7 @@ Object.prototype.regExpValidate = function ({regExp, context, message, customVal
 }
 
 /**
- * Validates the given input field as an E-Mail field with the given RegExp
+ * Validates the given input field as an E-Mail field with the given RegExp.
  *
  * @param regExp {RegExp}
  * @param context {HTMLElement|[HTMLElement]|undefined}
@@ -791,15 +767,14 @@ Object.prototype.upon = function (events, callback, option = false) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => {
-		if (typeof events === 'object') {
-			Object.keys(events).filter(evt => {
-				element.addEventListener(evt, (e) => handler.handleEvent({evt: e, prefix: 'on', callback: events[evt]}), option);
-			})
-		} else
+		if (typeof events === 'object')
+			Object.keys(events).filter(evt => element.addEventListener(evt, (e) => handler.handleEvent({evt: e, prefix: 'on', callback: events[evt]}), option));
+		else
 			typeof callback === 'function' ? element.addEventListener(events, (e) => callback(e), option) : console.error('Listener undefined');
 	});
 	return target;
 }
+
 
 /**
  * Displays validation message.
@@ -1048,6 +1023,7 @@ Object.prototype.disable = function (option = true) {
 
 /**
  * Load the given modal with a callback.
+ *
  * @param options {Object}
  * @param callback {function}
  * @returns {[HTMLElement]}
@@ -1062,6 +1038,7 @@ Object.prototype.onModalLoad = function (options, callback) {
 
 /**
  * Dispose the given modal with a callback.
+ *
  * @param callback
  */
 Object.prototype.onModalClose = function (callback) {
@@ -1072,7 +1049,8 @@ Object.prototype.onModalClose = function (callback) {
 }
 
 /**
- * Handle the submission of the target form using the fetch API (***https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API***)
+ * Handle the submission of the target form using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+ *
  * Returns a promise which can be used to handle actions after response of the resource.
  *
  * @param uri {string}
@@ -1162,7 +1140,8 @@ Object.prototype.handleFormSubmit = function ({uri = '', method = 'get', data = 
 }
 
 /**
- * Loads specified Page/HTML into the target element fro given URI.
+ * Loads specified Page/HTML into the target element from given URI.
+ *
  * If the selector parameter is specified the it will load the content of the specified element for the given URI.
  *
  * @param uri {string}
@@ -1209,6 +1188,7 @@ Object.prototype.loadPageData = async function ({uri, selector = null, data = nu
 
 /**
  * Check if the target element has a scrollbar in the given direction.
+ *
  * Default direction is vertical.
  *
  * @param direction {string}
@@ -1233,7 +1213,7 @@ Object.prototype.hasScrollBar = function (direction = 'vertical') {
  * @param form_group {string|selector}
  * @returns {FBFormValidate}
  */
-Object.prototype.initValidator = function (form_group) {
+Object.prototype.FBValidator = function (form_group) {
 	const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]));
 	return new FBFormValidate(target, form_group);
@@ -1282,9 +1262,10 @@ function $el(selector, context) {
 	}
 }
 
-//
+// Misc Functions.
 window.$fb = {
 	/**
+	 * Perform a fetch request using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 	 *
 	 * @param uri
 	 * @param method
@@ -1325,9 +1306,12 @@ window.$fb = {
 		}).catch(err => (typeof onError === 'function') && onError(err, status, statusText));
 	},
 	/**
+	 * Toggle the disabled state (property) of button.
+	 *
+	 * Also toggle the button loader if available.
 	 *
 	 * @param buttonElement
-	 * @param processIsDone
+	 * @param processIsDone {boolean}
 	 */
 	toggleButtonState(buttonElement, processIsDone = false) {
 		const target = ((buttonElement.constructor.name.toUpperCase() === 'NODELIST' || buttonElement.constructor.name.toUpperCase() === 'S')
@@ -1347,6 +1331,9 @@ window.$fb = {
 		}
 	},
 	/**
+	 * Manipulate the buttons state.
+	 *
+	 * (**N.B:** ***Depends on the toggleButtonState() function***).
 	 *
 	 * @param form
 	 * @param processIsDone
@@ -1358,6 +1345,9 @@ window.$fb = {
 		this.toggleButtonState(submitButton, processIsDone);
 	},
 	/**
+	 * Returns true if the string is a JSON string and can be parsed to a JSON Object.
+	 *
+	 * Returns false otherwise.
 	 *
 	 * @param JSONString
 	 * @returns {boolean}
@@ -1372,16 +1362,86 @@ window.$fb = {
 	}
 }
 
+
+/**
+ * Creates a new instance of Bootstrap Alert on the given element.
+ *
+ * @param element
+ * @returns {Alert}
+ */
+const newBsAlert = (element) => new bootstrap.Alert(element);
+
+/**
+ * Creates a new instance of Bootstrap Modal on the given element.
+ *
+ * @param element
+ * @param options
+ * @returns {Modal}
+ */
+const newBsModal = (element, options) => new bootstrap.Modal(element, options);
+
+/**
+ *
+ * @param number {number|string}
+ * @returns {string}
+ */
+window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+/**
+ *
+ * @param show {NodeList|HTMLElement|[HTMLElement]}
+ * @param hide {NodeList|HTMLElement|[HTMLElement]}
+ * @param target {NodeList|HTMLElement|Object|Array}
+ * @param showIcon {boolean}
+ */
+window.toggleValidationIcon = ({show, hide}, target, showIcon) => {
+	if (showIcon) {
+		hide.fadeout();
+		target.addValidationPadding();
+		show.touchCssValue({right: valid_right}).fadein()
+	} else
+		target.removeValidationPadding();
+}
+
+/**
+ *
+ * @param value {string}
+ * @returns {string}
+ */
+window.spaceToComma = (value) => {
+	return value.trim().split(/[ ,]+/g).filter((val) => {
+		return val !== '';
+	}).join(', ');
+};
+
+/**
+ * Multiply the values using the CSS calc() function
+ *
+ * @param pad1 {number|string}
+ * @param pad2 {number|string}
+ * @returns {string}
+ */
 function multiplyPadding(pad1, pad2) {
 	return `calc(${pad1} + ${pad2}px)`;
 }
 
+/**
+ * Toggle Validation of the target element.
+ *
+ * @param element
+ * @param target
+ */
 function checkValidate(element, target) {
 	element[0].needsValidation() ?
 		element.validate({context: target}) :
 		element.removeValidationMessage({context: target, removeAlert: true});
 }
 
+/**
+ * Remove all corresponding validation elements when the targets' validation alert is closed.
+ *
+ * @param context
+ */
 function onAlertClose(context) {
 	$el('.alert').upon('close.bs.alert', function (e) {
 		const target = e.currentTarget;
@@ -1390,6 +1450,12 @@ function onAlertClose(context) {
 	});
 }
 
+/**
+ * Checks the validity of the Card Number (Payment Card) using Luhn's Algorithm.
+ *
+ * @param numberInput {number|string}
+ * @returns {boolean}
+ */
 function checkLuhn(numberInput) {
 	const sumDigit = (c) => (c < 10) ? c :
 		sumDigit(Math.trunc(c / 10) + (c % 10));
@@ -1400,6 +1466,12 @@ function checkLuhn(numberInput) {
 		.reduce((acc, v) => acc + v) % 10 === 0;
 }
 
+/**
+ * Parse the input and return the boolean equivalent.
+ *
+ * @param value
+ * @returns {boolean}
+ */
 function parseBool(value) {
 	switch (value) {
 		case true:
@@ -1415,40 +1487,114 @@ function parseBool(value) {
 }
 
 const handler = {
+	/**
+	 * Handle incoming EventListener event from the upon() function.
+	 *
+	 * @param evt
+	 * @param prefix
+	 * @param callback
+	 * @returns {false}
+	 */
 	handleEvent({evt, prefix, callback}) {
 		const handler = `${prefix}${evt.type}`;
 		return typeof this[handler] === 'function' && this[handler](evt, callback);
 	},
+	/**
+	 * Custom event from the handler.
+	 *
+	 * @param event
+	 * @param callback
+	 */
 	customEvent(event, callback) {
 		typeof callback === 'function' && callback(event);
 	},
+	/**
+	 * OnBlur Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onblur(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnClick Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onclick(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnFocus Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onfocus(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnKeyup Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onkeyup(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnKeydown Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onkeydown(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnInput Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	oninput(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnMouseenter Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onmouseenter(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnMouseleave Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onmouseleave(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnChange Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onchange(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
+	/**
+	 * OnKeypress Event
+	 *
+	 * @param element
+	 * @param callback
+	 */
 	onkeypress(element, callback) {
 		typeof callback === 'function' && this.customEvent(element, callback);
 	},
