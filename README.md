@@ -1,6 +1,19 @@
 # Fusion Form Validator and Utilities
 > #### Form Validation plugin with fluent chainable utility methods.
 ---
+
+## Content
+
+- [Installation - Getting started](#installation)
+- [Installation - Note](#note)
+- [Usage](#usage)
+- [Configuration Options](#available-config-options)
+- [About](#about)
+- [Creator](#creator)
+- [Acknowledgement](#acknowledgement)
+- [Feedback](#feedback)
+- [Contact](#contact)
+
 <br>
 
 ## Installation
@@ -174,7 +187,7 @@ Putting it all together we would have:
 			<!-- e.g. if the input element id is email; this div should hav an id emailValid and class valid-text -->
 			<div id="emailValid" class="valid-text"></div>
 		</div>
-
+		
 		<div class="form-group">
 			<div class="input-group align-items-stretch flex-nowrap">
 				<!-- N.B. The form-label-group class below is only for floating label. It is not needed if floating label is not intended. -->
@@ -187,13 +200,13 @@ Putting it all together we would have:
 			<!-- e.g. if the input element id is password; this div should hav an id passwordValid and class valid-text -->
 			<div id="passwordValid" class="valid-text"></div>
 		</div>
-
+		
 		<div class="form-group">
 			<button type="submit" class="btn btn-sm btn-primary">
 				Submit
 				<!--<i class="ms-1 fa fa-1x fa-spin fa-spinner-third button-loader"></i>-->
 			</button>
-
+			
 			<div class="form-message">
 				<div class="waiting-text d-none">
 					<i class="fa fa-1x fa-exclamation-circle text-danger"></i>
@@ -214,6 +227,7 @@ Putting it all together we would have:
 <script src="plugins/fb-fomvalidator/js/init.js"></script>
 </html>
 ```
+
 \
 Instantiating and initializing the validator (in your JS file):
 
