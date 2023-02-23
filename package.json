@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "@bien-glitch/fusion.form.validator": "^1.0.0"
+  },
+  "name": "fusion.form.utils",
+  "description": "> #### Form Validation plugin with fluent chainable utility methods. ---",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bien-Glitch/fusion.form.utils.git"
+  },
+  "keywords": [
+    "validator",
+    "form",
+    "validator",
+    "validation",
+    "form",
+    "validation",
+    "form"
+  ],
+  "author": "Bien Nwinate",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bien-Glitch/fusion.form.utils/issues"
+  },
+  "homepage": "https://github.com/Bien-Glitch/fusion.form.utils#readme"
+}
