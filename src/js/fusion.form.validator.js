@@ -1,6 +1,6 @@
 /*!
-* Fusion Form Validator V1.0
-* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.0)
+* Fusion Form Validator V1.0.0
+* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.0.0)
 * Copyright 2023 Fusion Bolt inc.
 */
 
@@ -88,7 +88,7 @@ class FBBaseComponent {
 	}
 	
 	static get VERSION() {
-		return '1.0';
+		return '1.0.0';
 	}
 }
 
