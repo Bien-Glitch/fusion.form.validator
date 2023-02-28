@@ -1,12 +1,12 @@
 /*!
-* Fusion Form Validator V1.0
-* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.0)
+* Fusion Form Validator V1.1.0
+* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.1.0)
 * Copyright 2023 Fusion Bolt inc.
 */
 
 /**
  * ----------------------------------------------------------
- * Fusion Form Validator - Utilities (v1.0.0)
+ * Fusion Form Validator - Utilities (v1.1.0)
  * ----------------------------------------------------------
  * (**Global Variables Declaration**)
  */
@@ -306,12 +306,12 @@ Object.prototype.isPhoneField = function () {
  *
  * @returns {boolean}
  */
-Object.prototype.isPasswordField = function () {
+Object.prototype.isPasswordField = function (passwordId) {
 	const target = this;
 	const elementId = target.attribute('id') && target.id.toLowerCase();
 	const elementName = target.attribute('name') && target.name.toLowerCase();
 	const elementType = target.attribute('type') && target.type.toLowerCase();
-	return !!((elementType && elementType.toLowerCase() === 'password') || (elementId && elementId.toLowerCase().includes('password'))) || (elementName && elementName.toLowerCase().includes('password'));
+	return !!((elementType && elementType.toLowerCase() === 'password') || (elementId && elementId.toLowerCase().includes(passwordId))) || (elementName && elementName.toLowerCase().includes(passwordId));
 }
 
 /**
@@ -488,19 +488,52 @@ Object.prototype.HTMLAfter = function (value) {
  *
  * @param timeout {number}
  * @param toggleDisplay {boolean}
+ * @param display
  * @param callback
  * @returns {[HTMLElement]}
  */
-Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, callback} = {}) {
+Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, display = 'block', callback} = {}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
 	target.forEach(element => {
 		let timeoutID = {},
-			display = element.getCssValue('display');
-		element.touchCssValue({opacity: 0, transition: `all ${timeout}ms`})
+			_display = element.getCssValue('display');
+		toggleDisplay && (_display === 'none' && element.touchCssValue({opacity: 0, transition: `all ${timeout}ms`}));
 		
 		const timeOutFunc = (callback) => {
+			const animation = () => {
+				const keyframes = [
+					{opacity: 0, display: 'none'},
+					{opacity: '100%', display: display}
+				]
+				const timing = {
+					duration: timeout,
+					iterations: 1
+				}
+				
+				if (toggleDisplay && _display === 'none') {
+					// display === 'none' && (element.touchCssValue({display: 'block'}));
+					currentAnimation = element.animate(keyframes, timing);
+					currentAnimation.id = 'fadein';
+				}
+				clearTimeout(timeoutID[element.id]);
+				
+				setTimeout(() => {
+					toggleDisplay && element.touchCssValue({opacity: 1, display: display});
+					element.touchCssValue({animation: null, transition: null});
+					/*currentAnimation = null;*/
+					typeof callback === 'function' && callback(target)
+				}, timeout);
+			}
+			!!currentAnimation ? currentAnimation.finished.then(() => animation()) : animation();
+		};
+		
+		timeoutID[element.id] = setTimeout(() => {
+			timeOutFunc(callback);
+		}, 0)
+		
+		/*const timeOutFunc = (callback) => {
 			element.touchCssValue({opacity: 1});
 			// (element.touchCssValue({visibility: 'visible'}));
 			clearTimeout(timeoutID[element.id]);
@@ -510,7 +543,7 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, callb
 		
 		timeoutID[element.id] = setTimeout(() => {
 			timeOutFunc(callback);
-		}, 0);
+		}, 0);*/
 	});
 	return target;
 }
@@ -529,8 +562,43 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 	
 	target.forEach(element => {
 		let timeoutID = {},
-			display = element.getCssValue('display');
-		element.touchCssValue({opacity: 1, transition: `all ${timeout}ms`});
+			_display = element.getCssValue('display');
+		toggleDisplay && (_display !== 'none' && element.touchCssValue({opacity: 1, transition: `all ${timeout}ms`}));
+		
+		const timeOutFunc = (callback) => {
+			const animation = () => {
+				const keyframes = [
+					{opacity: 1},
+					{opacity: '100%', display: 'none'}
+				]
+				const timing = {
+					duration: timeout,
+					iterations: 1
+				}
+				
+				if (toggleDisplay && _display !== 'none') {
+					// display === 'none' && (element.touchCssValue({display: 'block'}));
+					currentAnimation = element.animate(keyframes, timing);
+					currentAnimation.id = 'fadeout';
+				}
+				clearTimeout(timeoutID[element.id]);
+				
+				setTimeout(() => {
+					toggleDisplay && element.touchCssValue({display: 'none'});
+					element.touchCssValue({opacity: 0});
+					element.touchCssValue({animation: null, transition: null});
+					/*currentAnimation = null;*/
+					typeof callback === 'function' && callback(target)
+				}, timeout);
+			}
+			!!currentAnimation ? currentAnimation.finished.then(() => animation()) : animation();
+		};
+		
+		timeoutID[element.id] = setTimeout(() => {
+			timeOutFunc(callback);
+		}, 0);
+		
+		/*element.touchCssValue({opacity: 1, transition: `all ${timeout}ms`});
 		
 		const timeOutFunc = (callback) => {
 			element.touchCssValue({opacity: 0});
@@ -544,7 +612,7 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 		
 		timeoutID[element.id] = setTimeout(() => {
 			timeOutFunc(callback);
-		}, 0);
+		}, 0);*/
 	});
 	return target;
 }
@@ -879,7 +947,6 @@ Object.prototype.removeValidationMessage = function ({context, removeAlert = fal
 	target.removeValidationPadding();
 	
 	if (removeAlert)
-		// TODO: Check for proper way to close BS Alert
 		$el(`#${validationFieldId} > .alert`, context).forEach(field => newBsAlert(field).close());
 	target.classListRemove('border-danger').classListRemove('border-success');
 	
@@ -1396,9 +1463,9 @@ window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractio
  */
 window.toggleValidationIcon = ({show, hide}, target, showIcon) => {
 	if (showIcon) {
-		hide.fadeout();
+		hide.fadeout({timeout: 10});
 		target.addValidationPadding();
-		show.touchCssValue({right: valid_right}).fadein()
+		show.touchCssValue({right: valid_right}).fadein({timeout: 10, toggleDisplay: true});
 	} else
 		target.removeValidationPadding();
 }
