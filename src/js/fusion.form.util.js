@@ -499,7 +499,7 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, displ
 	target.forEach(element => {
 		let timeoutID = {},
 			_display = element.getCssValue('display');
-		toggleDisplay && (_display === 'none' && element.touchCssValue({opacity: 0, transition: `all ${timeout}ms`}));
+		toggleDisplay && (_display === 'none' && element.touchCssValue({opacity: 0, transition: `all ease-in-out ${timeout}ms`}));
 		
 		const timeOutFunc = (callback) => {
 			const animation = () => {
@@ -518,9 +518,9 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, displ
 					currentAnimation.id = 'fadein';
 				}
 				clearTimeout(timeoutID[element.id]);
+				toggleDisplay && element.touchCssValue({opacity: 1, display: display});
 				
 				setTimeout(() => {
-					toggleDisplay && element.touchCssValue({opacity: 1, display: display});
 					element.touchCssValue({animation: null, transition: null});
 					/*currentAnimation = null;*/
 					typeof callback === 'function' && callback(target)
@@ -532,18 +532,6 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, displ
 		timeoutID[element.id] = setTimeout(() => {
 			timeOutFunc(callback);
 		}, 0)
-		
-		/*const timeOutFunc = (callback) => {
-			element.touchCssValue({opacity: 1});
-			// (element.touchCssValue({visibility: 'visible'}));
-			clearTimeout(timeoutID[element.id]);
-			toggleDisplay && element.touchCssValue({display: 'block'})
-			setTimeout(() => typeof callback === 'function' && callback(element), timeout);
-		};
-		
-		timeoutID[element.id] = setTimeout(() => {
-			timeOutFunc(callback);
-		}, 0);*/
 	});
 	return target;
 }
@@ -568,8 +556,8 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 		const timeOutFunc = (callback) => {
 			const animation = () => {
 				const keyframes = [
-					{opacity: 1},
-					{opacity: '100%', display: 'none'}
+					{opacity: 1, display: 'block'},
+					{opacity: 0}
 				]
 				const timing = {
 					duration: timeout,
@@ -577,17 +565,15 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 				}
 				
 				if (toggleDisplay && _display !== 'none') {
-					// display === 'none' && (element.touchCssValue({display: 'block'}));
 					currentAnimation = element.animate(keyframes, timing);
 					currentAnimation.id = 'fadeout';
 				}
 				clearTimeout(timeoutID[element.id]);
 				
 				setTimeout(() => {
-					toggleDisplay && element.touchCssValue({display: 'none'});
 					element.touchCssValue({opacity: 0});
+					toggleDisplay && element.touchCssValue({display: 'none'});
 					element.touchCssValue({animation: null, transition: null});
-					/*currentAnimation = null;*/
 					typeof callback === 'function' && callback(target)
 				}, timeout);
 			}
@@ -597,22 +583,6 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 		timeoutID[element.id] = setTimeout(() => {
 			timeOutFunc(callback);
 		}, 0);
-		
-		/*element.touchCssValue({opacity: 1, transition: `all ${timeout}ms`});
-		
-		const timeOutFunc = (callback) => {
-			element.touchCssValue({opacity: 0});
-			setTimeout(() => {
-				// (element.touchCssValue({visibility: 'hidden'}))
-				clearTimeout(timeoutID[element.id]);
-				toggleDisplay && element.touchCssValue({display: 'none'});
-				typeof callback === 'function' && callback(element)
-			}, Math.floor(timeout / 2));
-		};
-		
-		timeoutID[element.id] = setTimeout(() => {
-			timeOutFunc(callback);
-		}, 0);*/
 	});
 	return target;
 }
@@ -1287,48 +1257,6 @@ Object.prototype.FBValidator = function (form_group) {
 }
 
 
-/**
- * Selects the given element either by selector, or object with an optional context.
- * @param selector
- * @param context
- * @returns {*[]|NodeListOf<*>|boolean}
- */
-function $el(selector, context) {
-	
-	try {
-		const _context = context && ((context.constructor.name.toUpperCase() === 'NODELIST' || context.constructor.name.toUpperCase() === 'S')
-			? Array.from(context) : (Array.isArray(context) ? context : [context]))[0];
-		
-		if (selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase().includes('HTML')) {
-			if (context) {
-				const target = ((selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase() === 'S')
-					? Array.from(selector) : (Array.isArray(selector) ? selector : [selector]));
-				
-				if (target.length) {
-					let _target = target[0];
-					
-					if (target.length < 2) {
-						const _selector = `#${_target.id}` || _target.tagName.toLowerCase();
-						return _context.querySelectorAll(_selector);
-					}
-					
-					target.classListAdd('fb-marked');
-					const selected = _context.querySelectorAll('.fb-marked');
-					target.classListRemove('fb-marked');
-					selected.classListRemove('fb-marked');
-					return selected;
-				}
-			}
-			return selector;
-		}
-		return context ? [].slice.call(_context.querySelectorAll(selector)) : document.querySelectorAll(selector);
-	} catch (error) {
-		/* Uncomment for debugging purposes only. */
-		// console.error(error);
-		return false;
-	}
-}
-
 // Misc Functions.
 window.$fb = {
 	/**
@@ -1550,6 +1478,48 @@ function parseBool(value) {
 			return true;
 		default:
 			return false;
+	}
+}
+
+
+/**
+ * Selects the given element either by selector, or object with an optional context.
+ * @param selector
+ * @param context
+ * @returns {*[]|NodeListOf<*>|boolean}
+ */
+function $el(selector, context) {
+	try {
+		const _context = context && ((context.constructor.name.toUpperCase() === 'NODELIST' || context.constructor.name.toUpperCase() === 'S')
+			? Array.from(context) : (Array.isArray(context) ? context : [context]))[0];
+		
+		if (selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase().includes('HTML')) {
+			if (context) {
+				const target = ((selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase() === 'S')
+					? Array.from(selector) : (Array.isArray(selector) ? selector : [selector]));
+				
+				if (target.length) {
+					let _target = target[0];
+					
+					if (target.length < 2) {
+						const _selector = `#${_target.id}` || _target.tagName.toLowerCase();
+						return _context.querySelectorAll(_selector);
+					}
+					
+					target.classListAdd('fb-marked');
+					const selected = _context.querySelectorAll('.fb-marked');
+					target.classListRemove('fb-marked');
+					selected.classListRemove('fb-marked');
+					return selected;
+				}
+			}
+			return selector;
+		}
+		return context ? [].slice.call(_context.querySelectorAll(selector)) : document.querySelectorAll(selector);
+	} catch (error) {
+		/* Uncomment for debugging purposes only. */
+		// console.error(error);
+		return false;
 	}
 }
 

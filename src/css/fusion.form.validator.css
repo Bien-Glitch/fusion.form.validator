@@ -125,7 +125,7 @@ body {
   border: 1px solid transparent;
   border-radius: 0.25rem;
 }
-.valid-text .alert.capslock-alert {
+.valid-text .capslock-alert {
   display: none;
   padding: 0.5rem;
   margin-top: 0.3rem !important;

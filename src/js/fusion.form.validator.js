@@ -58,7 +58,7 @@ class FBBaseComponent {
 		this.#_passwordTogglerWrapper = (icon) => `<a class="position-absolute text-muted toggle password-toggler-icon">${icon}</a>`;
 		this.#_validIconWrapper = (icon) => `<small class="position-absolute text-success valid validation-icon">${icon}</small>`;
 		this.#_invalidIconWrapper = (icon) => `<small class="position-absolute text-danger invalid validation-icon">${icon}</small>`;
-		this.#_passwordCapslockWrapper = (icon, text) => `<div class="valid-text"><small class="alert alert-info capslock-alert">${icon} ${text}</small></div>`;
+		this.#_passwordCapslockWrapper = (icon, text) => `<div class="valid-text d-flex"><small class="bg-white shadow-sm text-danger capslock-alert p-1 m-auto">${icon} ${text}</small></div>`;
 	}
 	
 	get baseElement() {
@@ -250,16 +250,15 @@ class FBFormValidate extends FBBaseComponent {
 							}
 						},
 						keyup: function (e) {
+							const key = e.key.toLowerCase();
 							const _toggler = $el(toggler, target);
 							const _capslockAlert = $el(capslockAlert, target);
 							const filterType = new Set(['date', 'month', 'datetime', 'datetime-local']);
 							const capslockIsOn = e.getModifierState('CapsLock');
 							(_inputElement[0].type && filterType.has(_inputElement[0].type.toLowerCase())) && _inputElement.validate({context: target});
 							
-							// TODO: Toggle Password CapsLock alert message when CapsLock is toggled.
-							/*($el(target).nodeContains(_capslockAlert[0]).length) && capslockIsOn ?
-								_capslockAlert.fadein({toggleDisplay: true, timeout: 100}) :
-								_capslockAlert.fadeout({toggleDisplay: true, timeout: 100});*/
+							if (_capslockAlert.length)
+								capslockIsOn ? _capslockAlert.fadein({timeout: 500, toggleDisplay: true, display: 'inline-block'}) : _capslockAlert.fadeout({timeout: 500, toggleDisplay: true});
 							
 							if (elementId && elementId.toLowerCase().includes(validationConfig.passwordId)) {
 								if ($el(form_field_group, target).nodeContains(_toggler[0]).length) {
@@ -618,6 +617,18 @@ class FBFormValidate extends FBBaseComponent {
 	set validationIcons(options) {
 		let _options = (options && typeof options === 'object') ? options : this.#_validationIcons;
 		this.touchConfig(_options, this.#_validationIcons);
+		return this;
+	}
+	
+	/**
+	 * **Set Validation Texts configuration**
+	 *
+	 * @param options
+	 * @returns
+	 */
+	set validationTexts(options) {
+		let _options = (options && typeof options === 'object') ? options : this.#_validationTexts;
+		this.touchConfig(_options, this.#_validationTexts);
 		return this;
 	}
 	
