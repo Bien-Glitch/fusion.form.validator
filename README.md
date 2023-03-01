@@ -354,6 +354,7 @@ Also a huge thanks to:
 - [ScaletFox ltd](https://github.com/scaletfoxltd)
 - [Victor](https://github.com/echovick)
 - [Omotayo](https://github.com/omotayosam)
+- [Jacob](https://github.com/BojakePoleman)
 - And many others for their huge support
 
 ## Feedback
