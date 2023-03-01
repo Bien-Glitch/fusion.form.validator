@@ -1,17 +1,18 @@
 /*!
-* Fusion Form Validator V1.0.0
-* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.0.0)
+* Fusion Form Validator V1.1.0
+* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.1.0)
 * Copyright 2023 Fusion Bolt inc.
 */
 
 /**
  * ----------------------------------------------------------
- * Fusion Form Validator - Validator (v1.0.0):
+ * Fusion Form Validator - Validator (v1.1.0):
  * ----------------------------------------------------------
  * (**Base-Component**)
  */
 class FBBaseComponent {
 	#_config;
+	#_passwordCapslockWrapper;
 	#_passwordTogglerWrapper;
 	#_validIconWrapper;
 	#_invalidIconWrapper;
@@ -28,6 +29,10 @@ class FBBaseComponent {
 			validIcon: '<i class="fa far fa-1x fa-check"></i>',
 			invalidIcon: '<i class="fa far fa-1x fa-exclamation-circle"></i>',
 			passwordToggleIcon: '<i class="fa fa-eye"></i>',
+			passwordCapslockAlertIcon: '<i class="fa far fa-exclamation-triangle"></i>',
+		},
+		validationTexts: {
+			capslock: 'Capslock is on',
 		},
 		validationConfig: {
 			showPassword: true,
@@ -53,6 +58,7 @@ class FBBaseComponent {
 		this.#_passwordTogglerWrapper = (icon) => `<a class="position-absolute text-muted toggle password-toggler-icon">${icon}</a>`;
 		this.#_validIconWrapper = (icon) => `<small class="position-absolute text-success valid validation-icon">${icon}</small>`;
 		this.#_invalidIconWrapper = (icon) => `<small class="position-absolute text-danger invalid validation-icon">${icon}</small>`;
+		this.#_passwordCapslockWrapper = (icon, text) => `<div class="valid-text d-flex"><small class="bg-white shadow-sm text-danger capslock-alert p-1 m-auto">${icon} ${text}</small></div>`;
 	}
 	
 	get baseElement() {
@@ -65,6 +71,10 @@ class FBBaseComponent {
 	
 	get config() {
 		return this.#_config;
+	}
+	
+	get passwordCapslockAlert() {
+		return this.#_passwordCapslockWrapper
 	}
 	
 	get passwordToggler() {
@@ -88,13 +98,13 @@ class FBBaseComponent {
 	}
 	
 	static get VERSION() {
-		return '1.0.0';
+		return '1.1.0';
 	}
 }
 
 /**
  * ----------------------------------------------------------
- * Fusion Form Validator (v1.0.0):
+ * Fusion Form Validator (v1.1.0):
  * ----------------------------------------------------------
  * (**Validate Form**)
  */
@@ -103,7 +113,9 @@ class FBFormValidate extends FBBaseComponent {
 	#_padding;
 	#_validationConfig;
 	#_validationIcons;
+	#_validationTexts;
 	#_passwordToggler;
+	#_passwordCapslockAlert;
 	#_invalidIcon;
 	#_validIcon;
 	
@@ -126,10 +138,12 @@ class FBFormValidate extends FBBaseComponent {
 		this.#_regExp = _config.regExp;
 		this.#_validationConfig = _config.validationConfig;
 		this.#_validationIcons = _config.validationIcons;
+		this.#_validationTexts = _config.validationTexts;
 		
 		this.#_validIcon = this.validIcon;
 		this.#_invalidIcon = this.invalidIcon;
 		this.#_passwordToggler = this.passwordToggler;
+		this.#_passwordCapslockAlert = this.passwordCapslockAlert;
 	}
 	
 	touchConfig(options, config) {
@@ -142,8 +156,10 @@ class FBFormValidate extends FBBaseComponent {
 			this._form.forEach((form, idx) => {
 				let regExp = this.#_regExp,
 					validationIcons = this.#_validationIcons,
+					validationTexts = this.#_validationTexts,
 					validationConfig = this.#_validationConfig,
 					passwordTogglerWrapper = this.#_passwordToggler,
+					passwordCapslockAlertWrapper = this.#_passwordCapslockAlert,
 					invalidWrapper = this.#_invalidIcon,
 					validWrapper = this.#_validIcon,
 					context = `#${form.id} ${this._element}`;
@@ -161,6 +177,7 @@ class FBFormValidate extends FBBaseComponent {
 					const inputElement = 'input:not(.bs-searchbox > input)';
 					const element = `${inputElement}, ${textAreaElement}, ${selectElement}`;
 					const toggler = '.password-toggler-icon';
+					const capslockAlert = '.capslock-alert';
 					let _selectElement = $el(selectElement, target),
 						_textAreaElement = $el(textAreaElement, target),
 						_selected = $el(selected, target),
@@ -172,7 +189,8 @@ class FBFormValidate extends FBBaseComponent {
 					
 					target.nodeContains(_element[0]).length && target.setAttribute('id', `${elementId}_group`);
 					_inputElement.length && _inputElement.attribute('type') === 'password' && _inputElement.HTMLAfter(passwordTogglerWrapper(validationIcons.passwordToggleIcon));
-					$el(form_field_group, target).appendHTML(validWrapper(validationIcons.validIcon)).appendHTML(invalidWrapper(validationIcons.invalidIcon)); // TODO: changed from '.input-group' to form_field_group
+					$el(form_field_group, target).appendHTML(validWrapper(validationIcons.validIcon)).appendHTML(invalidWrapper(validationIcons.invalidIcon));
+					(elementId.toString().toLowerCase().includes(validationConfig.passwordId) || $el(target).nodeContains($el(`#${validationConfig.passwordId}`)[0]).length) && $el(target).prependHTML(passwordCapslockAlertWrapper(validationIcons.passwordCapslockAlertIcon, validationTexts.capslock));
 					
 					_inputElement.upon({
 						input: function (e) {
@@ -187,10 +205,10 @@ class FBFormValidate extends FBBaseComponent {
 							
 							if (_input.needsValidation()) {
 								if (!filterType.has(elementType) && !filterType.has(fbRole) && !filterId.has(elementId))
-									if (!_input.isPasswordField())
+									if (!_input.isPasswordField(validationConfig.passwordId))
 										_inputElement.validate({context: target});
 									else
-										_input.isPasswordField() && validatePassword();
+										_input.isPasswordField(validationConfig.passwordId) && validatePassword();
 								
 								if (elementId.includes('name') || fbRole === 'name')
 									if (validationConfig.validateName)
@@ -231,28 +249,37 @@ class FBFormValidate extends FBBaseComponent {
 								(filterType.has(elementType) && elementType !== 'email') && _inputElement.validate({context: target});
 							}
 						},
-						keyup: function () {
+						keyup: function (e) {
+							const key = e.key.toLowerCase();
 							const _toggler = $el(toggler, target);
+							const _capslockAlert = $el(capslockAlert, target);
 							const filterType = new Set(['date', 'month', 'datetime', 'datetime-local']);
+							const capslockIsOn = e.getModifierState('CapsLock');
 							(_inputElement[0].type && filterType.has(_inputElement[0].type.toLowerCase())) && _inputElement.validate({context: target});
 							
-							if ($el(form_field_group, target).nodeContains(_toggler[0]).length)
-								if (elementId && elementId.toLowerCase().includes('password') && validationConfig.showPassword) {
-									if (requireRefill)
-										if (!_inputElement[0].value.length) {
-											_toggler.dataAttribute('refill', 'false');
-											requireRefill = parseBool(_toggler.dataAttribute('refill'));
-										}
-									(!requireRefill && _inputElement[0].value.length) ?
-										_toggler.touchCssValue({right: `${toggler_padding_right}px`}).fadein() :
-										_toggler.fadeout().dataAttribute('refill', false);
+							if (_capslockAlert.length)
+								capslockIsOn ? _capslockAlert.fadein({timeout: 500, toggleDisplay: true, display: 'inline-block'}) : _capslockAlert.fadeout({timeout: 500, toggleDisplay: true});
+							
+							if (elementId && elementId.toLowerCase().includes(validationConfig.passwordId)) {
+								if ($el(form_field_group, target).nodeContains(_toggler[0]).length) {
+									if (validationConfig.showPassword) {
+										if (requireRefill)
+											if (!_inputElement[0].value.length) {
+												_toggler.dataAttribute('refill', 'false');
+												requireRefill = parseBool(_toggler.dataAttribute('refill'));
+											}
+										(!requireRefill && _inputElement[0].value.length) ?
+											_toggler.touchCssValue({right: `${toggler_padding_right}px`}).fadein({toggleDisplay: true, timeout: 100}) :
+											_toggler.fadeout({timeout: 100}).dataAttribute('refill', false);
+									}
 								}
+							}
 						},
 						blur: function () {
 							let _toggler = $el(toggler, target);
 							
 							if ($el(form_field_group, target).nodeContains(_toggler[0]).length)
-								if ((elementId && elementId.toLowerCase().includes('password')) && validationConfig.showPassword) {
+								if ((elementId && elementId.toLowerCase().includes(validationConfig.passwordId)) && validationConfig.showPassword) {
 									_toggler.mouseIsOver().then(isOver => {
 										if (!isOver && _inputElement[0].value.length && _inputElement[0].type !== 'text') {
 											toggler_padding_right = 0;
@@ -261,7 +288,7 @@ class FBFormValidate extends FBBaseComponent {
 										}
 									});
 								}
-						}
+						},
 					});
 					_selectElement.upon('change', (e) => $el(e.currentTarget).needsValidation() && $el(e.currentTarget).validate({context: target}));
 					_textAreaElement.upon('input', (e) => $el(e.currentTarget).needsValidation() && $el(e.currentTarget).validate({context: target}));
@@ -456,7 +483,7 @@ class FBFormValidate extends FBBaseComponent {
 								let currentTarget = e.currentTarget,
 									_passwordField = currentTarget.previousSiblings('input');
 								
-								if (_passwordField.isPasswordField()) {
+								if (_passwordField.isPasswordField(validationConfig.passwordId)) {
 									if (_passwordField.type && _passwordField.type.toLowerCase() === 'password') {
 										_passwordField.setAttribute('type', 'text');
 										$el('i', currentTarget).classListAdd('fa-eye-slash').classListRemove('fa-eye')
@@ -534,6 +561,10 @@ class FBFormValidate extends FBBaseComponent {
 		return this.#_validationIcons;
 	}
 	
+	get validationTexts() {
+		return this.#_validationTexts;
+	}
+	
 	
 	/**
 	 * ----------------------------------------------------------
@@ -586,6 +617,18 @@ class FBFormValidate extends FBBaseComponent {
 	set validationIcons(options) {
 		let _options = (options && typeof options === 'object') ? options : this.#_validationIcons;
 		this.touchConfig(_options, this.#_validationIcons);
+		return this;
+	}
+	
+	/**
+	 * **Set Validation Texts configuration**
+	 *
+	 * @param options
+	 * @returns
+	 */
+	set validationTexts(options) {
+		let _options = (options && typeof options === 'object') ? options : this.#_validationTexts;
+		this.touchConfig(_options, this.#_validationTexts);
 		return this;
 	}
 	

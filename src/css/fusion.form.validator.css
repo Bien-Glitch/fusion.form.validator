@@ -125,6 +125,12 @@ body {
   border: 1px solid transparent;
   border-radius: 0.25rem;
 }
+.valid-text .capslock-alert {
+  display: none;
+  padding: 0.5rem;
+  margin-top: 0.3rem !important;
+  margin-bottom: 0.2rem !important;
+}
 
 .response-text .alert {
   font-size: 14px;

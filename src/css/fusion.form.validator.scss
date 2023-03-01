@@ -140,6 +140,14 @@ body {
   .alert {
     border: 1px solid transparent;
     border-radius: 0.25rem;
+
+  }
+
+  .capslock-alert {
+    display: none;
+    padding: .5rem;
+    margin-top: .3rem !important;
+    margin-bottom: .2rem !important;
   }
 }
 

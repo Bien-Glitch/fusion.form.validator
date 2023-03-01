@@ -1,12 +1,12 @@
 /*!
-* Fusion Form Validator V1.0.0
-* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.0.0)
+* Fusion Form Validator V1.1.0
+* fusion.form.validator.js (https://github.com/Bien-Glitch/fusion.form.validator/tree/v1.1.0)
 * Copyright 2023 Fusion Bolt inc.
 */
 
 /**
  * ----------------------------------------------------------
- * Fusion Form Validator - Utilities (v1.0.0)
+ * Fusion Form Validator - Utilities (v1.1.0)
  * ----------------------------------------------------------
  * (**Global Variables Declaration**)
  */
@@ -306,12 +306,12 @@ Object.prototype.isPhoneField = function () {
  *
  * @returns {boolean}
  */
-Object.prototype.isPasswordField = function () {
+Object.prototype.isPasswordField = function (passwordId) {
 	const target = this;
 	const elementId = target.attribute('id') && target.id.toLowerCase();
 	const elementName = target.attribute('name') && target.name.toLowerCase();
 	const elementType = target.attribute('type') && target.type.toLowerCase();
-	return !!((elementType && elementType.toLowerCase() === 'password') || (elementId && elementId.toLowerCase().includes('password'))) || (elementName && elementName.toLowerCase().includes('password'));
+	return !!((elementType && elementType.toLowerCase() === 'password') || (elementId && elementId.toLowerCase().includes(passwordId))) || (elementName && elementName.toLowerCase().includes(passwordId));
 }
 
 /**
@@ -488,29 +488,50 @@ Object.prototype.HTMLAfter = function (value) {
  *
  * @param timeout {number}
  * @param toggleDisplay {boolean}
+ * @param display
  * @param callback
  * @returns {[HTMLElement]}
  */
-Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, callback} = {}) {
+Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, display = 'block', callback} = {}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
 	target.forEach(element => {
 		let timeoutID = {},
-			display = element.getCssValue('display');
-		element.touchCssValue({opacity: 0, transition: `all ${timeout}ms`})
+			_display = element.getCssValue('display');
+		toggleDisplay && (_display === 'none' && element.touchCssValue({opacity: 0, transition: `all ease-in-out ${timeout}ms`}));
 		
 		const timeOutFunc = (callback) => {
-			element.touchCssValue({opacity: 1});
-			// (element.touchCssValue({visibility: 'visible'}));
-			clearTimeout(timeoutID[element.id]);
-			toggleDisplay && element.touchCssValue({display: 'block'})
-			setTimeout(() => typeof callback === 'function' && callback(element), timeout);
+			const animation = () => {
+				const keyframes = [
+					{opacity: 0, display: 'none'},
+					{opacity: '100%', display: display}
+				]
+				const timing = {
+					duration: timeout,
+					iterations: 1
+				}
+				
+				if (toggleDisplay && _display === 'none') {
+					// display === 'none' && (element.touchCssValue({display: 'block'}));
+					currentAnimation = element.animate(keyframes, timing);
+					currentAnimation.id = 'fadein';
+				}
+				clearTimeout(timeoutID[element.id]);
+				toggleDisplay && element.touchCssValue({opacity: 1, display: display});
+				
+				setTimeout(() => {
+					element.touchCssValue({animation: null, transition: null});
+					/*currentAnimation = null;*/
+					typeof callback === 'function' && callback(target)
+				}, timeout);
+			}
+			!!currentAnimation ? currentAnimation.finished.then(() => animation()) : animation();
 		};
 		
 		timeoutID[element.id] = setTimeout(() => {
 			timeOutFunc(callback);
-		}, 0);
+		}, 0)
 	});
 	return target;
 }
@@ -529,17 +550,34 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 	
 	target.forEach(element => {
 		let timeoutID = {},
-			display = element.getCssValue('display');
-		element.touchCssValue({opacity: 1, transition: `all ${timeout}ms`});
+			_display = element.getCssValue('display');
+		toggleDisplay && (_display !== 'none' && element.touchCssValue({opacity: 1, transition: `all ${timeout}ms`}));
 		
 		const timeOutFunc = (callback) => {
-			element.touchCssValue({opacity: 0});
-			setTimeout(() => {
-				// (element.touchCssValue({visibility: 'hidden'}))
+			const animation = () => {
+				const keyframes = [
+					{opacity: 1, display: 'block'},
+					{opacity: 0}
+				]
+				const timing = {
+					duration: timeout,
+					iterations: 1
+				}
+				
+				if (toggleDisplay && _display !== 'none') {
+					currentAnimation = element.animate(keyframes, timing);
+					currentAnimation.id = 'fadeout';
+				}
 				clearTimeout(timeoutID[element.id]);
-				toggleDisplay && element.touchCssValue({display: 'none'});
-				typeof callback === 'function' && callback(element)
-			}, Math.floor(timeout / 2));
+				
+				setTimeout(() => {
+					element.touchCssValue({opacity: 0});
+					toggleDisplay && element.touchCssValue({display: 'none'});
+					element.touchCssValue({animation: null, transition: null});
+					typeof callback === 'function' && callback(target)
+				}, timeout);
+			}
+			!!currentAnimation ? currentAnimation.finished.then(() => animation()) : animation();
 		};
 		
 		timeoutID[element.id] = setTimeout(() => {
@@ -879,7 +917,6 @@ Object.prototype.removeValidationMessage = function ({context, removeAlert = fal
 	target.removeValidationPadding();
 	
 	if (removeAlert)
-		// TODO: Check for proper way to close BS Alert
 		$el(`#${validationFieldId} > .alert`, context).forEach(field => newBsAlert(field).close());
 	target.classListRemove('border-danger').classListRemove('border-success');
 	
@@ -1220,48 +1257,6 @@ Object.prototype.FBValidator = function (form_group) {
 }
 
 
-/**
- * Selects the given element either by selector, or object with an optional context.
- * @param selector
- * @param context
- * @returns {*[]|NodeListOf<*>|boolean}
- */
-function $el(selector, context) {
-	
-	try {
-		const _context = context && ((context.constructor.name.toUpperCase() === 'NODELIST' || context.constructor.name.toUpperCase() === 'S')
-			? Array.from(context) : (Array.isArray(context) ? context : [context]))[0];
-		
-		if (selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase().includes('HTML')) {
-			if (context) {
-				const target = ((selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase() === 'S')
-					? Array.from(selector) : (Array.isArray(selector) ? selector : [selector]));
-				
-				if (target.length) {
-					let _target = target[0];
-					
-					if (target.length < 2) {
-						const _selector = `#${_target.id}` || _target.tagName.toLowerCase();
-						return _context.querySelectorAll(_selector);
-					}
-					
-					target.classListAdd('fb-marked');
-					const selected = _context.querySelectorAll('.fb-marked');
-					target.classListRemove('fb-marked');
-					selected.classListRemove('fb-marked');
-					return selected;
-				}
-			}
-			return selector;
-		}
-		return context ? [].slice.call(_context.querySelectorAll(selector)) : document.querySelectorAll(selector);
-	} catch (error) {
-		/* Uncomment for debugging purposes only. */
-		// console.error(error);
-		return false;
-	}
-}
-
 // Misc Functions.
 window.$fb = {
 	/**
@@ -1396,9 +1391,9 @@ window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractio
  */
 window.toggleValidationIcon = ({show, hide}, target, showIcon) => {
 	if (showIcon) {
-		hide.fadeout();
+		hide.fadeout({timeout: 10});
 		target.addValidationPadding();
-		show.touchCssValue({right: valid_right}).fadein()
+		show.touchCssValue({right: valid_right}).fadein({timeout: 10, toggleDisplay: true});
 	} else
 		target.removeValidationPadding();
 }
@@ -1483,6 +1478,48 @@ function parseBool(value) {
 			return true;
 		default:
 			return false;
+	}
+}
+
+
+/**
+ * Selects the given element either by selector, or object with an optional context.
+ * @param selector
+ * @param context
+ * @returns {*[]|NodeListOf<*>|boolean}
+ */
+function $el(selector, context) {
+	try {
+		const _context = context && ((context.constructor.name.toUpperCase() === 'NODELIST' || context.constructor.name.toUpperCase() === 'S')
+			? Array.from(context) : (Array.isArray(context) ? context : [context]))[0];
+		
+		if (selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase().includes('HTML')) {
+			if (context) {
+				const target = ((selector.constructor.name.toUpperCase() === 'NODELIST' || selector.constructor.name.toUpperCase() === 'S')
+					? Array.from(selector) : (Array.isArray(selector) ? selector : [selector]));
+				
+				if (target.length) {
+					let _target = target[0];
+					
+					if (target.length < 2) {
+						const _selector = `#${_target.id}` || _target.tagName.toLowerCase();
+						return _context.querySelectorAll(_selector);
+					}
+					
+					target.classListAdd('fb-marked');
+					const selected = _context.querySelectorAll('.fb-marked');
+					target.classListRemove('fb-marked');
+					selected.classListRemove('fb-marked');
+					return selected;
+				}
+			}
+			return selector;
+		}
+		return context ? [].slice.call(_context.querySelectorAll(selector)) : document.querySelectorAll(selector);
+	} catch (error) {
+		/* Uncomment for debugging purposes only. */
+		// console.error(error);
+		return false;
 	}
 }
 
