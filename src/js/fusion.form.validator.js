@@ -452,6 +452,14 @@ class FBFormValidate extends FBBaseComponent {
 												}
 											}
 										}
+									} else {
+										if (_inputElement[0].value !== _password[0].value) {
+											_inputElement.validate({context: target, isPassword: true});
+											_password.validate({context: _password_group, message: `Passwords do not match.`, isPassword: true});
+										} else {
+											_inputElement.validate({context: target});
+											_password.validate({context: _password_group});
+										}
 									}
 								} else {
 									if (!_inputElement[0].value.length)
