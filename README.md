@@ -1,5 +1,7 @@
 # Fusion Form Validator and Utilities
+
 > #### Form Validation plugin with fluent chainable utility methods.
+
 ---
 
 <br>
@@ -19,17 +21,18 @@
 <br>
 
 ## Installation
+
 [Bootstrap](https://getbootstrap.com/) ^5.x, and [Fontawesome](https://fontawesome.com/) ^6.x are required.
 
-No worries, the above requirements are shipped along with the Fusion Form Validator package.\
-Simply head over to the [latest release page](https://github.com/Bien-Glitch/fusion.form.validator/releases/latest) and download the assets to stay up to date.
+No worries, the above requirements are shipped along with the Fusion Form Validator package.Simply head over to the [latest release page](https://github.com/Bien-Glitch/fusion.form.validator/releases/latest) and download the assets to stay up to date.
 
 > ### Once the Fusion Form Validator asset has been downloaded:
->  - The ***Fusion Form Validator*** can be found in the `src` folder.
->  - The dependencies ***(Bootstrap & Fontawesome)*** can be found in the `plugins` folder.
->  - Copy the files / folders in the `src` and `plugins` folder to wherever you like in the root of your Web-Project.
+>
+> - The ***Fusion Form Validator*** can be found in the `src` folder.
+> - The dependencies ***(Bootstrap & Fontawesome)*** can be found in the `plugins` folder.
+> - Copy the files / folders in the `src` and `plugins` folder to wherever you like in the root of your Web-Project.
 
-\
+
 Assuming you copied them into plugins folder; the structure in your project should be somewhat like this:
 
 ```
@@ -53,7 +56,6 @@ Assuming you copied them into plugins folder; the structure in your project shou
 |...
 ```
 
-\
 Now all that is left is to add them into your document as so:
 
 ```html
@@ -89,24 +91,28 @@ Now all that is left is to add them into your document as so:
 ```
 
 > ### Note:
+>
 > #### To avoid errors:
+>
 > - The `fusion.form.validator.css` must come after `bootstrap css`, and `fontawesome css`.
 > - The same goes for the `fusion.form.validator.js`, it must come after `jQuery js (If available)`, `bootstrap js`, and `fusion.form.util.js`.
 
 ## Usage
+
 *Firstly, ensure the stylesheets and scripts are linked in the correct hierarchy as in the above example. If you have problems getting it correctly, just copy the code in the example above and edit.*
 
-Out of the box, Fusion Form Validator ships with `init.js` file, so you can initialize, configure, and use the fusion form validator without messing up your other JS codes.\
+Out of the box, Fusion Form Validator ships with `init.js` file, so you can initialize, configure, and use the fusion form validator without messing up your other JS codes.
 **N.B:** You can still use the validator in another JS file.
 
-[comment]: <> (The Validator has already been initialized in `init.js` for all forms; with default configuration out of the box)
-
-To initialize and configure the validator on a form, you need an instance of the form.\
+[comment]:
+To initialize and configure the validator on a form, you need an instance of the form.
 A utility function is available for getting elements. Other methods could still be used too.
 
 Built-in function `$el(selector)` can be used to fetch an element or fetch elements. The `selector` argument is either the elements tag name, or a CSS selector `eg. '#login-form'` as a string.
+
 ### Initializing:
-The form elements must follow the below structure\
+
+The form elements must follow the below structure
 Assuming the form has id `login-form` i.e.
 
 ```html
@@ -230,7 +236,6 @@ Putting it all together we would have:
 </html>
 ```
 
-\
 Instantiating and initializing the validator (in your JS file):
 
 ```javascript
@@ -266,18 +271,21 @@ validator.initValidation();
 ```
 
 > ### Available Config Options:
+>
 > #### Regular Expressions `regExp` config options; For validating associated form fields using given Regular Expression.
 >
-> | Key          | Configurable Values     | Default Value                                                 | Description                                                                                                 |                                                
-> | ------------ | ----------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |                                                
-> | _name_       | **_RegExp string_**     | `'/^([a-zA-Z]{2,255})(\s[a-zA-Z]{2,255}){1,2}$/gi'`           | RegExp string used to validate a `name` field <br> if `validateName` option is set to `true`                |                                                
-> | _username_   | **_RegExp string_**     | `'/^[a-zA-Z]+([_]?[a-zA-Z]){2,255}$/gi'`                      | RegExp string used to validate a `username` field <br> if `validateUsername` option is set to `true`        |                                                
-> | _email_      | **_RegExp string_**     | `'/^\w+([.-]?\w+)*@\w+([.-]?\w{2,3})*(\.\w{2,3})$/gi'`        | RegExp string used to validate a `email` field <br> if `validateEmail` option is set to `true`              |                                                
-> | _phone_      | **_RegExp string_**     | `'/^(\+\d{1,3}?\s)(\(\d{3}\)\s)?(\d+\s)*(\d{2,3}-?\d+)+$/g'`  | RegExp string used to validate a `phone` field <br> if `validatePhone` option is set to `true`              |                                                
-> | _cardCVV_    | **_RegExp string_**     | `'/[0-9]{3,4}$/gi'`                                           | RegExp string used to validate a `card cvv` field <br> if `validateCard` option is set to `true`            |                                                 
-> | _cardNumber_ | **_RegExp string_**     | `'/^[0-9]+$/gi'`                                              | RegExp string used to validate a `card number` field <br> if `validateCard` option is set to `true`         |                                                
+>
+> | Key          | Configurable Values | Default Value                                                | Description                                                                                         |
+> | ------------ | ------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+> | _name_       | **_RegExp string_** | `'/^([a-zA-Z]{2,255})(\s[a-zA-Z]{2,255}){1,2}$/gi'`          | RegExp string used to validate a`name` field <br> if `validateName` option is set to `true`         |
+> | _username_   | **_RegExp string_** | `'/^[a-zA-Z]+([_]?[a-zA-Z]){2,255}$/gi'`                     | RegExp string used to validate a`username` field <br> if `validateUsername` option is set to `true` |
+> | _email_      | **_RegExp string_** | `'/^\w+([.-]?\w+)*@\w+([.-]?\w{2,3})*(\.\w{2,3})$/gi'`       | RegExp string used to validate an`email` field <br> if `validateEmail` option is set to `true`      |
+> | _phone_      | **_RegExp string_** | `'/^(\+\d{1,3}?\s)(\(\d{3}\)\s)?(\d+\s)*(\d{2,3}-?\d+)+$/g'` | RegExp string used to validate a`phone` field <br> if `validatePhone` option is set to `true`       |
+> | _cardCVV_    | **_RegExp string_** | `'/[0-9]{3,4}$/gi'`                                          | RegExp string used to validate a`card cvv` field <br> if `validateCard` option is set to `true`     |
+> | _cardNumber_ | **_RegExp string_** | `'/^[0-9]+$/gi'`                                             | RegExp string used to validate a`card number` field <br> if `validateCard` option is set to `true`  |
 >
 > These configuration options are accessible via the `validator.regExpConfig` and can be set using the syntax:
+>
 > ```javascript
 > validator.regExpConfig = {
 >     name: 'value',
@@ -290,18 +298,39 @@ validator.initValidation();
 >
 > #### Validation Icons `validationIcons` config options; Displayed validation icons.
 >
-> | Key                   | Configurable Values     | Default Value                                               | Description                                                                                                 |                                                
-> | --------------------- | ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |                                                
-> | _validIcon_           | **_HTML string_**       | `'<i class="fa far fa-1x fa-check"></i>'`                   | HTML string to show valid icon (tick or check) when a field is correctly filled.                            |                                                
-> | _invalidIcon_         | **_HTML string_**       | `'<i class="fa far fa-1x fa-exclamation-circle"></i>'`      | HTML string to show invalid icon (times or exclamation) when a field has error.                             |                                                
-> | _passwordTogglerIcon_ | **_HTML string_**       | `'<i class="fa fa-eye"></i>'`                               | HTML string to show a toggler icon for the password field.                                                  |                                                 
+>
+> | Key                         | Configurable Values | Default Value                                          | Description                                                                      |
+> | --------------------------- | ------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------- |
+> | _validIcon_                 | **_HTML string_**   | `'<i class="fa far fa-1x fa-check"></i>'`              | HTML string to show valid icon (tick or check) when a field is correctly filled. |
+> | _invalidIcon_               | **_HTML string_**   | `'<i class="fa far fa-1x fa-exclamation-circle"></i>'` | HTML string to show invalid icon (times or exclamation) when a field has error.  |
+> | _passwordTogglerIcon_       | **_HTML string_**   | `'<i class="fa fa-eye"></i>'`                          | HTML string to show a toggler icon for the password field.                       |
+> | _passwordCapslockAlertIcon_ | **_HTML string_**   | `'<i class="fa far fa-exclamation-triangle"></i>'`     | HTML string to show alert icon when Capslock state is true.                      |
 >
 > These configuration options are accessible via the `validator.validationIcons` and can be set using the syntax:
+>
 > ```javascript
 > validator.validationIcons = {
 >     validIcon: 'value',
 >     invalidIcon: 'value',
 >     passwordTogglerIcon: 'value',
+>     passwordCapslockAlertIcon: 'value',
+> }
+> ```
+>
+> <br>
+>
+> #### Validation Texts `validationTexts` config options; Displayed validation texts.
+>
+>
+> | Key                   | Configurable Values | Default Value      | Description                                         |
+> | --------------------- | ------------------- | ------------------ | --------------------------------------------------- |
+> | _capslock_            | **_string_**        | `'Capslock is on'` | String to be displayed when CapsLock state is true. |
+>
+> These configuration options are accessible via the `validator.validationTexts` and can be set using the syntax:
+>
+> ```javascript
+> validator.validationTexts = {
+>     capslock: 'value (e.g. Capslock)',
 > }
 > ```
 >
@@ -309,20 +338,22 @@ validator.initValidation();
 >
 > #### Field Validation `validationConfig` config options; For toggling validation state of form field elements.
 >
-> | Key                   | Configurable Values                        | Default Value                     | Description                                                                                                      |                                                
-> | --------------------- | ------------------------------------------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |                                                
-> | _showPassword_        | **_boolean <br> `true` or `false`_**       | `true`                            | boolean to toggle showing the password type toggler icon.                                                        |                                                
-> | _validateCard_        | **_boolean <br> `true` or `false`_**       | `false`                           | boolean to toggle Card Number and CVV field validation.                                                          |                                                
-> | _validateName_        | **_boolean <br> `true` or `false`_**       | `false`                           | boolean to toggle Name field validation.                                                                         |                                                 
-> | _validateEmail_       | **_boolean <br> `true` or `false`_**       | `false`                           | boolean to toggle Email field validation.                                                                        |                                                 
-> | _validatePhone_       | **_boolean <br> `true` or `false`_**       | `false`                           | boolean to toggle Phone Number field validation.                                                                 |                                                 
-> | _validatePassword_    | **_boolean <br> `true` or `false`_**       | `true`                            | boolean to toggle Password field validation <br> (***Mostly used if there is a password confirmation field***).  |                                                 
-> | _validateUsername_    | **_boolean <br> `true` or `false`_**       | `false`                           | boolean to toggle Username field validation.                                                                     |                                                 
-> | _nativeValidation_    | **_boolean <br> `true` or `false`_**       | `false`                           | boolean to toggle Native HTML Validation on the form.                                                            |                                                 
-> | _passwordId_          | **_string_**                               | `'password'`                      | String that matches the `id` of the `password field`.                                                            |                                                 
-> | _passwordConfirmId_   | **_string_**                               | `'password_confirmation'`         | String that matches the `id` of the `confirm password field`.                                                    |                                                 
+>
+> | Key                 | Configurable Values                  | Default Value             | Description                                                                                                    |
+> | ------------------- | ------------------------------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+> | _showPassword_      | **_boolean <br> `true` or `false`_** | `true`                    | boolean to toggle showing the password type toggler icon.                                                      |
+> | _validateCard_      | **_boolean <br> `true` or `false`_** | `false`                   | boolean to toggle Card Number and CVV field validation.                                                        |
+> | _validateName_      | **_boolean <br> `true` or `false`_** | `false`                   | boolean to toggle Name field validation.                                                                       |
+> | _validateEmail_     | **_boolean <br> `true` or `false`_** | `false`                   | boolean to toggle Email field validation.                                                                      |
+> | _validatePhone_     | **_boolean <br> `true` or `false`_** | `false`                   | boolean to toggle Phone Number field validation.                                                               |
+> | _validatePassword_  | **_boolean <br> `true` or `false`_** | `true`                    | boolean to toggle Password field validation<br> (***Mostly used if there is a password confirmation field***). |
+> | _validateUsername_  | **_boolean <br> `true` or `false`_** | `false`                   | boolean to toggle Username field validation.                                                                   |
+> | _nativeValidation_  | **_boolean <br> `true` or `false`_** | `false`                   | boolean to toggle Native HTML Validation on the form.                                                          |
+> | _passwordId_        | **_string_**                         | `'password'`              | String that matches the`id` of the `password field`.                                                           |
+> | _passwordConfirmId_ | **_string_**                         | `'password_confirmation'` | String that matches the`id` of the `confirm password field`.                                                   |
 >
 > These configuration options are accessible via the `validator.validationConfig` and can be set using the syntax:
+>
 > ```javascript
 > validator.validationConfig = {
 >     showPassword: value,
@@ -334,9 +365,11 @@ validator.initValidation();
 > ```
 
 ## About
+
 Fusion form validator is an easy-to-use JS plugin for front-end form validation and miscellaneous utilities which requires little or no knowledge of JavaScript. Read through this documentation on how to set it up, and you're ready. It's fun to use and hassle-free.
 
 ## Creator
+
 ### [Bien Nwinate](https://github.com/Bien-Glitch)
 
 - https://twitter.com/nwinate
@@ -348,8 +381,8 @@ Fusion form validator is an easy-to-use JS plugin for front-end form validation 
 	- [Vorldline Team](https://github.com/Vorldline)
 
 ## Acknowledgement
-Thanks to God Almighty for making this project a possible.\
-Also a huge thanks to:
+
+Thanks to God Almighty for making this project a possible.Also a huge thanks to:
 
 - [ScaletFox ltd](https://github.com/scaletfoxltd)
 - [Victor](https://github.com/echovick)
@@ -358,8 +391,9 @@ Also a huge thanks to:
 - And many others for their huge support
 
 ## Feedback
-If you discover a vulnerability or bug within the Fusion Form Validator, or have an improvement,\
-Please [open an issue on the Github page](https://github.com/Bien-Glitch/fusion.form.validator/issues) or send an e-mail to Bien Nwinate via [fusionboltinc@gmail.com](mailto:fusionboltinc@gmail.com).\
+
+If you discover a vulnerability or bug within the Fusion Form Validator, or have an improvement,
+Please [open an issue on the Github page](https://github.com/Bien-Glitch/fusion.form.validator/issues) or send an e-mail to Bien Nwinate via [fusionboltinc@gmail.com](mailto:fusionboltinc@gmail.com).
 All issues will be promptly addressed.
 
 ## Contact

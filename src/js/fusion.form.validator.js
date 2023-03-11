@@ -19,7 +19,7 @@ class FBBaseComponent {
 	#_fbValidatorConfig = {
 		regExp: {
 			name: /^([a-zA-Z]{2,255})(\s[a-zA-Z]{2,255}){1,2}$/gi,
-			username: /^[a-zA-Z]+([_]?[a-zA-Z]){2,255}$/gi,
+			username: /^[a-zA-Z]+(_?[a-zA-Z]){2,255}$/gi,
 			email: /^\w+([.-]?\w+)*@\w+([.-]?\w{2,3})*(\.\w{2,3})$/gi,
 			phone: /^(\+\d{1,3}?\s)(\(\d{3}\)\s)?(\d+\s)*(\d{2,3}-?\d+)+$/g,
 			cardCVV: /[0-9]{3,4}$/gi,

@@ -754,7 +754,7 @@ Object.prototype.touchAttribute = function (key, value) {
  * @param value
  * @returns {string|touchAttribute}
  */
-Object.prototype.attribute = function (key, value) {
+Object.prototype.attribute = function (key, value = null) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -787,7 +787,7 @@ Object.prototype.touchDataAttribute = function (key, value) {
  * @param value
  * @returns {string|touchDataAttribute}
  */
-Object.prototype.dataAttribute = function (key, value) {
+Object.prototype.dataAttribute = function (key, value = null) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	return value ? target.touchDataAttribute(key, value) : target[0].dataset[key];
@@ -801,7 +801,7 @@ Object.prototype.dataAttribute = function (key, value) {
  * @param option {boolean}
  * @returns {Object}
  */
-Object.prototype.upon = function (events, callback, option = false) {
+Object.prototype.upon = function (events, callback = null, option = false) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => {
@@ -1488,7 +1488,7 @@ function parseBool(value) {
  * @param context
  * @returns {*[]|NodeListOf<*>|boolean}
  */
-function $el(selector, context) {
+function $el(selector, context = null) {
 	try {
 		const _context = context && ((context.constructor.name.toUpperCase() === 'NODELIST' || context.constructor.name.toUpperCase() === 'S')
 			? Array.from(context) : (Array.isArray(context) ? context : [context]))[0];
