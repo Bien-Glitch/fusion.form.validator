@@ -190,7 +190,7 @@ class FBFormValidate extends FBBaseComponent {
 					target.nodeContains(_element[0]).length && target.setAttribute('id', `${elementId}_group`);
 					_inputElement.length && _inputElement.attribute('type') === 'password' && _inputElement.HTMLAfter(passwordTogglerWrapper(validationIcons.passwordToggleIcon));
 					$el(form_field_group, target).appendHTML(validWrapper(validationIcons.validIcon)).appendHTML(invalidWrapper(validationIcons.invalidIcon));
-					(elementId.toString().toLowerCase().includes(validationConfig.passwordId) || $el(target).nodeContains($el(`#${validationConfig.passwordId}`)[0]).length) && $el(target).prependHTML(passwordCapslockAlertWrapper(validationIcons.passwordCapslockAlertIcon, validationTexts.capslock));
+					(elementId.toString().toLowerCase() === (validationConfig.passwordId.toLowerCase()) || $el(target).nodeContains($el(`#${validationConfig.passwordId}`)[0]).length) && $el(target).prependHTML(passwordCapslockAlertWrapper(validationIcons.passwordCapslockAlertIcon, validationTexts.capslock));
 					
 					_inputElement.upon({
 						input: function (e) {
@@ -252,12 +252,13 @@ class FBFormValidate extends FBBaseComponent {
 						keyup: function (e) {
 							const key = e.key.toLowerCase();
 							const _toggler = $el(toggler, target);
-							const _capslockAlert = $el(capslockAlert, target);
+							const _capslockAlert = $el(capslockAlert, form);
 							const filterType = new Set(['date', 'month', 'datetime', 'datetime-local']);
 							const capslockIsOn = e.getModifierState('CapsLock');
+							const showCapslockAlert = ((elementId.toString().toLowerCase() === (validationConfig.passwordId.toLowerCase())) || (elementId.toString().toLowerCase() === (validationConfig.passwordConfirmId.toLowerCase())));
 							(_inputElement[0].type && filterType.has(_inputElement[0].type.toLowerCase())) && _inputElement.validate({context: target});
 							
-							if (_capslockAlert.length)
+							if (_capslockAlert.length && showCapslockAlert)
 								capslockIsOn ? _capslockAlert.fadein({timeout: 500, toggleDisplay: true, display: 'inline-block'}) : _capslockAlert.fadeout({timeout: 500, toggleDisplay: true});
 							
 							if (elementId && elementId.toLowerCase().includes(validationConfig.passwordId)) {
