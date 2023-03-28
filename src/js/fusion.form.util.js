@@ -110,13 +110,13 @@ Object.prototype.needsValidation = function () {
  * @param keyValuePair {Object}
  * @returns {[HTMLElement]}
  */
-Object.prototype.touchCssValue = function (keyValuePair) {
+/*Object.prototype.touchCssValue = function (keyValuePair) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	if (Object.keys(keyValuePair).length)
 		Object.keys(keyValuePair).forEach(key => target.forEach(element => element.style[key] = keyValuePair[key]));
 	return target;
-}
+}*/
 
 /**
  * Get CSS style Value.
@@ -124,15 +124,15 @@ Object.prototype.touchCssValue = function (keyValuePair) {
  * @param property {string}
  * @returns {string|undefined}
  */
-Object.prototype.getCssValue = function (property) {
+/*Object.prototype.getCssValue = function (property) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	return target ? (target.cssProperty().getPropertyValue(property)) : undefined;
-}
+}*/
 
-Object.prototype.cssProperty = function () {
+/*Object.prototype.cssProperty = function () {
 	return window.getComputedStyle(this[0]);
-}
+}*/
 
 /**
  * Add class to the elements' class list.
@@ -140,12 +140,12 @@ Object.prototype.cssProperty = function () {
  * @param className {string}
  * @returns {[HTMLElement]}
  */
-Object.prototype.classListAdd = function (className) {
+/*Object.prototype.classListAdd = function (className) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => element.classList.add(className));
 	return target;
-}
+}*/
 
 /**
  * Remove class from the elements' class list.
@@ -153,12 +153,12 @@ Object.prototype.classListAdd = function (className) {
  * @param className {string}
  * @returns {[HTMLElement]}
  */
-Object.prototype.classListRemove = function (className) {
+/*Object.prototype.classListRemove = function (className) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => element.classList.remove(className));
 	return target;
-}
+}*/
 
 /**
  * Check if element has given class.
@@ -695,15 +695,15 @@ Object.prototype.slideOutUp = function ({timeout = 300, callback} = {}) {
  * @param value
  * @returns {[HTMLElement]}
  */
-Object.prototype.touchProperty = function (key, value) {
+/*Object.prototype.touchProperty = function (key, value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
-	
+
 	(key.constructor.name.toUpperCase() === 'OBJECT' && Object.keys(key).length && !value) ?
 		Object.keys(key).forEach(prop => target.forEach(element => element[prop] = key[prop])) :
 		target.forEach(element => element[key] = value);
 	return target;
-}
+}*/
 
 /**
  * Get the given property of the target element if only the key is given as a string.
@@ -715,14 +715,14 @@ Object.prototype.touchProperty = function (key, value) {
  * @param value
  * @returns {[HTMLElement]}
  */
-Object.prototype.property = function (key, value) {
+/*Object.prototype.property = function (key, value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
-	
+
 	return key.constructor.name.toUpperCase() === 'OBJECT' ?
 		target.touchProperty(key) :
 		((key && value) ? target.touchProperty(key, value) : target[0][key]);
-}
+}*/
 
 /**
  * Set the given attribute(s) for the target element.
@@ -733,16 +733,16 @@ Object.prototype.property = function (key, value) {
  * @param value
  * @returns {[HTMLElement]}
  */
-Object.prototype.touchAttribute = function (key, value) {
+/*Object.prototype.touchAttribute = function (key, value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
-	
+
 	(key.constructor.name.toUpperCase() === 'OBJECT' && Object.keys(key).length && !value) ?
 		Object.keys(key).forEach(prop => target.forEach(element => element.setAttribute(prop, key[prop]))) :
 		target.forEach(element => element.setAttribute(key, value));
 	return target;
-	
-}
+
+}*/
 
 /**
  * Get the given attribute(s) of the target element if only the key is given as a string.
@@ -754,14 +754,15 @@ Object.prototype.touchAttribute = function (key, value) {
  * @param value
  * @returns {string|touchAttribute}
  */
-Object.prototype.attribute = function (key, value = null) {
+/*Object.prototype.attribute = function (key, value = null) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
-	
+
 	return target.length && (key.constructor.name.toUpperCase() === 'OBJECT' ?
 		target.touchAttribute(key) :
 		((key && value) ? target.touchAttribute(key, value) : target[0].getAttribute(key)));
-}
+}*/
+
 
 /**
  * Get the given data-* attribute value of the target element if only the key is given as a string.
@@ -770,13 +771,13 @@ Object.prototype.attribute = function (key, value = null) {
  * @param value {string|undefined|null}
  * @returns {[HTMLElement]}
  */
-Object.prototype.touchDataAttribute = function (key, value) {
+/*Object.prototype.touchDataAttribute = function (key, value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => element.dataset[key] = value);
 	// target[0].dataset[key] = value;
 	return target;
-}
+}*/
 
 /**
  * Get or set the given data-* attribute value of the target element if only the key is given as a string.
@@ -787,11 +788,11 @@ Object.prototype.touchDataAttribute = function (key, value) {
  * @param value
  * @returns {string|touchDataAttribute}
  */
-Object.prototype.dataAttribute = function (key, value = null) {
+/*Object.prototype.dataAttribute = function (key, value = null) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	return value ? target.touchDataAttribute(key, value) : target[0].dataset[key];
-}
+}*/
 
 /**
  * Add event listener(s) to the target element and apply callback on them.
