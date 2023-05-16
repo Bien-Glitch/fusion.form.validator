@@ -388,6 +388,7 @@ Thanks to God Almighty for making this project a possible.Also a huge thanks to:
 - [Victor](https://github.com/echovick)
 - [Omotayo](https://github.com/omotayosam)
 - [Jacob](https://github.com/BojakePoleman)
+- [Daniel](https://github.com/chigaemezu)
 - And many others for their huge support
 
 ## Feedback

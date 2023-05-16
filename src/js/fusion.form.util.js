@@ -492,7 +492,7 @@ Object.prototype.HTMLAfter = function (value) {
  * @param callback
  * @returns {[HTMLElement]}
  */
-Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, display = 'block', callback} = {}) {
+/*Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, display = 'block', callback} = {}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -522,7 +522,7 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, displ
 				
 				setTimeout(() => {
 					element.touchCssValue({animation: null, transition: null});
-					/*currentAnimation = null;*/
+					/!*currentAnimation = null;*!/
 					typeof callback === 'function' && callback(target)
 				}, timeout);
 			}
@@ -534,7 +534,7 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, displ
 		}, 0)
 	});
 	return target;
-}
+}*/
 
 /**
  * Add fadeout Animation to target element.
@@ -544,7 +544,7 @@ Object.prototype.fadein = function ({timeout = 300, toggleDisplay = false, displ
  * @param callback
  * @returns {[HTMLElement]}
  */
-Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, callback} = {}) {
+/*Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, callback} = {}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -585,7 +585,7 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
 		}, 0);
 	});
 	return target;
-}
+}*/
 
 /**
  * Add slidein Animation to target element.
@@ -594,7 +594,7 @@ Object.prototype.fadeout = function ({timeout = 300, toggleDisplay = false, call
  * @param callback
  * @returns {[HTMLElement]}
  */
-Object.prototype.slideInDown = function ({timeout = 300, callback} = {}) {
+/*Object.prototype.slideInDown = function ({timeout = 300, callback} = {}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -623,7 +623,7 @@ Object.prototype.slideInDown = function ({timeout = 300, callback} = {}) {
 				setTimeout(() => {
 					element.touchCssValue({opacity: 1});
 					element.touchCssValue({animation: null, transition: null});
-					/*currentAnimation = null;*/
+					/!*currentAnimation = null;*!/
 					typeof callback === 'function' && callback(target)
 				}, timeout);
 			}
@@ -635,7 +635,7 @@ Object.prototype.slideInDown = function ({timeout = 300, callback} = {}) {
 		}, 0)
 	});
 	return target;
-}
+}*/
 
 /**
  * Add slideout Animation to target element.
@@ -644,7 +644,7 @@ Object.prototype.slideInDown = function ({timeout = 300, callback} = {}) {
  * @param callback
  * @returns {[HTMLElement]}
  */
-Object.prototype.slideOutUp = function ({timeout = 300, callback} = {}) {
+/*Object.prototype.slideOutUp = function ({timeout = 300, callback} = {}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -684,7 +684,7 @@ Object.prototype.slideOutUp = function ({timeout = 300, callback} = {}) {
 		}, 0)
 	});
 	return target;
-}
+}*/
 
 /**
  * Set the given property / properties for the target element.
@@ -802,7 +802,7 @@ Object.prototype.slideOutUp = function ({timeout = 300, callback} = {}) {
  * @param option {boolean}
  * @returns {Object}
  */
-Object.prototype.upon = function (events, callback = null, option = false) {
+/*Object.prototype.upon = function (events, callback = null, option = false) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => {
@@ -812,7 +812,7 @@ Object.prototype.upon = function (events, callback = null, option = false) {
 			typeof callback === 'function' ? element.addEventListener(events, (e) => callback(e), option) : console.error('Listener undefined');
 	});
 	return target;
-}
+}*/
 
 
 /**
@@ -1533,10 +1533,10 @@ const handler = {
 	 * @param callback
 	 * @returns {false}
 	 */
-	handleEvent({evt, prefix, callback}) {
+	/*handleEvent({evt, prefix, callback}) {
 		const handler = `${prefix}${evt.type}`;
 		return typeof this[handler] === 'function' && this[handler](evt, callback);
-	},
+	},*/
 	/**
 	 * Custom event from the handler.
 	 *
