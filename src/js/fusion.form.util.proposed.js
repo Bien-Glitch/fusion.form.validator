@@ -1,13 +1,179 @@
 let currentAnimation,
-	// Short Functions
-	isFunction = (value) => (typeof value).toUpperCase() === 'FUNCTION',
-	isObject = (object) => (typeof object).toUpperCase() === 'OBJECT' || object.constructor && (object.constructor.name.toUpperCase() === 'OBJECT');
+	buttonLoader = '.button-loader',
+	globalMessageTag = '#global-message-wrapper';
 
-class FB {
+export const alert_d = 'alert-danger';
+export const alert_i = 'alert-info';
+export const alert_s = 'alert-success';
+
+export const fa_check = 'far fa-1x fa-check';
+export const fa_check_c = 'far fa-1x fa-check-circle';
+export const fa_check_d = 'far fa-1x fa-check-double';
+export const fa_exc = 'far fa-1x fa-exclamation';
+export const fa_exc_c = 'far fa-1x fa-exclamation-circle';
+export const fa_info = 'far fa-1x fa-info';
+export const fa_info_c = 'far fa-1x fa-info-circle';
+export const fa_wifi_s = 'far fa-1x fa-wifi-slash';
+
+const errorBag = {}, errorCount = {};
+
+/** Short Functions **/
+/**
+ * Creates new FBUtil Object with selected element.
+ *
+ * _Returns an empty Object if the element is not found_
+ * @param selector {string|Iterable} HTMLString or Iterable
+ * @param context {string|Iterable|null} The Element context to select from. Accepts HTMLString or Iterable
+ * @return {FBUtil<HTMLElement>} A new FBUtil Object
+ */
+const $fs = (selector, context = null) => new FBUtil(selector, context);
+
+/**
+ * Checks if the given Value is a function
+ * @param value
+ * @return {boolean}
+ */
+const isFunction = (value) => (typeof value).toUpperCase() === 'FUNCTION';
+
+/**
+ * Checks id the given Value is a String
+ * @param value
+ * @return {boolean}
+ */
+const isString = (value) => (typeof value).toUpperCase() === 'STRING';
+
+/**
+ * Checks if the given value is an Object
+ * @param object
+ * @return {boolean}
+ */
+const isObject = (object) => (typeof object).toUpperCase() === 'OBJECT' || object.constructor && (object.constructor.name.toUpperCase() === 'OBJECT');
+
+const checkLuhn = (input) => {
+	const sumDigit = (c) => (c < 10) ? c :
+		sumDigit(Math.trunc(c / 10) + (c % 10));
+	
+	return input.split('').reverse()
+		.map(Number)
+		.map((c, i) => i % 2 !== 0 ? sumDigit(c * 2) : c)
+		.reduce((acc, v) => acc + v) % 10 === 0;
+}
+
+/**
+ *
+ * @param value
+ * @return {boolean}
+ */
+const parseBool = (value) => {
+	switch (value) {
+		case true:
+		case 'true':
+		case 1:
+		case '1':
+		case 'on':
+		case 'yes':
+			return true;
+		default:
+			return false;
+	}
+}
+
+const spaceToComma = (value) => {
+	return value.trim().split(/[ ,]+/g).filter((val) => {
+		return val !== '';
+	}).join(', ');
+}
+
+/**
+ * Converts given string case to Title-Case with optional string replacement using RegExp
+ * @param value {string} String to convert
+ * @param regExpReplace {RegExp} Regular Expression
+ * @return {string} Converted String
+ */
+const titleCase = (value, regExpReplace = /[-_]/gi) => {
+	let replaced = '',
+		replace = value.replaceAll(regExpReplace, ' '),
+		nameSplit = replace.split(/\s+/gi);
+	
+	nameSplit.forEach((split, idx) => {
+		let splinted = split.split(''),
+			firstWord = splinted[0]
+		splinted[0] = firstWord.toUpperCase();
+		replaced += idx === (nameSplit.length - 1) ? splinted.join('') : `${splinted.join('')} `;
+	});
+	return replaced;
+}
+
+/**
+ * Checks if the given string is JSON Parsable
+ * @param JSONString {string}
+ * @return {boolean}
+ */
+const canParseJSON = (JSONString) => {
+	try {
+		JSON.parse(JSONString)
+		return true
+	} catch (e) {
+		return false
+	}
+}
+
+/**
+ * Perform a fetch request using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
+ * @param uri {string}
+ * @param method {string}
+ * @param data {Object|null}
+ * @param dataType {string}
+ * @param beforeSend {function|null}
+ * @param onComplete {function|null}
+ * @param onSuccess {function|null}
+ * @param onError {function|null}
+ */
+const fetchReq = ({uri = '', method = 'get', data = null, dataType = 'json', beforeSend, onComplete, onSuccess, onError}) => {
+	const allowedErrorStatuses = new Set([401, 402, 422, 423, 426, 451, 511]);
+	let status,
+		statusText,
+		responseData;
+	isFunction(beforeSend) && beforeSend();
+	
+	fetch(uri, {
+		method: method,
+		body: data,
+	}).then(response => {
+		responseData = response;
+		status = responseData.status;
+		statusText = responseData.statusText;
+		
+		try {
+			const consumed = response[dataType]();
+			return (response.ok || (status > 299 && status < 400) || allowedErrorStatuses.has(status)) ? consumed : Promise.reject(response);
+		} catch (e) {
+			return console.error(e)
+		}
+	}).then(data => {
+		responseData.responseText = canParseJSON(data) ? data : JSON.stringify(data);
+		responseData.responseJSON = dataType === 'json' ? (canParseJSON(data) ? JSON.parse(data) : data) : null
+		
+		status > 199 && status < 300 && isFunction(onSuccess) && onSuccess(responseData, status, statusText);
+		isFunction(onComplete) && onComplete(responseData, status, statusText);
+	}).catch(err => isFunction(onError) && onError(err, status, statusText));
+}
+
+/*classes*/
+class FBBase {
 	constructor(selector, context) {
 		const _this = this;
 		const target = _init();
+		const initDocumentArray = this.#_initToArray(document);
+		
 		_this.length = 0;
+		_this.prev = {};
+		_this.prev.length = 0;
+		
+		initDocumentArray.forEach((e, i) => {
+			_this.prev[i] = e
+			_this.prev.length++;
+		});
 		
 		target && target.forEach((element, idx) => {
 			_this[idx] = element;
@@ -16,12 +182,14 @@ class FB {
 		
 		function _init() {
 			try {
-				const _context = context && _this.#_initToArray(context)[0];
+				const _context = context && ((!_this.#_hasValidConstructor(context) && !_this.#_constructorIsHTMLElement(context)) ?
+					_this.#_initToArray(document.querySelectorAll(context))[0] :
+					_this.#_initToArray(context)[0]);
 				
-				if (_this.#_constructorIsHTMLElement(selector) || _this.#_hasValidConstructor(selector)) {
-					if (context) {
-						const target = _this.#_initToArray(selector);
-						
+				if (_this.#_constructorIsHTMLElement(selector) || _this.#_isIterable(selector)) {
+					const target = _this.#_initToArray(selector);
+					
+					if (context)
 						if (target.length) {
 							if (target.length < 2) {
 								const _target = target[0], _selector = `#${_target.id}` || _target.tagName.toLowerCase();
@@ -29,19 +197,18 @@ class FB {
 							}
 							
 							_this.#_createTemporalContext(target); // Create Temp context for targets
-							_this.classListAdd('fb-init-mark'); // mark targets
+							_this.internal.forEach(element => element.classList.add('fb-init-mark')); // mark targets;*/
+							/*_this.classList.put('fb-init-mark') // mark targets;*/
 							
-							const selected = document.querySelectorAll('.fb-init-mark'); // select marked targets
-							_this.#_createTemporalContext(selected); // Create Temp context for marked targets
-							
-							_this.classListRemove('fb-init-mark'); // unmark targets
+							const selected = _context.querySelectorAll('.fb-init-mark'); // select marked targets
+							_this.internal.forEach(element => element.classList.remove('fb-init-mark')); // unmark targets*/
+							/*_this.classList.remove('fb-init-mark'); // unmark targets*/
 							_this.#_deleteTemporalContext(); // Delete created Temp context
 							
 							return selected;
 						}
-					}
 					// return selector;
-					return _this.#_initToArray(selector);
+					return target;
 				}
 				return context ? [].slice.call(_context.querySelectorAll(selector)) : document.querySelectorAll(selector);
 			} catch (error) {
@@ -59,11 +226,15 @@ class FB {
 	}
 	
 	#_hasValidConstructor(element) {
-		return element.constructor.name.toUpperCase() === 'FB' || element.constructor.name.toUpperCase() === 'NODELIST' || element.constructor.name.toUpperCase() === 'S' || element.constructor.name.toUpperCase() === 'JQUERY'
+		return element.constructor.name.toUpperCase().includes('FB') || element.constructor.name.toUpperCase() === 'NODELIST' || element.constructor.name.toUpperCase() === 'S' || element.constructor.name.toUpperCase() === 'JQUERY'
+	}
+	
+	#_isIterable(element) {
+		return this.#_hasValidConstructor(element) || element.constructor.name.toUpperCase().includes('COLLECTION') || Array.isArray(element);
 	}
 	
 	#_initToArray(element) {
-		return this.#_hasValidConstructor(element) ? Array.from(element) : (this.#_constructorIsHTMLElement(element) ? [element] : (Array.isArray(element) ? element : [element]))
+		return this.#_isIterable(element) ? Array.from(element) : (this.#_constructorIsHTMLElement(element) ? [element] : [element]);
 	}
 	
 	#_getTarget() {
@@ -72,18 +243,227 @@ class FB {
 	
 	#_createTemporalContext(object) {
 		this.internal = object;
-		// this.originalLength = this.length;
-		this.length = object.length;
 	}
 	
 	#_deleteTemporalContext() {
-		// this.length = this.originalLength
-		delete this.internal
-		// delete this.originalLength
+		delete this.internal;
+		this.length = Object.keys(this).length;
 	}
 	
+	/**
+	 *
+	 * @return {unknown[] | [*] | [*]}
+	 */
+	get target() {
+		return this.#_getTarget();
+	}
+	
+	/**
+	 *
+	 * @return {FBUtil}
+	 */
+	get util() {
+		return new FBUtil(this)
+	}
+	
+	/**
+	 *
+	 * @return {*|{}}
+	 */
+	prevObject() {
+		return this.prev;
+	}
+	
+	/**
+	 *
+	 * @return {{role: (""|string), id: (""|string), type: (""|string)}}
+	 */
+	getFieldAttribute() {
+		return {
+			id: this.util.attribute('id') && this.util.attribute('id').toLowerCase(),
+			type: this.util.attribute('type') && this.util.attribute('type').toLowerCase(),
+			role: this.util.dataAttribute('fb-role') && this.util.dataAttribute('fb-role').toLowerCase(),
+		}
+	}
+	
+	/**
+	 * Plugin Current Version
+	 * @return {string}
+	 */
+	get version() {
+		return '2.0.0';
+	}
+}
+
+class FBUtil extends FBBase {
+	/**
+	 *
+	 * @param selector
+	 * @param context
+	 */
+	constructor(selector, context) {
+		super(selector, context)
+	}
+	
+	/**
+	 *
+	 * @return {FBClassList}
+	 */
+	get classlist() {
+		return new FBClassList(this);
+	}
+	
+	/**
+	 *
+	 * @return {FBHtml}
+	 */
+	get html() {
+		return new FBHtml(this);
+	}
+	
+	/**
+	 *
+	 * @return {FBValidator}
+	 */
+	get validator() {
+		return new FBValidator(this);
+	}
+	
+	/**
+	 *
+	 * @return {string|void}
+	 */
+	get action() {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			return this.isFormElement(target[0]) ?
+				(target[0].action ?? _target.attribute('action')) :
+				_target.dataAttribute('action')
+		}
+		return console.error('ReferenceError: Element is Undefined.', this);
+	}
+	
+	/**
+	 *
+	 * @return {unknown[] | [*] | [*]}
+	 */
+	#_getTarget() {
+		return this.target;
+	}
+	
+	/**
+	 *
+	 * @param element
+	 * @return {boolean}
+	 */
+	isFormElement(element) {
+		return element.tagName.toUpperCase() === 'FORM';
+	}
+	
+	/**
+	 *
+	 * @return {boolean|void}
+	 */
+	isEmailField() {
+		const target = this.target;
+		if (target.length) {
+			const attributes = this.getFieldAttribute();
+			return !!((attributes.type && attributes.type.includes('email')) || (attributes.role && attributes.role.includes('email')) || (attributes.id && attributes.id.match(/(mail)/gi)));
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/**
+	 *
+	 * @return {boolean|void}
+	 */
+	isNameField() {
+		const target = this.target;
+		if (target.length) {
+			const attributes = this.getFieldAttribute();
+			return !!((attributes.role && attributes.role.includes('name')) || (attributes.id && attributes.id.match(/(name)/gi)));
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/**
+	 *
+	 * @param passwordId
+	 * @return {boolean|void}
+	 */
+	isPasswordField(passwordId) {
+		const target = this.target;
+		if (target.length) {
+			const attributes = this.getFieldAttribute();
+			return !!(attributes.type === 'password' || (attributes.id && attributes.id.includes(passwordId.toLowerCase())));
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/**
+	 *
+	 * @return {boolean|void}
+	 */
+	isPhoneField() {
+		const target = this.target;
+		if (target.length) {
+			const attributes = this.getFieldAttribute();
+			return !!((attributes.type && attributes.type.includes('tel')) || (attributes.role && attributes.role.includes('phone')) || (attributes.id && attributes.id.match(/(phone)/gi)));
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/**
+	 *
+	 * @return {boolean|void}
+	 */
+	isUsernameField() {
+		const target = this.target;
+		if (target.length) {
+			const attributes = this.getFieldAttribute();
+			return !!((attributes.role && attributes.role.includes('username')) || (attributes.id && attributes.id.match(/(username)/gi)));
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/*#_setPrevObject() {
+		const _this = this.#_getTarget()
+		_this.splice(_this.length, null, [this.prev])
+		
+		Object.keys(this).forEach(idx => delete this[idx]);
+		this.length = 0;
+		this.prev = new FBUtil();
+		this.prev.length = 0;
+		
+		_this.forEach((element, idx) => {
+			if (idx !== (_this.length - 1)) {
+				this.prev[idx] = element
+				this.prev.length++;
+			} else {
+				if (element.length)
+					this.prev.prev = element[0];
+			}
+		});
+	}*/
+	
+	/**
+	 *
+	 * @param prevObject {FBUtil}
+	 */
+	#_setPrevObject(prevObject) {
+		this.prev = new FBUtil();
+		this.prev = prevObject;
+	}
+	
+	/**
+	 *
+	 * @param event
+	 * @param prefix
+	 * @param callback
+	 * @return {Error|*}
+	 */
 	#_handleEvent({event, prefix, callback}) {
-		const handler = `${prefix}${event.type}`, eventsSource = [
+		const handler = isString(event) ? `${prefix}${event}` : `${prefix}${event.name}`, /*handler = `${prefix}${event.type}`,*/ eventsSource = [
 			'onblur',
 			'onchange',
 			'onclick',
@@ -94,22 +474,22 @@ class FB {
 			'onkeyup',
 			'onmouseenter',
 			'onmouseleave',
-			'onmouseover'
+			'onmouseover',
+			'onreset',
+			'onsubmit',
+			'onclose.bs.alert',
+			'onshow.bs.modal',
+			'onhide.bs.modal',
+			'onshown.bs.modal',
+			'onhidden.bs.modal',
 		], allowedEvents = new Set(eventsSource);
 		
-		allowedEvents.has(handler.toLowerCase()) ?
-			callback(event) :
+		if (!allowedEvents.has(handler.toLowerCase())) {
 			console.error(`Given Event - ${handler} - is not allowed.\r\nList of Allowed Events:\r\n [${eventsSource}]`);
+			return new Error(`Given Event - ${handler} - is not allowed.\r\nList of Allowed Events:\r\n [${eventsSource}]`);
+		}
+		return callback;
 	}
-	
-	/*#_runFunction(fn) {
-		const action = () => {
-			console.log(currentAnimation);
-			return fn()
-		};
-		
-		return !!currentAnimation ? currentAnimation.finished.then(() => action()) : action();
-	}*/
 	
 	/**
 	 * Perform called animations with optional callback
@@ -120,15 +500,15 @@ class FB {
 	 * @returns {*}
 	 */
 	async #_animations({animation, timeout = 300, iterations = 1, callback = null}) {
-		let that = this, keyframesRule, defaultKeyframe, ongoingAnim;
+		let keyframesRule, defaultKeyframe, ongoingAnim;
 		
 		/**
 		 * FadeIn Animation
 		 * @param callback
-		 * @returns {FB}
+		 * @returns {FBUtil}
 		 */
-		const fadeIn = (callback) => {
-			ongoingAnim = `fadeIn`;
+		const fadein = (callback) => {
+			ongoingAnim = `fadein`;
 			defaultKeyframe = [{opacity: 0}, {opacity: 0.3333333333333333}, {opacity: 0.6666666666666667}, {opacity: 1}];
 			
 			keyframesRule = {
@@ -139,7 +519,7 @@ class FB {
 			target.forEach(element => {
 				const elementDisplay = window.getComputedStyle(element).display;
 				
-				elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
+				// elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
 				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
 				currentAnimation.id = ongoingAnim;
 				
@@ -151,10 +531,10 @@ class FB {
 		/**
 		 * FadeOut Animation
 		 * @param callback
-		 * @returns {FB}
+		 * @returns {FBUtil}
 		 */
-		const fadeOut = (callback) => {
-			ongoingAnim = `fadeOut`;
+		const fadeout = (callback) => {
+			ongoingAnim = `fadeout`;
 			defaultKeyframe = [{opacity: 1}, {opacity: 0.6666666666666667}, {opacity: 0.3333333333333333}, {opacity: 0}];
 			
 			keyframesRule = {
@@ -165,12 +545,12 @@ class FB {
 			target.forEach(element => {
 				const elementDisplay = window.getComputedStyle(element).display;
 				
-				elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
+				// elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
 				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
 				currentAnimation.id = ongoingAnim;
 				
 				currentAnimation.finished.then(() => {
-					element.style.display = 'none';
+					// element.style.display = 'none';
 					isFunction(callback) && callback(element)
 				});
 			});
@@ -180,7 +560,7 @@ class FB {
 		/**
 		 * SlideIn-Down Animation
 		 * @param callback
-		 * @returns {FB}
+		 * @returns {FBUtil}
 		 */
 		const slideInDown = (callback) => {
 			ongoingAnim = `slideInDown`;
@@ -202,7 +582,7 @@ class FB {
 		/**
 		 * SlideIn-Up Animation
 		 * @param callback
-		 * @returns {FB}
+		 * @returns {FBUtil}
 		 */
 		const slideInUp = (callback) => {
 			ongoingAnim = `slideInUp`;
@@ -224,7 +604,7 @@ class FB {
 		/**
 		 * SlideOut-Up Animation
 		 * @param callback
-		 * @returns {FB}
+		 * @returns {FBUtil}
 		 */
 		const slideOutUp = (callback) => {
 			ongoingAnim = `slideOutUp`;
@@ -246,7 +626,7 @@ class FB {
 		/**
 		 * SlideOut-Down Animation
 		 * @param callback
-		 * @returns {FB}
+		 * @returns {FBUtil}
 		 */
 		const slideOutDown = (callback) => {
 			ongoingAnim = `slideOutDown`;
@@ -266,8 +646,8 @@ class FB {
 		}
 		
 		const target = this.#_getTarget(), animations = {
-			fadeInAnim: fadeIn,
-			fadeOutAnim: fadeOut,
+			fadeInAnim: fadein,
+			fadeOutAnim: fadeout,
 			slideInUpAnim: slideInUp,
 			slideOutUpAnim: slideOutUp,
 			slideInDownAnim: slideInDown,
@@ -282,7 +662,7 @@ class FB {
 	 * @param timeout
 	 * @param iterations
 	 * @param callback
-	 * @returns {Promise<FB>}
+	 * @returns {Promise<FBUtil>}
 	 */
 	#_callAnimation(animation, timeout, iterations, callback = null) {
 		const callAnimation = () => isFunction(iterations) ?
@@ -296,7 +676,7 @@ class FB {
 	 * @param timeout
 	 * @param iterations
 	 * @param callback
-	 * @returns {Promise<FB>}
+	 * @returns {Promise<FBUtil>}
 	 */
 	fadein(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('fadeInAnim', timeout, iterations, callback);
@@ -307,7 +687,7 @@ class FB {
 	 * @param timeout
 	 * @param iterations
 	 * @param callback
-	 * @returns {Promise<FB>}
+	 * @returns {Promise<FBUtil>}
 	 */
 	fadeout(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('fadeOutAnim', timeout, iterations, callback);
@@ -318,7 +698,7 @@ class FB {
 	 * @param timeout
 	 * @param iterations
 	 * @param callback
-	 * @returns {Promise<FB>}
+	 * @returns {Promise<FBUtil>}
 	 */
 	slideInUp(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideInUpAnim', timeout, iterations, callback);
@@ -329,7 +709,7 @@ class FB {
 	 * @param timeout
 	 * @param iterations
 	 * @param callback
-	 * @returns {Promise<FB>}
+	 * @returns {Promise<FBUtil>}
 	 */
 	slideInDown(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideInDownAnim', timeout, iterations, callback);
@@ -340,7 +720,7 @@ class FB {
 	 * @param timeout
 	 * @param iterations
 	 * @param callback
-	 * @returns {Promise<FB>}
+	 * @returns {Promise<FBUtil>}
 	 */
 	slideOutUp(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideOutUpAnim', timeout, iterations, callback);
@@ -351,33 +731,12 @@ class FB {
 	 * @param timeout
 	 * @param iterations
 	 * @param callback
-	 * @returns {Promise<FB>}
+	 * @returns {Promise<FBUtil>}
 	 */
 	slideOutDown(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideOutDownAnim', timeout, iterations, callback);
 	}
 	
-	/**
-	 * Add given token(s) to the elements tokenList (class list).
-	 * @param tokenList {...String} _String(s) representing the token (or tokens) to add to the tokenList._
-	 * @returns {FB}
-	 */
-	classListAdd(...tokenList) {
-		const target = this.#_getTarget();
-		target.length && (target.forEach(element => tokenList.forEach(token => element.classList.add(token))));
-		return this;
-	}
-	
-	/**
-	 * Remove given token(s) from the elements tokenList (class list).
-	 * @param tokenList {...String} _String(s) representing the token (or tokens) to remove from the tokenList._
-	 * @returns {FB}
-	 */
-	classListRemove(...tokenList) {
-		const target = this.#_getTarget();
-		target.length && (target.forEach(element => tokenList.forEach(token => element.classList.remove(token))));
-		return this;
-	}
 	
 	/**
 	 * Get or Set the given attribute for the target element (If a String is passed to the key param).
@@ -406,13 +765,19 @@ class FB {
 	 * _Sets the given attributes if name is given as Object (Key-Value Pair)._
 	 * @param name {string|object}
 	 * @param value {string|null}
-	 * @returns {FB}
+	 * @returns {FBUtil}
 	 */
 	touchAttribute(name, value = null) {
 		const target = this.#_getTarget();
 		target.length && ((isObject(name) && Object.keys(name).length && !value) ?
 			Object.keys(name).forEach(attr => target.forEach(element => element.setAttribute(attr, name[attr]))) :
 			target.forEach(element => element.setAttribute(name, value)));
+		return this;
+	}
+	
+	removeAttribute(name) {
+		const target = this.#_getTarget();
+		(target.length && name) && target.forEach(element => element.removeAttribute(name));
 		return this;
 	}
 	
@@ -444,7 +809,7 @@ class FB {
 	 * _Sets the given properties if name is given as a plain Object (Key-Value Pair)._
 	 * @param name {string|object}
 	 * @param value {string|null}
-	 * @returns {FB}
+	 * @returns {FBUtil}
 	 */
 	touchProperty(name, value = null) {
 		const target = this.#_getTarget();
@@ -468,6 +833,22 @@ class FB {
 	 */
 	dataAttribute(name, value = null) {
 		const target = this.#_getTarget();
+		
+		if (!isObject(name)) {
+			let replaced = '',
+				nameSplit = name.split('-')
+			
+			nameSplit.forEach((split, idx) => {
+				if (idx) {
+					let splinted = split.split(''),
+						firstWord = splinted[0]
+					splinted[0] = firstWord.toUpperCase();
+					replaced += splinted.join('');
+				}
+			});
+			name = `${nameSplit[0]}${replaced}`
+		}
+		
 		return target.length && ((isObject(name) ?
 			this.touchDataAttribute(name) :
 			target.length && ((name && value) ? this.touchDataAttribute(name, value) : target[0].dataset[name])));
@@ -481,31 +862,13 @@ class FB {
 	 * _Sets the given data-* attributes if name is given as a plain Object (Key-Value Pair)._
 	 * @param name {string|Object}
 	 * @param value {string|null}
-	 * @returns {FB}
+	 * @returns {FBUtil}
 	 */
 	touchDataAttribute(name, value = null) {
-		const target = this.#_getTarget()
+		const target = this.#_getTarget();
 		target.length && ((isObject(name) && Object.keys(name).length && !value) ?
 			Object.keys(name).forEach(data => target.forEach(element => element.dataset[data] = name[data])) :
 			target.forEach(element => element.dataset[name] = value));
-		return this;
-	}
-	
-	/**
-	 * Set the given CSS style(s) for the target element.
-	 *
-	 * _Sets the given style if name and value is given as a String._
-	 *
-	 * _Sets the given styles if name is given as a plain Object (Key-Value Pair)._
-	 * @param name {string|Object}
-	 * @param value {string|null}
-	 * @returns {FB}
-	 */
-	touchStyle(name, value = null) {
-		const target = this.#_getTarget();
-		target.length && ((isObject(name) && Object.keys(name).length && !value) ?
-			Object.keys(name).forEach(key => target.forEach(element => element.style[key] = name[key])) :
-			target.forEach(element => element.style[name] = value));
 		return this;
 	}
 	
@@ -519,13 +882,31 @@ class FB {
 	 * _Sets the given styles if name is given as a plain Object (Key-Value Pair)._
 	 * @param name {string|Object}
 	 * @param value {string|null}
-	 * @returns {string|touchDataAttribute}
+	 * @returns {string|touchStyle}
 	 */
 	style(name, value = null) {
 		const target = this.#_getTarget();
 		return target.length && ((isObject(name) ?
 			this.touchStyle(name) :
 			target.length && ((name && value) ? this.touchStyle(name, value) : this.cssProp().getPropertyValue(name))));
+	}
+	
+	/**
+	 * Set the given CSS style(s) for the target element.
+	 *
+	 * _Sets the given style if name and value is given as a String._
+	 *
+	 * _Sets the given styles if name is given as a plain Object (Key-Value Pair)._
+	 * @param name {string|Object}
+	 * @param value {string|null}
+	 * @returns {FBUtil}
+	 */
+	touchStyle(name, value = null) {
+		const target = this.#_getTarget();
+		target.length && ((isObject(name) && Object.keys(name).length && !value) ?
+			Object.keys(name).forEach(key => target.forEach(element => element.style[key] = name[key])) :
+			target.forEach(element => element.style[name] = value));
+		return this;
 	}
 	
 	/**
@@ -538,6 +919,21 @@ class FB {
 		return window.getComputedStyle(target[0], pseudoElement);
 	}
 	
+	disable(enable = false) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			target.forEach(element => {
+				const tagName = element.tagName && element.tagName.toLowerCase(), _element = $fs(element);
+				
+				tagName !== 'a' ?
+					(!enable ? _element.property({disabled: true}) : _element.property({disabled: false})) :
+					(!enable ? _element.classlist.put('disabled') : _element.classlist.remove('disabled'));
+			});
+			return this
+		}
+	}
+	
 	/**
 	 * Returns the attributes of the given element as on Object.
 	 * @returns {Object} A Key-Value pair Object representing the attribute as names and values
@@ -545,7 +941,7 @@ class FB {
 	listAttributes() {
 		const attributesList = {}, target = this.#_getTarget();
 		(Array.from(target[0].attributes)).forEach(attribute => attributesList[attribute.name] = attribute.value);
-		return attributesList
+		return attributesList;
 	}
 	
 	/**
@@ -554,11 +950,178 @@ class FB {
 	 */
 	listProperties() {
 		const propertiesList = {}, target = this.#_getTarget();
-		/*return this.#_runFunction(() => {*/
 		Object.keys(target[0]).filter(value => Number.isNaN(parseInt(value)) && target[0][value])
 			.forEach(property => propertiesList[property] = target[0][property]);
 		return propertiesList;
-		/*});*/
+	}
+	
+	/**
+	 *
+	 * @param selector
+	 * @return {FBUtil<HTMLElement>}
+	 */
+	children(selector = null) {
+		const target = this.#_getTarget(), children = [];
+		// this.#_setPrevObject();
+		
+		$fs(target[0].children).target.forEach((child, idx) => {
+			if (selector) {
+				if ($fs(child).selectorMatches(selector)) {
+					children.push(child)
+					/*this[this.length] = child;
+					this.length++;*/
+				}
+			} else {
+				children.push(child)
+				/*this[this.length] = child;
+				this.length++;*/
+			}
+		});
+		const _children = $fs(children);
+		_children.#_setPrevObject(this)
+		return _children;
+	}
+	
+	/**
+	 *
+	 * @param selector
+	 * @return {FBUtil<HTMLElement>}
+	 */
+	siblings(selector = null) {
+		const target = this.#_getTarget(), siblings = [];
+		/*this.#_setPrevObject();*/
+		
+		$fs(target[0].parentNode.children).target.filter(sibling => {
+			if (selector) {
+				if (sibling !== target[0] && $fs(sibling).selectorMatches(selector)) {
+					siblings.push(sibling)
+				}
+			} else {
+				if (sibling !== target[0]) {
+					siblings.push(sibling)
+					/*this[this.length] = sibling;
+					this.length++;*/
+				}
+			}
+		});
+		const _siblings = $fs(siblings);
+		_siblings.#_setPrevObject(this);
+		return _siblings;
+	}
+	
+	/**
+	 *
+	 * @param selector
+	 * @return {FBUtil<HTMLElement>}
+	 */
+	prevSiblings(selector = null) {
+		const prevSiblings = [], target = this.#_getTarget();
+		// this.#_setPrevObject();
+		
+		let _prevSibling = target[0].previousElementSibling;
+		
+		while (_prevSibling) {
+			if (selector) {
+				if ($fs(_prevSibling).selectorMatches(selector)) {
+					prevSiblings.push(_prevSibling);
+					break;
+				}
+			} else {
+				if (_prevSibling !== target[0])
+					prevSiblings.push(_prevSibling);
+			}
+			_prevSibling = _prevSibling.previousElementSibling;
+		}
+		
+		/*prevSiblings.forEach(prevSibling => {
+			this[this.length] = prevSibling;
+			this.length++;
+		});
+		return this;*/
+		const _prevSiblings = $fs(prevSiblings);
+		_prevSiblings.#_setPrevObject(this);
+		return _prevSiblings;
+	}
+	
+	/**
+	 *
+	 * @param selector
+	 * @return {FBUtil<HTMLElement>}
+	 */
+	descendants(selector = null) {
+		const target = this.#_getTarget(), descendants = [];
+		// this.#_setPrevObject();
+		
+		$fs('*', target[0]).target.forEach(descendant => {
+			if (selector) {
+				if ($fs(descendant).selectorMatches(selector)) {
+					/*this[this.length] = descendant;
+					this.length++;*/
+					descendants.push(descendant);
+				}
+			} else {
+				/*this[this.length] = descendant;
+				this.length++;*/
+				descendants.push(descendant);
+			}
+		});
+		
+		// return this;
+		const _descendants = $fs(descendants);
+		_descendants.#_setPrevObject(this);
+		return _descendants;
+	}
+	
+	/**
+	 * Checks if the target element has the given element.
+	 *
+	 * _Returns the element if true else an empty array Object returned._
+	 * @param selector
+	 * @return {FBUtil}
+	 */
+	has(selector) {
+		const target = this.#_getTarget(), matches = [];
+		// this.#_setPrevObject();
+		
+		$fs('*', target[0]).target.forEach(node => {
+			if (isString(selector)) {
+				if ($fs(node).selectorMatches(selector))
+					matches.push(node)
+			} else {
+				$fs(selector).target.forEach(e => {
+					if (e === node)
+						matches.push(e)
+				});
+			}
+		});
+		const _matches = $fs(matches);
+		_matches.#_setPrevObject(this);
+		return _matches;
+	}
+	
+	/**
+	 * Checks if the mouse cursor is over the element.
+	 * @return {Promise<boolean>}
+	 */
+	mouseIsOver() {
+		const target = this.#_getTarget();
+		
+		return new Promise(async resolve => {
+			await target.forEach(element => {
+				resolve($fs(element).selectorMatches(':hover'))
+			})
+		});
+	}
+	
+	/**
+	 * Checks the status of given CSS Pseudo selector on the target element.
+	 * @param selector {string}
+	 * @return {boolean}
+	 */
+	selectorMatches(selector) {
+		const target = this.#_getTarget();
+		// this.#_setPrevObject();
+		return (target[0].matches || target[0].matchesSelector || target[0].msMatchesSelector || target[0].mozMatchesSelector || target[0].webkitMatchesSelector || target[0].oMatchesSelector).call(target[0], selector);
 	}
 	
 	/**
@@ -566,16 +1129,1459 @@ class FB {
 	 * @param events {string|Object|DocumentEventMap}
 	 * @param callback {function|null}
 	 * @param option {boolean}
-	 * @returns {FB}
+	 * @returns {FBUtil}
 	 */
-	upon(events, callback = null, option = false) {
-		const target = this.#_getTarget();
+	upon(events, callback = null, option = true) {
+		const _target = this, target = _target.#_getTarget();
 		target.forEach(element => {
 			isObject(events) ?
-				Object.keys(events).forEach(event => element.addEventListener(event, (evt) => this.#_handleEvent({event: evt, prefix: 'on', callback: events[event]}), option)) :
-				(isFunction(callback) ? element.addEventListener(events, (evt) => callback(evt), option) : console.error('Undefined Listener'));
+				Object.keys(events).forEach(event => element.addEventListener(event, this.#_handleEvent({event: events[event], prefix: 'on', callback: events[event]}), option)) :
+				(isFunction(callback) ? element.addEventListener(events, this.#_handleEvent({event: events, prefix: 'on', callback: callback}), option) : console.error(`Argument 2 [callback] expects Function. ${typeof callback} given.`));
 		});
 		return this;
+	}
+	
+	/**
+	 * Toggle the disabled state (property) of button.
+	 *
+	 * _Also toggle the button loader if available._
+	 * @param processIsDone {boolean}
+	 */
+	toggleButtonState(processIsDone = false) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			const buttonLoaderElement = $fs(buttonLoader, _target);
+			if ((!_target.property('disabled') || (_target.attribute('disabled') && _target.attribute('disabled').toLowerCase() !== 'disabled')) && !processIsDone) {
+				buttonLoaderElement.length && buttonLoaderElement.touchStyle({opacity: 0, display: 'inline-flex'}).fadein().then(element => element.touchStyle({opacity: 1}));
+				_target.disable();
+			}
+			
+			if (processIsDone) {
+				buttonLoaderElement.length && buttonLoaderElement.fadeout().then(element => element.touchStyle({opacity: 0, display: 'none'}));
+				_target.disable(true);
+			}
+		}
+	}
+	
+	/**
+	 * Manipulate the buttons state of a Form Submit form.
+	 *
+	 * _(**N.B:** ***Depends on the toggleButtonState() function***)._
+	 * @param processIsDone {boolean}
+	 */
+	toggleSubmitButtonState(processIsDone = false) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			if (this.isFormElement(target[0])) {
+				const submitButton = $fs('button[type="submit"]', _target).length ? $fs('button[type="submit"]', _target) : $fs(`button[form="${target[0].id}"]`);
+				submitButton.toggleButtonState(processIsDone);
+			}
+		}
+	}
+	
+	/**
+	 * Load the given modal with a callback.
+	 * @param options {Object}
+	 * @param callback {function}
+	 * @return {void|FBUtil}
+	 */
+	onBSModalLoad(options, callback) {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			_target.upon('show.bs.modal', isFunction(callback) ? callback : (isFunction(options) && options));
+			if (target.length > 1)
+				target.forEach(element => new bootstrap.Modal(element, isObject(options) ? options : null).show());
+			else
+				new bootstrap.Modal(target[0], isObject(options) ? options : null).show();
+			return this;
+		}
+		return console.error('ReferenceError: Element is undefined.');
+	}
+	
+	/**
+	 * Dispose the given modal with a callback.
+	 * @param callback
+	 */
+	onBSModalClose(callback) {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			_target.upon('hide.bs.modal', function (e) {
+				if (target.length > 1)
+					target.forEach(element => new bootstrap.Modal(element).hide());
+				else
+					new bootstrap.Modal(target[0]).hide();
+				isFunction(callback) && callback(e);
+			});
+		}
+	}
+	
+	/**
+	 * Loads specified Page/HTML into the target element from given URI.
+	 *
+	 * _If the selector parameter is specified, then it will load the content of the specified element for the given URI._
+	 * @param uri {string}
+	 * @param selector {string|null}
+	 * @param data {Object|null}
+	 * @param overlay {string|null}
+	 * @param dataType {string}
+	 * @param slug {string|null}
+	 * @param beforeSend {function|null}
+	 * @param callback {function|null}
+	 * @return {Promise<unknown>}
+	 */
+	async loadPageData({uri = '', selector = null, data = null, overlay = null, dataType = 'text', slug = 'Page', beforeSend, callback}) {
+		const _target = this, target = _target.target;
+		
+		const requestType = !data ? 'get' : 'post';
+		const params = !data ? null : new URLSearchParams(data);
+		
+		return new Promise((resolve, reject) => {
+			target.forEach(element => {
+				const _element = $fs(element);
+				fetchReq({
+					uri: uri,
+					method: requestType,
+					data: params,
+					dataType: dataType,
+					beforeSend: beforeSend,
+					onError: err => {
+						console.error(`${err.status} HTTP error: ${err.statusText} for ${requestType.toUpperCase()} request from URL: ${err.url}`)
+						if (overlay)
+							if ($fs(overlay).style('display').toString().toLowerCase() !== 'none')
+								$fs(overlay).fadeout().then(element => element.touchStyle({display: 'none'}).classlist.remove('overlay-shown'));
+						reject(err);
+					},
+					onSuccess: (data) => {
+						_element.html.insert(!selector ? data : new XMLSerializer().serializeToString(new DOMParser().parseFromString(data.responseText, "text/html").querySelector(selector)));
+						typeof callback === 'function' && callback();
+						resolve({response: data.responseText, status: data.status});
+					}
+				});
+			});
+		});
+	}
+	
+	/**
+	 * Handle the submission of the target form using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+	 *
+	 * Returns a promise which can be used to handle actions after response of the resource.
+	 * @param uri {string}
+	 * @param method {string}
+	 * @param data {Object|null}
+	 * @param dataType {string}
+	 * @return {Promise<unknown>}
+	 */
+	handleFormSubmit({uri = '', method = 'get', data = null, dataType = 'json'} = {}) {
+		const _target = this, target = _target.target, _globalMessageTag = $fs(globalMessageTag);
+		
+		return new Promise((resolve, reject) => {
+			target.forEach(function (element) {
+				if (_target.isFormElement(element)) {
+					const _element = $fs(element);
+					const formData = new FormData(element);
+					const messageTag = _element.validator.messageTag;
+					const form = {
+						hasErrors: !!(_element.validator.getErrors.count),
+						errors: _element.validator.getErrors.errors
+					};
+					data && Object.keys(data).length && Object.keys(data).forEach(key => formData.append(key, data[key]));
+					let _messageTag = messageTag.length ? messageTag : (_globalMessageTag.length && _globalMessageTag);
+					
+					!form.hasErrors ? fetchReq({
+						uri: uri,
+						method: method,
+						data: formData,
+						dataType: dataType,
+						beforeSend: () => {
+							_element.toggleSubmitButtonState();
+							messageTag.html.insert(_element.validator.waitText).fadein().then();
+						},
+						onError: (err, status) => {
+							setTimeout(() => {
+								_messageTag.renderMessage(fa_wifi_s, alert_d, 'Server error occurred, please try again.', null, element, true);
+								_element.toggleSubmitButtonState(true);
+								reject({response: err, status: status, messageTag: _messageTag, form: element});
+							}, 1500);
+						},
+						onComplete: xhr => {
+							let response = xhr.responseJSON,
+								responseText = xhr.responseText,
+								status = xhr.status;
+							console.log(xhr)
+							setTimeout(() => {
+								if ((status > 199 && status < 300 || status === 308)) {
+									if (status === 308 && dataType === 'json') {
+										if (_messageTag.length) {
+											_messageTag.renderMessage(fa_check_c, alert_s, response.message, null, element, false, true);
+											_messageTag === messageTag ?
+												setTimeout(() => _messageTag.fadeout().then(() => setTimeout(() => '/*location.href = response.redirect*/', 2000)), 1000) :
+												_messageTag === _globalMessageTag && _messageTag.slideInDown().then(target => setTimeout(() => target.slideOutUp().then(() => '/*location.href = response.redirect*/'), 1500));
+										}
+									} else
+										resolve({JSON: response, text: responseText, form: element, messageTag: _messageTag});
+								} else {
+									if (dataType === 'json') {
+										if (status === 419)
+											_messageTag.length && _messageTag.renderMessage(alert_d, fa_exc_c, response.message, null, element, true);
+										// location.href = response.redirect
+										else if (status === 422 || status === 501) {
+											_messageTag.length ?
+												!!response.errors && _element.validator.renderValidationErrors(response.errors, response.message) :
+												_messageTag.renderMessage(fa_exc_c, alert_d, response.message, null, element, true);
+											_messageTag === _globalMessageTag && _messageTag.slideInDown({timeout: 800});
+										} else {
+											console.error('Server Failure', xhr);
+											reject({response: xhr, status: status, messageTag: _messageTag, form: element});
+										}
+									} else {
+										console.error('Server Failure', xhr);
+										reject({response: xhr, status: status, messageTag: _messageTag, form: element});
+									}
+									_element.toggleSubmitButtonState(true);
+								}
+							}, 1500);
+						},
+					}) : $fs(element).validator.renderValidationErrors(form.errors, 'Given Data is invalid');
+				}
+			});
+		});
+	}
+}
+
+class FBClassList extends FBBase {
+	constructor(selector, context) {
+		super(selector, context);
+	}
+	
+	#_classList() {
+		return this.target[0].classList;
+	}
+	
+	each(callback) {
+		return this.#_classList().length ?
+			this.#_classList().forEach((value, idx) => callback(value, idx)) :
+			console.warn('classList for element is empty');
+	}
+	
+	/**
+	 * Returns true if the element has the given class, else returns false.
+	 * @param token
+	 * @return {Boolean}
+	 */
+	has(token) {
+		return this.#_classList().contains(token);
+	}
+	
+	/**
+	 * Add given token(s) to the elements tokenList (class list).
+	 * @param tokenList {...String} _String(s) representing the token (or tokens) to add to the tokenList._
+	 * @return {FBClassList}
+	 */
+	put(...tokenList) {
+		this.target.length && (this.target.forEach(element => tokenList.forEach(token => element.classList.add(token))));
+		return this;
+	}
+	
+	/**
+	 * Remove given token(s) from the elements tokenList (class list).
+	 * @param tokenList {...String} _String(s) representing the token (or tokens) to remove from the tokenList._
+	 * @return {FBClassList}
+	 */
+	remove(...tokenList) {
+		this.target.length && (this.target.forEach(element => tokenList.forEach(token => element.classList.remove(token))));
+		return this;
+	}
+	
+	/**
+	 * Replaces the OldToken with the newToken.
+	 *
+	 * _Adds the newToken to the elements tokenList if the oldToken does not exist_
+	 * @param oldToken {string} _String representing the token to be replaced._
+	 * @param newToken {string} _String representing the token to replace the old token._
+	 * @return {FBClassList}
+	 */
+	replace(oldToken, newToken) {
+		this.target.length && (this.target.forEach(element => (element.classList.contains(oldToken)) ?
+			element.classList.replace(oldToken, newToken) :
+			element.classList.add(newToken)
+		));
+		return this;
+	}
+	
+	get collect() {
+		const classList = [];
+		this.#_classList() && this.each(value => classList.push(value))
+		return classList;
+	}
+	
+	get log() {
+		console.log(this.collect);
+	}
+}
+
+class FBHtml extends FBUtil {
+	constructor(selector, context) {
+		super(selector, context);
+	}
+	
+	get classList() {
+		return new FBClassList(this);
+	}
+	
+	insert(value) {
+		const target = this.target
+		target.forEach(element => element.innerHTML = value);
+		return this;
+	}
+	
+	affix(value) {
+		const target = this.target;
+		target.forEach(element => element.insertAdjacentHTML('beforeend', value));
+		return this;
+	}
+	
+	prefix(value) {
+		const target = this.target;
+		target.forEach(element => element.insertAdjacentHTML('afterbegin', value));
+		return this;
+	}
+	
+	insertBefore(value) {
+		const target = this.target;
+		target.forEach(element => element.insertAdjacentHTML('beforebegin', value));
+		return this;
+	}
+	
+	insertAfter(value) {
+		const target = this.target;
+		target.forEach(element => element.insertAdjacentHTML('afterend', value));
+		return this;
+	}
+	
+	get collect() {
+		return this[0].innerHTML;
+	}
+	
+	get log() {
+		console.log(this.collect);
+	}
+}
+
+class FBValidator extends FBUtil {
+	#_formFieldGroup = '.form-field-group';
+	#_fbValidatorConfig = {
+		regExp: {
+			name: /^([a-zA-Z]{2,255})(\s[a-zA-Z]{2,255}){1,2}$/gi,
+			username: /^[a-zA-Z]+(_?[a-zA-Z]){2,255}$/gi,
+			email: /^\w+([.-]?\w+)*@\w+([.-]?\w{2,3})*(\.\w{2,3})$/gi,
+			phone: /^(\+\d{1,3}?\s)(\(\d{3}\)\s)?(\d+\s)*(\d{2,3}-?\d+)+$/g,
+			cardCVV: /[0-9]{3,4}$/gi,
+			cardNumber: /^[0-9]+$/gi,
+		},
+		icons: {
+			validIcon: '<i class="far fa-1x fa-check"></i>',
+			invalidIcon: '<i class="far fa-1x fa-exclamation-circle"></i>',
+			passwordToggleIcon: '<i class="fa fa-eye"></i>',
+			passwordCapslockAlertIcon: '<i class="far fa-exclamation-triangle"></i>',
+		},
+		config: {
+			showPassword: true,
+			capslockAlert: true,
+			validateCard: false,
+			validateName: false,
+			validateEmail: false,
+			validatePhone: false,
+			validatePassword: true,
+			validateUsername: false,
+			nativeValidation: false,
+			passwordId: 'password',
+			passwordConfirmId: 'password_confirmation',
+			initWrapper: '.form-group',
+		},
+		texts: {
+			capslock: 'Capslock active',
+		},
+	};
+	#_init = false;
+	#_originals = {};
+	
+	constructor(selector, context) {
+		super(selector, context);
+	}
+	
+	get errorBag() {
+		return (this.length && this[0].tagName && this[0].tagName.toLowerCase() === 'form' && Object.keys(errorBag[this[0].id])) ? errorBag[this[0].id] : null;
+	}
+	
+	get errorCount() {
+		return (this.length && this[0].tagName && this[0].tagName.toLowerCase() === 'form' && Object.keys(errorCount[this[0].id])) ? errorCount[this[0].id] : 0;
+	}
+	
+	get messageTag() {
+		if (this.length && this.isFormElement(this[0])) {
+			const messageTag = $fs('.form-message .response-text', this);
+			messageTag.length && this.#_resetFBObject(messageTag);
+			return this;
+		}
+		return console.error('ReferenceError: Non Form Element given.', this);
+	}
+	
+	get waitText() {
+		if (this.length && this.isFormElement(this[0])) {
+			const waitTextWrapper = $fs('.form-message .waiting-text', this);
+			return waitTextWrapper.length ? waitTextWrapper[0].innerHTML : 'Please Wait...';
+		}
+		return console.error('ReferenceError: Non Form Element given.', this);
+	}
+	
+	static passwordCapslockAlertClass() {
+		return 'capslock-alert';
+	}
+	
+	static passwordTogglerIconClass() {
+		return 'password-toggler-icon';
+	}
+	
+	/**
+	 *
+	 * @return {{}|{count: (number), errors: (Object)}|void}
+	 */
+	get getErrors() {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			if (target.length > 1) {
+				let errors = {}
+				
+				target.forEach(element => {
+					if (element.tagName && element.tagName.toLowerCase() === 'form') {
+						errors[element.id] = {
+							count: $fs(element).validator.errorCount,
+							errors: $fs(element).validator.errorBag
+						};
+					}
+				});
+				return errors;
+			}
+			return {
+				count: this.errorCount,
+				errors: this.errorBag
+			};
+		}
+		return console.warn('ReferenceError: Element is undefined.');
+	}
+	
+	get validatorConfig() {
+		return this.#_fbValidatorConfig;
+	}
+	
+	#_passwordCapslockWrapper(icon, text) {
+		return `<div class="valid-text ${FBValidator.passwordCapslockAlertClass()} d-flex"><small class="bg-white shadow-sm text-danger m-auto p-1">${icon} ${text}</small></div>`;
+	}
+	
+	#_passwordTogglerWrapper(icon) {
+		return `<a class="text-muted toggle ${FBValidator.passwordTogglerIconClass()}">${icon}</a>`;
+	}
+	
+	#_invalidIconWrapper(icon) {
+		return `<small class="text-danger validation-icon invalid">${icon}</small>`;
+	}
+	
+	#_validIconWrapper(icon) {
+		return `<small class="text-success validation-icon valid">${icon}</small>`;
+	}
+	
+	#_touchConfig(config) {
+		if (isObject(config)) {
+			const validatorConfig = this.validatorConfig;
+			
+			Object.keys(validatorConfig).forEach(option => {
+				if (option in config && isObject(config[option])) {
+					const validatorConfigOptions = validatorConfig[option], configOptions = config[option];
+					
+					if (Object.keys(configOptions).length) {
+						Object.keys(validatorConfigOptions).forEach(subOption => {
+							if (subOption in configOptions) {
+								if (configOptions[subOption] !== undefined && configOptions[subOption] !== null && configOptions[subOption] !== '') {
+									validatorConfigOptions[subOption] = configOptions[subOption];
+								}
+							}
+						});
+					}
+				}
+			});
+		}
+	}
+	
+	#_isPasswordField(inputElement) {
+		return !!($fs(inputElement).length && ($fs(inputElement).attribute('type') && $fs(inputElement).attribute('type').toUpperCase() === 'PASSWORD' || ($fs(inputElement)[0].id && $fs(inputElement)[0].id.toLowerCase().includes('password'))));
+	}
+	
+	#_isDefaultPasswordField(element, passwordId) {
+		return $fs(element).length && $fs(element).attribute('id') && $fs(element).attribute('id').toLowerCase() === passwordId.toString().toLowerCase();
+	}
+	
+	/**
+	 *
+	 * @param elements
+	 * @param returnObject
+	 * @return {FBValidator}
+	 */
+	#_resetFBObject(elements, returnObject = false) {
+		const target = this.target;
+		target.splice(target.length, null, [this.prev]);
+		
+		Object.keys(this).forEach(idx => delete this[idx]);
+		this.length = 0;
+		this.prev = new FBUtil();
+		this.prev.length = 0;
+		
+		target.forEach((element, idx) => {
+			if (idx !== (target.length - 1)) {
+				this.prev[idx] = element
+				this.prev.length++;
+			} else {
+				if (element.length)
+					this.prev.prev = element[0];
+			}
+		});
+		
+		elements.target.forEach(element => {
+			this[this.length] = element;
+			this.length++;
+		});
+		
+		if (returnObject)
+			return this;
+	}
+	
+	#_onAlertCLose(context, originals = {}) {
+		const _target = this;
+		
+		$fs('.alert').upon('close.bs.alert', (e) => {
+			const target = e.currentTarget;
+			const targetElementId = target.dataset['alertId'];
+			
+			if ((context && targetElementId && targetElementId.length)) {
+				_target.#_resetFBObject($fs(targetElementId));
+				_target.removeValidationProps({context: context}, originals);
+			}
+		});
+	}
+	
+	#_placeBaseElements(target, originalLabel, originalField, fieldGroup, inputGroup, fieldId, fieldValidation, hasFloatingLabel) {
+		fieldValidation.classList.add('valid-text');
+		fieldValidation.setAttribute('id', `${fieldId}Valid`);
+		
+		if ($fs(target).has(originalField).length) {
+			originalLabel.target.forEach(child => target.removeChild(child));
+			originalField.target.forEach(child => target.removeChild(child));
+		}
+		
+		hasFloatingLabel ?
+			fieldGroup.append(originalField[0], originalLabel[0]) :
+			fieldGroup.append(originalField[0]);
+		inputGroup.append(fieldGroup);
+		hasFloatingLabel ?
+			target.append(inputGroup, fieldValidation) :
+			target.append(originalLabel[0], inputGroup, fieldValidation);
+		
+	}
+	
+	#_placeResponseMessageWrapper(form) {
+		let messageWrapper;
+		const _messageWrapper = form.has('.form-message');
+		const waitingTextWrapper = document.createElement('div');
+		const waitingIcon = document.createElement('i');
+		const waitingText = document.createElement('span');
+		const responseTextWrapper = document.createElement('div');
+		
+		responseTextWrapper.classList.add('response-text', 'small');
+		waitingText.classList.add('text-primary');
+		waitingText.classList.add('text-primary');
+		waitingText.innerText = 'Please Wait...';
+		waitingIcon.classList.add('fa', 'fa-1x', 'fa-exclamation-circle', 'text-danger');
+		waitingTextWrapper.classList.add('waiting-text', 'd-none');
+		waitingTextWrapper.append(waitingIcon, waitingText);
+		
+		if (_messageWrapper.length) {
+			const assumedChildren = _messageWrapper.children()
+			assumedChildren.length && assumedChildren.target.forEach(child => child.remove())
+			messageWrapper = _messageWrapper[0];
+		} else {
+			messageWrapper = document.createElement('div');
+			messageWrapper.classList.add('form-message');
+		}
+		messageWrapper.append(waitingTextWrapper, responseTextWrapper)
+	}
+	
+	#_formValidate(forms) {
+		// this.#_resetFBObject($fs(forms));
+		this.#_init = true;
+		
+		forms.forEach(form => {
+			this.#_resetFBObject($fs(form));
+			form = $fs(form);
+			let validatorConfig = this.validatorConfig,
+				regExp = validatorConfig.regExp,
+				config = validatorConfig.config,
+				icons = validatorConfig.icons,
+				texts = validatorConfig.texts,
+				capslockWrapper = this.#_passwordCapslockWrapper,
+				togglerWrapper = this.#_passwordTogglerWrapper,
+				invalidWrapper = this.#_invalidIconWrapper,
+				validWrapper = this.#_validIconWrapper;
+			
+			if (form.attribute('id')) {
+				let formId = form.attribute('id'),
+					selector = `#${formId} ${config.initWrapper}`;
+				/*this.#_errorBag[formId] = {};
+				this.#_errorCount[formId] = {};*/
+				errorBag[formId] = {};
+				errorCount[formId] = 0;
+				
+				this.#_placeResponseMessageWrapper(form)
+				
+				config.nativeValidation ? form.property({noValidate: false}) : form.property({noValidate: true});
+				
+				$fs(selector).length ? $fs(selector).target.forEach(target => {
+					const selectElement = 'select', textAreaElement = 'textarea', inputElement = 'input:not(.bs-searchbox > input)';
+					const element = `${inputElement}, ${selectElement}, ${textAreaElement}`;
+					
+					if ($fs(target).has($fs(element)).length) {
+						/*---- Prepare Elements ----*/
+						// Get Original Elements (User created)
+						const originalLabel = $fs(target).has('label');
+						const originalField = $fs(target).has('*:not(label):not(option)');
+						
+						// Get element user options
+						const isOptional = $fs(target).classlist.has('optional');
+						const hasFloatingLabel = $fs(target).classlist.has('floating-label');
+						
+						// Create base elements
+						const inputGroup = document.createElement('div')
+						const fieldGroup = document.createElement('div')
+						
+						// Add and remove appropriate classes to base elements (Using user options also)
+						target.classList.remove('floating-label', 'required');
+						inputGroup.classList.add('input-group', 'align-items-stretch', 'flex-nowrap');
+						fieldGroup.classList.add('form-field-group', 'w-100');
+						
+						
+						!isOptional && hasFloatingLabel ?
+							fieldGroup.classList.add('form-label-group', 'required') :
+							(!isOptional ? fieldGroup.classList.add('required') : (hasFloatingLabel && fieldGroup.classList.add('form-label-group')));
+						isOptional && (originalField.touchDataAttribute({fbValidate: false}));
+						
+						
+						if (originalLabel.length && originalField.length) {
+							const elementId = originalField[0].id;
+							const element_groupId = `${elementId}_group`;
+							const fieldValidation = document.createElement('div');
+							this.#_placeBaseElements(
+								target,
+								originalLabel,
+								originalField,
+								fieldGroup,
+								inputGroup,
+								elementId,
+								fieldValidation,
+								hasFloatingLabel
+							);
+							
+							if (!elementId)
+								console.error('ReferenceError: Field does not have an id.\r\nValidation will not be performed on this field:', originalField);
+							
+							let requireRefill,
+								toggler = `.${FBValidator.passwordTogglerIconClass()}`,
+								_element = $fs(element, target),
+								_inputElement = $fs(inputElement, target),
+								_selectElement = $fs(selectElement, target),
+								_textAreaElement = $fs(textAreaElement, target),
+								_fieldGroup = $fs(this.#_formFieldGroup, target);
+							
+							target.setAttribute('id', element_groupId);
+							this.#_isPasswordField(_inputElement) && (config.showPassword && _fieldGroup.html.affix(togglerWrapper(icons.passwordToggleIcon)));
+							_fieldGroup.html.affix(validWrapper(icons.validIcon)).affix(invalidWrapper(icons.invalidIcon));
+							((this.#_isDefaultPasswordField(_inputElement, config.passwordId) || $fs(target).has(`#${config.passwordId}`).length) && config.capslockAlert) && $fs(target).html.prefix(capslockWrapper(icons.passwordCapslockAlertIcon, texts.capslock));
+							
+							_inputElement.upon({
+								focus: (e) => {
+									this.#_resetFBObject(_inputElement);
+									const _toggler = $fs(toggler, $fs(target));
+									
+									// TODO: Show Capslock Alert if is password field
+									if (this.isPasswordField(config.passwordId)) {
+										if (config.showPassword && _toggler.length) {
+											_toggler.mouseIsOver().then(isOver => {
+												if (!isOver && _inputElement[0].value.length) {
+													_toggler.dataAttribute('require-refill', 'true');
+													requireRefill = parseBool(_toggler.dataAttribute('require-refill'));
+												}
+											});
+										}
+									}
+								},
+								blur: (e) => {
+									this.#_resetFBObject(_inputElement);
+									const dimensions = this.getFieldDimensions();
+									const _toggler = $fs(toggler, $fs(target));
+									
+									if (this.isPasswordField(config.passwordId)) {
+										if (config.showPassword && _toggler.length) {
+											_toggler.mouseIsOver().then(isOver => {
+												if (!isOver && _inputElement[0].value.length)
+													_toggler.fadeout(0).then(icon => {
+														_inputElement.touchStyle({paddingRight: `${dimensions._paddingRight}px`});
+														icon.touchStyle({opacity: 0}).dataAttribute('require-refill', 'true');
+														requireRefill = parseBool(icon.dataAttribute('require-refill'));
+													});
+											});
+										}
+									}
+								},
+								input: (e) => {
+									this.#_resetFBObject(_inputElement);
+									const fbRole = _inputElement.dataAttribute('fb-role') && _inputElement.dataAttribute('fb-role').toLowerCase();
+									const elementId = _inputElement.attribute('id') && _inputElement.attribute('id').toLowerCase();
+									const elementType = _inputElement.attribute('type') && _inputElement.attribute('type').toLowerCase();
+									
+									const filterId = ['name', 'username', 'card_cvv', 'card_number'];
+									const filterType = new Set(['date', 'email', 'month', 'datetime', 'datetime-local']);
+									
+									if (this.needsValidation()) {
+										if (!filterType.has(elementType) && !filterType.has(fbRole) && !filterId.deepIncludes(elementId))
+											if (this.isPasswordField(config.passwordId))
+												this.#_validatePasswordField();
+											else
+												this.validateField({context: target});
+										
+										if (this.isUsernameField()) {
+											if (config.validateUsername)
+												this.usernameValidate(regExp.username, target)
+											else
+												this.toggleValidation(target)
+										}
+										
+										if (this.isNameField()) {
+											if (config.validateName)
+												this.nameValidate(regExp.name, target)
+											else
+												this.toggleValidation(target)
+										}
+										
+										if (this.isEmailField()) {
+											if (config.validateEmail)
+												this.emailValidate(regExp.email, target)
+											else
+												this.toggleValidation(target)
+										}
+										
+										if (this.isPhoneField()) {
+											if (config.validatePhone)
+												this.phoneValidate(regExp.phone, target)
+											else
+												this.toggleValidation(target)
+										}
+										
+										if (config.validateCard) {
+											if (elementId.includes('card_cvv') || fbRole === 'card_cvv')
+												this.cardCVVValidate(regExp.cardCVV, target)
+											if (elementId.includes('card_number') || fbRole === 'card_number')
+												this.cardNumberValidate(regExp.cardNumber, target)
+										} else {
+											if ((elementId.includes('card_cvv') || fbRole === 'card_cvv') || (elementId.includes('card_number') || fbRole === 'card_number'))
+												this.toggleValidation(target);
+										}
+										
+										(filterType.has(elementType) && elementType !== 'email') && this.validateField({context: target})
+									}
+								},
+								keyup: (e) => {
+									this.#_resetFBObject(_inputElement);
+									const dimensions = this.getFieldDimensions();
+									const _toggler = $fs(toggler, $fs(target));
+									
+									if (_inputElement.length) {
+										if (this.isPasswordField(config.passwordId)) {
+											if (config.showPassword && _toggler.length) {
+												if (requireRefill)
+													if (!_inputElement[0].value.length) {
+														_toggler.dataAttribute('require-refill', 'false');
+														requireRefill = parseBool(_toggler.dataAttribute('require-refill'));
+													}
+												(!requireRefill && _inputElement[0].value.length) ?
+													_toggler.touchStyle({right: `${dimensions.togglerRight}px`}).fadein(0).then(icon => {
+														icon.touchStyle({opacity: 1, right: `${dimensions.togglerRight}px`}).classlist.put('shown')
+														_inputElement.classlist.put('toggler-active');
+													}) :
+													_toggler.fadeout(0)
+														.then(icon => {
+															_inputElement.touchStyle({paddingRight: `${dimensions._paddingRight}px`}).classlist.remove('toggler-active');
+															icon.touchStyle({opacity: 0, right: 0}).dataAttribute('require-refill', 'false')
+															icon.classlist.remove('shown');
+														});
+											}
+										}
+									}
+								}
+							});
+							
+							_selectElement.upon('change', (e) => {
+								this.#_resetFBObject(_selectElement);
+								(this.needsValidation()) && this.validateField({context: target});
+							});
+							
+							_textAreaElement.upon('input', (e) => {
+								this.#_resetFBObject(_textAreaElement);
+								(this.needsValidation()) && this.validateField({context: target});
+							});
+							
+							if (elementId) {
+								const elementType = _element.attribute('type') && _element.attribute('type').toLowerCase();
+								const tagName = _element[0].tagName.toLowerCase();
+								const fieldName = titleCase(elementId);
+								
+								if (config.showPassword)
+									$fs(toggler, $fs(target)).upon('click', (e) => {
+										const _toggler = $fs(e.currentTarget), _passwordField = $fs(e.currentTarget).prevSiblings('input');
+										this.#_resetFBObject(_passwordField);
+										
+										if (this.isPasswordField(config.passwordId)) {
+											if (_passwordField[0].type && _passwordField[0].type.toLowerCase() === 'password') {
+												_passwordField.attribute({type: 'text'});
+												$fs('i', _toggler).classlist.replace('fa-eye', 'fa-eye-slash');
+											} else {
+												_passwordField.attribute({type: 'password'});
+												$fs('i', _toggler).classlist.replace('fa-eye-slash', 'fa-eye');
+											}
+										}
+										_passwordField[0].focus({preventScroll: false});
+									});
+								
+								this.#_resetFBObject(_element)
+								if (this.needsValidation()) {
+									if (tagName === 'select') {
+										if (!_selectElement[0].value) {
+											errorBag[formId][elementId] = `Please select an option for ${fieldName} field.`;
+											errorCount[formId]++;
+										}
+									} else {
+										if (elementType !== 'checkbox' && !_element[0].value.length) {
+											errorBag[formId][elementId] = `The ${fieldName} field is required.`;
+											errorCount[formId]++;
+										}
+									}
+								}
+							}
+						} else
+							(!originalLabel.length && !originalField.length) ?
+								console.error('ReferenceError: No Label and Form field found for init wrapper:', target) :
+								((!originalLabel.length) ?
+									console.error('ReferenceError: No Label found for init wrapper:', target) :
+									console.error('ReferenceError: No Form field found for init wrapper:', target));
+					}
+				}) : console.error('ReferenceError: Unable to find init wrapper for form:', form);
+				
+				form.upon('reset', (e) => {
+					const target = e.currentTarget;
+					$fs('.alert', $fs(target)).target.forEach(alert => new bootstrap.Alert(alert).close());
+					$fs('input, textarea, select', $fs(target)).classlist.remove('border-danger').remove('border-success');
+					$fs('.validation-icon', $fs(target)).fadeout(0).then(icon => icon.touchStyle({opacity: 0}));
+				});
+			} else
+				console.error('ReferenceError: Form Element does not have an id to be referenced.', form);
+		});
+		this.#_resetFBObject($fs(forms));
+		return this;
+	}
+	
+	#_validatePasswordField() {
+		const _target = this, target = _target.target, validatorConfig = this.validatorConfig, validateMatchPassword = (_password, _passwordConfirm, _passwordGroup, _passwordConfirmGroup) => {
+			if (_password[0].value.length && (_passwordConfirm[0].value !== _password[0].value)) {
+				this.#_resetFBObject(_password);
+				this.validateField({context: _passwordGroup, message: `Passwords do not match.`, isPasswordField: true});
+				this.#_resetFBObject(_passwordConfirm);
+				this.validateField({context: _passwordConfirmGroup, isPasswordField: true});
+			} else {
+				this.#_resetFBObject(_password);
+				this.validateField({context: _passwordGroup});
+				this.#_resetFBObject(_passwordConfirm);
+				this.validateField({context: _passwordConfirmGroup});
+			}
+		};
+		
+		if (target.length && validatorConfig.config.validatePassword) {
+			const form = target[0].form;
+			
+			let // elementId = target[0].id,
+				passwordId = validatorConfig.config.passwordId,
+				passwordConfirmId = validatorConfig.config.passwordConfirmId,
+				_password = $fs(`#${passwordId}`, form),
+				_passwordGroup = $fs(`#${passwordId}_group`, form),
+				_passwordConfirm = $fs(`#${passwordConfirmId}`, form),
+				_passwordConfirmGroup = $fs(`#${passwordConfirmId}_group`, form),
+				passwordFieldName = titleCase(validatorConfig.config.passwordId.toLowerCase()),
+				// passwordConfirmFieldName = titleCase(validatorConfig.config.passwordConfirmId.toLowerCase()),
+				minlength = _password.target.length && _password.attribute('minlength'),
+				maxlength = _password.target.length && _password.attribute('maxlength');
+			
+			if (minlength || maxlength) {
+				if (_password.length && ((minlength && _password[0].value.length < minlength) || (maxlength && _password[0].value.length > maxlength))) {
+					if (_passwordConfirm.length) {
+						if (minlength && maxlength) {
+							if (minlength === maxlength) {
+								this.#_resetFBObject(_password);
+								if (_password[0].value.length)
+									this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field requires ${maxlength} characters.`});
+								else
+									this.validateField({context: _passwordGroup, isPasswordField: true});
+								this.#_resetFBObject(_passwordConfirm)
+								this.validateField({context: _passwordConfirmGroup, isPasswordField: true});
+							} else {
+								this.#_resetFBObject(_password);
+								if (_password[0].value.length)
+									this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field must be between ${minlength} and ${maxlength} characters.`});
+								else
+									this.validateField({context: _passwordGroup, isPasswordField: true});
+								this.#_resetFBObject(_passwordConfirm);
+								this.validateField({context: _passwordConfirmGroup, isPasswordField: true});
+							}
+						} else {
+							if (minlength) {
+								if (_password[0].value.length < minlength) {
+									this.#_resetFBObject(_password);
+									if (_password[0].value.length) {
+										this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field requires a minimum of ${minlength} characters.`});
+									} else {
+										this.validateField({context: _passwordGroup, isPasswordField: true});
+									}
+									this.#_resetFBObject(_passwordConfirm);
+									this.validateField({context: _passwordConfirmGroup, isPasswordField: true});
+								} else
+									validateMatchPassword(_password, _passwordConfirm, _passwordGroup, _passwordConfirmGroup);
+							} else if (maxlength) {
+								if (_password[0].value.length > maxlength) {
+									this.#_resetFBObject(_password);
+									this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field requires a maximum of ${maxlength} characters.`});
+									this.#_resetFBObject(_passwordConfirm);
+									this.validateField({context: _passwordConfirmGroup, isPasswordField: true});
+								} else
+									validateMatchPassword(_password, _passwordConfirm, _passwordGroup, _passwordConfirmGroup);
+							} else {
+								if (_password[0].value.length && _passwordConfirm[0].value.length)
+									validateMatchPassword(_password, _passwordConfirm, _passwordGroup, _passwordConfirmGroup);
+							}
+						}
+					} else {
+						this.#_resetFBObject(_password);
+						if (minlength && maxlength) {
+							if (minlength === maxlength) {
+								if (_password[0].value.length)
+									this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field requires ${maxlength} characters.`});
+								else
+									this.validateField({context: _passwordGroup, isPasswordField: true});
+							} else {
+								if (_password[0].value.length)
+									this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field must be between ${minlength} and ${maxlength} characters.`});
+								else
+									this.validateField({context: _passwordGroup, isPasswordField: true});
+							}
+						} else {
+							if (minlength) {
+								if (_password[0].value.length < minlength) {
+									if (_password[0].value.length) {
+										this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field requires a minimum of ${minlength} characters.`});
+									} else {
+										this.validateField({context: _passwordGroup, isPasswordField: true});
+									}
+								} else
+									this.validateField({context: _passwordGroup});
+							} else if (maxlength) {
+								if (_password[0].value.length > maxlength) {
+									this.validateField({context: _passwordGroup, message: `The ${passwordFieldName} field requires a maximum of ${maxlength} characters.`});
+								} else
+									this.validateField({context: _passwordGroup});
+							} else
+								this.validateField({context: _passwordGroup});
+						}
+					}
+				} else {
+					if (_passwordConfirm.length)
+						if (_password[0].value.length && _passwordConfirm[0].value.length)
+							validateMatchPassword(_password, _passwordConfirm, _passwordGroup, _passwordConfirmGroup);
+						else
+							validateMatchPassword(_password, _passwordConfirm, _passwordGroup, _passwordConfirmGroup);
+					else {
+						this.#_resetFBObject(_password);
+						this.validateField({context: _passwordGroup});
+					}
+				}
+			} else {
+				if (_passwordConfirm.length)
+					if (_password[0].value.length && _passwordConfirm[0].value.length)
+						validateMatchPassword(_password, _passwordConfirm, _passwordGroup, _passwordConfirmGroup);
+					else {
+						this.#_resetFBObject(_password);
+						this.validateField({context: _passwordGroup});
+						this.#_resetFBObject(_passwordConfirm);
+						this.validateField({context: _passwordConfirmGroup, isPasswordField: true});
+					}
+				else {
+					this.#_resetFBObject(_password);
+					this.validateField({context: _passwordGroup});
+				}
+			}
+		} else
+			return console.error('ReferenceError: Undefined target', target);
+	}
+	
+	initFormValidation(config = null) {
+		const _forms = this.target;
+		let notForms = _forms.filter(form => !this.isFormElement(form)),
+			forms = _forms.filter(form => this.isFormElement(form));
+		
+		if (_forms.length) {
+			(notForms.length && forms.length) && console.warn('Non Form Element passed to validator:', notForms);
+			
+			config && this.#_touchConfig(config);
+			
+			return (forms.length) ?
+				/*forms.forEach(form =>*/ this.#_formValidate(/*$fs(*/forms/*)*/)/*)*/ :
+				console.error('Non Form Element passed to validator:', notForms);
+		} else
+			console.error('Given Elements failed to load in document:', _forms);
+		
+	}
+	
+	toggleValidation(context) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			return _target.needsValidation() ?
+				_target.validateField({context: context}) :
+				_target.removeValidationProps({context: target, removeAlert: true});
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	fieldElements() {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			if (target.length > 1) {
+				const elements = {}
+				target.forEach(element => {
+					if (this.isFormElement(element))
+						elements[element.id] = element.elements
+				});
+				return elements
+			}
+			
+			if (this.isFormElement(target[0]))
+				return target[0].elements;
+			return console.error(`Non Form Element given`, _target);
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	regexValidate({regex, context = null, message = null, customValidation = null} = {}) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			return isFunction(customValidation) ? customValidation() : (target[0].value.length ?
+				(target[0].value.match(regex) ? _target.validateField({context: context}) : _target.validateField({context: context, message: message, isError: true})) :
+				this.toggleValidation(context));
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	cardCVVValidate(regex, context = null) {
+		return this.length ?
+			this.regexValidate({regex: regex, context: context, message: `Please input a valid CVV`}) : this;
+	}
+	
+	emailValidate(regex, context = null, customFormatEx = null) {
+		console.log(true)
+		return this.length ?
+			this.regexValidate({regex: regex, context: context, message: `Please input a valid E-Mail Address format:<br> (eg. ${customFormatEx ?? 'johndoe@mail.com'})`}) : this;
+	}
+	
+	nameValidate(regex, context = null, customFormatEx = null) {
+		return this.length ?
+			this.regexValidate({regex: regex, context: context, message: `Please input a valid Name format:<br> (eg. ${customFormatEx ?? 'John Doe, John Wood Doe'})`}) : this;
+	}
+	
+	phoneValidate(regex, context = null, customFormatEx = null) {
+		return this.length ?
+			this.regexValidate({regex: regex, context: context, message: `Please input a valid Phone Number format:<br> (eg. ${customFormatEx ?? '+234 8076899243, +1 211 1041'})`}) : this;
+	}
+	
+	cardNumberValidate(regex, context = null, customMessage = null) {
+		return this.length ? this.regexValidate({
+			customValidation: () =>
+				this[0].value.length ? (this[0].value.match(regex) ?
+					(checkLuhn(this[0].value) ? this.validateField({context: context}) : this.validateField({context: context, message: 'Please check card number and try again.', isError: true})) :
+					this.validateField({
+						context: context,
+						message: `${customMessage ?? 'Only numbers are allowed.'}`,
+						isError: true
+					})) : this.toggleValidation(context)
+		}) : this;
+	}
+	
+	usernameValidate(regex, context = null, minlength = 2, customFormatEx = null, customMessage = null) {
+		return this.length ? this.regexValidate({
+			customValidation: () =>
+				this[0].value.length ?
+					(this[0].value.length > minlength ? (this[0].value.match(regex) ? this.validateField({context: context}) : this.validateField({context: context, message: `Please input a valid Username format:<br> (ie. ${customFormatEx ?? 'Username must start and end with an alphabet, and must contain only alphabets, and underscore.'})`, isError: true})) :
+						this.validateField({
+							context: context,
+							message: `${customMessage ?? 'Username must have a minimum of 3 characters.'}`,
+							isError: true
+						})) : this.toggleValidation(context)
+		}) : this;
+	}
+	
+	validateField({context, message = null, isError = false, isPasswordField = false} = {}) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			target.forEach(element => {
+				this.#_resetFBObject($fs(element));
+				const formId = element.form.id, elementId = element.id, tagName = element.tagName.toLowerCase();
+				
+				let minLength = tagName === 'input' && _target.attribute('minlength'),
+					fieldName = titleCase(elementId.toLowerCase()),
+					finalMessage = minLength ?
+						(!message && element.value.length && element.value.length < minLength ? `The ${fieldName} field requires a minimum of ${minLength} characters.` : message) :
+						(!message && isPasswordField ? (element.value.length ? 'Check Passwords.' : `The ${fieldName} field is required`) : message);
+				
+				/** If Validator is not initialized with form (Direct field Validation) **/
+				if (!this.#_init) {
+					this.#_originals[elementId] = {};
+					
+					/** If Form-Group wrapper is non-existent **/
+					if (!$fs(`#${elementId}_group`).length) {
+						// Create necessary base elements
+						const originalField = _target;
+						const originalLabel = _target.prevSiblings('label').length ?
+							_target.prevSiblings('label') :
+							(_target.siblings('label').length ? _target.siblings('label') : $fs(`label[for="${elementId}"]`));
+						
+						this.#_originals[elementId].field = originalField.target[0];
+						this.#_originals[elementId].label = originalLabel.target[0];
+						
+						const formGroup = document.createElement('div')
+						const inputGroup = document.createElement('div')
+						const fieldGroup = document.createElement('div')
+						const fieldValidation = document.createElement('div');
+						
+						formGroup.classList.add('form-group');
+						formGroup.id = `${elementId}_group`;
+						
+						fieldValidation.classList.add('valid-text');
+						fieldValidation.id = `${elementId}Valid`;
+						
+						inputGroup.classList.add('input-group', 'align-items-stretch', 'flex-nowrap');
+						fieldGroup.classList.add('form-field-group', 'position-relative', 'required', 'w-100');
+						
+						const fieldClone = originalField[0].cloneNode(true);
+						const labelClone = originalLabel[0].cloneNode(true);
+						
+						fieldGroup.append(fieldClone)
+						formGroup.append(labelClone, fieldGroup, fieldValidation);
+						originalField[0].parentElement.append(formGroup);
+						originalField.touchStyle({display: 'none'});
+						originalLabel.touchStyle({display: 'none'});
+						this.#_resetFBObject($fs(fieldClone));
+						
+						!_target.siblings('.validation-icon').length && _target.html.insertAfter(this.#_validIconWrapper(this.validatorConfig.icons.validIcon)).insertAfter(this.#_invalidIconWrapper(this.validatorConfig.icons.invalidIcon));
+						context = formGroup;
+					} else {
+						this.#_init = true;
+						this.#_originals = {};
+						context = $fs(`${elementId}_group`);
+					}
+				}
+				
+				if (!element.value || !element.value.length || element.value.length < minLength || (isPasswordField && (!element.value.length || finalMessage)) || isError)
+					_target.showError({context: context, message: finalMessage});
+				else
+					_target.showSuccess({context: context, message: finalMessage});
+				
+				if ($fs('.alert').length)
+					this.#_onAlertCLose(context, this.#_originals);
+			})
+			return this;
+		}
+		return console.error('ReferenceError: Element is Undefined');
+	}
+	
+	getFieldDimensions() {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			const tagName = target[0].tagName.toLowerCase();
+			const elementType = target[0].type && target[0].type.toLowerCase();
+			const filterType = new Set(['date', 'month', 'datetime', 'datetime-local']);
+			const validationIcons = this.validationProps().validationIcon;
+			
+			let paddingRight,
+				_paddingRight,
+				validationIconRight,
+				passwordIconRight = 0,
+				targetPaddingLeft = parseInt(_target.style('padding-left').replace('px', '')),
+				currentIcon = validationIcons.target.filter(icon => $fs(icon).classlist.has('on')).length ?
+					validationIcons.target.filter(icon => $fs(icon).classlist.has('on'))[0] : validationIcons[0],
+				iconWidth = currentIcon.getBoundingClientRect().width,
+				_targetPaddingLeft = targetPaddingLeft;
+			
+			if (tagName === 'select'/* || filterType.has(elementType)*/)
+				_targetPaddingLeft = targetPaddingLeft * 4.5;
+			
+			validationIconRight = (tagName === 'select' || filterType.has(elementType)) ? _targetPaddingLeft : targetPaddingLeft;
+			paddingRight = validationIconRight + iconWidth + targetPaddingLeft;
+			_paddingRight = paddingRight
+			
+			if (this.#_isPasswordField(target) && this.validatorConfig.config.showPassword && this.#_init) {
+				let togglerIcon = $fs(`#${target[0].id}_group .password-toggler-icon`)[0],
+					togglerIconWidth = togglerIcon.getBoundingClientRect().width;
+				passwordIconRight = paddingRight;
+				paddingRight = passwordIconRight + togglerIconWidth + targetPaddingLeft;
+			}
+			
+			return {
+				paddingRight: paddingRight,
+				_paddingRight: _paddingRight,
+				paddingLeft: targetPaddingLeft,
+				iconRight: validationIconRight,
+				togglerRight: passwordIconRight,
+			}
+		}
+		return console.warn('ReferenceError: Element is Undefined.');
+	}
+	
+	/**
+	 *
+	 * @param context
+	 * @param message
+	 * @param showIcon
+	 * @return {void|FBValidator}
+	 */
+	showError({context, message, showIcon = true} = {}) {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			const formId = target[0].form.id;
+			
+			if (formId) {
+				const elementId = target[0].id, fieldName = titleCase(elementId.toLowerCase()), validationProps = _target.validationProps();
+				const finalMessage = message ?? `The ${fieldName} field is required`;
+				Object.keys(errorBag).length && (errorBag[formId][elementId] = finalMessage);
+				this.toggleValidationIcon({oldIcon: validationProps.validIcon, newIcon: validationProps.invalidIcon, showIcon: showIcon});
+				
+				finalMessage ? validationProps.validationField.validator.renderMessage(fa_exc_c, alert_d, finalMessage, validationProps.id, context, true) : validationProps.validationField.html.insert(null);
+				_target.classlist.replace('border-success', 'border-danger');
+				Object.keys(errorCount).length && (errorCount[formId] = Object.keys(errorBag[formId]).length);
+				return this;
+			}
+			return console.error('Non Form Element given');
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/**
+	 *
+	 * @param context
+	 * @param message
+	 * @param showIcon
+	 * @return {void|FBValidator}
+	 */
+	showSuccess({context, message, showIcon = true} = {}) {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			const formId = target[0].form.id;
+			
+			if (formId) {
+				const elementId = target[0].id, validationProps = _target.validationProps();
+				Object.keys(errorBag).length && delete errorBag[formId][elementId];
+				this.toggleValidationIcon({oldIcon: validationProps.invalidIcon, newIcon: validationProps.validIcon, showIcon: showIcon});
+				
+				message ? validationProps.validationField.validator.renderMessage(fa_check, alert_s, message, validationProps.id, context, true) : validationProps.validationField.html.insert(null);
+				_target.classlist.replace('border-danger', 'border-success');
+				Object.keys(errorCount).length && (errorCount[formId] = Object.keys(errorBag[formId]).length);
+				return this;
+			}
+			return console.error('Non Form Element given');
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	renderValidationErrors(errors, message = null, callback = null) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			if (this.isFormElement(target[0])) {
+				const fieldElements = this.fieldElements();
+				
+				if (isObject(errors))
+					Object.keys(errors).forEach(element => {
+						const fieldName = titleCase(element)
+						this.#_resetFBObject($fs(`#${element}`, target[0]));
+						if (element in fieldElements && errors[element] !== undefined && errors[element] !== null && errors[element] !== '')
+							this.validateField({context: target[0], message: errors[element], isError: true});
+						else {
+							if (errors[element] !== undefined && errors[element] !== null && errors[element] !== '')
+								this.validateField({context: target[0], message: `Verify ${fieldName} and try again.`, isError: true});
+						}
+					});
+				
+				this.#_resetFBObject($fs(target));
+				isString(message) && message.length && this.messageTag.renderMessage(fa_exc_c, alert_d, message, null, target[0], true);
+				isFunction(callback) && callback();
+				return this;
+			}
+			return console.error('Non Form Element given');
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/**
+	 *
+	 * @param oldIcon {FBUtil}
+	 * @param newIcon {FBUtil}
+	 * @param showIcon
+	 */
+	toggleValidationIcon({oldIcon, newIcon, showIcon = true}) {
+		const dimensions = this.getFieldDimensions();
+		if (showIcon) {
+			oldIcon.fadeout(0).then(icon => icon.touchStyle({opacity: 0}).classlist.remove('on'));
+			this.addFieldValidationPadding();
+			newIcon.touchStyle({right: `${dimensions.iconRight}px`}).fadein(0).then(icon => icon.touchStyle({opacity: 1}).classlist.put('on'));
+		} else
+			this.removeFieldValidationPadding();
+	}
+	
+	addFieldValidationPadding() {
+		const dimensions = this.getFieldDimensions();
+		if (this.isPasswordField(this.validatorConfig.config.passwordId) && !this.validatorConfig.config.showPassword) {
+			this.touchStyle({paddingRight: `${dimensions.paddingRight}px`});
+		} else {
+			if (this.isPasswordField(this.validatorConfig.config.passwordId) && !this.classlist.has('toggler-active'))
+				this.touchStyle({paddingRight: `${dimensions._paddingRight}px`});
+			else
+				this.touchStyle({paddingRight: `${dimensions.paddingRight}px`});
+		}
+		return this;
+	}
+	
+	removeFieldValidationPadding() {
+		const dimensions = this.getFieldDimensions();
+		this.touchStyle({paddingRight: `${dimensions.paddingLeft}px`});
+		return this;
+	}
+	
+	needsValidation() {
+		const target = this.target
+		return target.length ? (this.dataAttribute('fb-validate') ? parseBool(this.dataAttribute('fb-validate').toLowerCase()) : true) : false;
+	}
+	
+	validationProps() {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			const formGroup = this.validatorConfig.config.initWrapper;
+			const formId = `#${target[0].form.id}`;
+			const targetId = `#${target[0].id}`;
+			
+			if (formId)
+				return {
+					id: targetId,
+					formGroup: $fs(`${formId} ${formGroup}` + `${targetId}_group`),
+					validationField: $fs(`${formId} ${targetId}Valid`),
+					validIcon: $fs(`${formId} ${formGroup}` + `${targetId}_group ${this.#_formFieldGroup} .valid`),
+					invalidIcon: $fs(`${formId} ${formGroup}` + `${targetId}_group ${this.#_formFieldGroup} .invalid`),
+					validationIcon: $fs(`${formId} ${formGroup}` + `${targetId}_group ${this.#_formFieldGroup} .validation-icon`),
+				}
+			return console.error('Non Form Element given');
+		}
+		return console.error('ReferenceError: Target Element not found');
+	}
+	
+	/**
+	 *
+	 * @param context
+	 * @param removeAlert
+	 * @param destroyValidation
+	 * @param originals
+	 * @return {void|FBValidator}
+	 */
+	removeValidationProps({context, removeAlert = false, destroyValidation = false} = {}, originals = null) {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			const formId = target[0].form.id, elementId = target[0].id, fieldName = titleCase(elementId.toLowerCase()), validationProps = _target.validationProps();
+			
+			if (destroyValidation) {
+				delete errorBag[formId][elementId];
+				errorCount[formId] = Object.keys(errorBag[formId]).length;
+			}
+			
+			_target.classlist.remove('border-danger', 'border-success');
+			validationProps.validationIcon.fadeout(0).then(icons => {
+				icons.touchStyle({opacity: 0}).classlist.remove('on');
+				this.#_init && _target.removeFieldValidationPadding();
+			});
+			
+			removeAlert && $fs(`${validationProps.validationField[0].id} > .alert`, context).target.forEach(alert => new bootstrap.Alert(alert).close());
+			
+			if (Object.keys(originals).length) {
+				if (Object.keys(originals[elementId]).length) {
+					originals[elementId].field.style.display = 'block';
+					originals[elementId].label.style.display = 'block';
+					
+					if (!!validationProps.formGroup[0])
+						validationProps.formGroup[0].remove();
+				}
+			}
+			return this;
+		}
+		return console.warn('ReferenceError: Element is Undefined');
+	}
+	
+	/**
+	 *
+	 * @param icon
+	 * @param bsAlert
+	 * @param message
+	 * @param id
+	 * @param context
+	 * @param dismissible
+	 * @param wait
+	 * @return {void|FBValidator}
+	 */
+	renderMessage(icon, bsAlert, message, id = null, context = null, dismissible = false, wait = false) {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			const alert = dismissible ? `${bsAlert} alert-dismissible` : bsAlert;
+			const waitHTML = wait ? '<br><i class="fa fa-1x fa-spin fa-spinner"></i> Please Wait...' : '';
+			const dismissHTML = dismissible ? '<a type="button" class="text-danger" data-bs-dismiss="alert"><i class="fa fa-times-circle"></i></a>' : '';
+			const _messageElement = context ?
+				(!$fs(target, context).length ? _target : $fs(target, context)) :
+				_target;
+			
+			_messageElement.html.insert(`\
+				<div class="alert ${alert} d-flex justify-content-between align-items-center show fade mt-1 p-1" data-alert-id="${id}" role="alert">\n\
+					<div class="container-fluid">\n\
+						<i class="${icon}"></i>\n\
+						<span>${message}</span>${waitHTML}\n\
+					</div>\n\
+					${dismissHTML}
+				</div>\n\
+			`);
+			return this
+		}
+		return console.warn('ReferenceError: Element is Undefined');
 	}
 }
 
@@ -587,23 +2593,18 @@ Object.defineProperties(Object.prototype, {
 	}
 });
 
-window.isFunction = isObject;
+/**
+ *
+ * @param value {String}
+ * @return {boolean}
+ */
+Array.prototype.deepIncludes = function (value) {
+	return !!this.filter(val => value.includes(val)).length;
+}
+
+window.isFunction = isFunction;
+window.isString = isString;
 window.isObject = isObject;
+window.parseBool = parseBool;
 
-const $fs = (selector, context) => new FB(selector, context);
-
-const test = $fs('form');
-
-/*test.touchAttribute({test: true}).attribute('boss');*/
-// test.touchProperty({novalidate: true}).listProperties();
-
-// $('form').FUInit().property('test-prop', 'boss');
-
-/*test.touchProperty({novalidate: true}).attribute({test: true}).slideInUp(800)
-	.then(e => e.fadeout(1500)
-		.then(e => e.fadein(1500)));
-console.log(test.listAttributes());*/
-
-test.upon({
-	click: (e) => console.log(e.currentTarget)
-});
+export {$fs, isFunction, isString, isObject, parseBool};

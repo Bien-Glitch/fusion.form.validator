@@ -54,7 +54,7 @@ const fa_wifi_s = 'fa-wifi-slash';
  * @param isError {boolean}
  * @returns {[HTMLElement]}
  */
-Object.prototype.validate = function ({context, message = null, isPassword = false, isError = false} = {}) {
+/*Object.prototype.validate = function ({context, message = null, isPassword = false, isError = false} = {}) {
 	if (this) {
 		const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 			? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -72,7 +72,9 @@ Object.prototype.validate = function ({context, message = null, isPassword = fal
 			validationIconRight = `${((tagName !== 'select' && !filterType.has(elementType)) ? _leftPadding : _leftPadding * 3)}px`,
 			horizontalPadding = `${((elementType === 'password' && _toggler_padding_right) ? ((_leftPadding * 2) + _toggler_padding_right) : (tagName !== 'select' ? _leftPadding * 2 : _leftPadding * 5)) + _leftPadding}px`,
 			minLength = tagName !== 'select' && target.attribute('minlength'),
-			customMessage = minLength ? (!message && target[0].value.length < minLength ? `This field requires a minimum of ${minLength} characters.` : message) : (!message && isPassword ? 'Check Passwords.' : message);
+			customMessage = minLength ?
+				(!message && target[0].value.length < minLength ? `This field requires a minimum of ${minLength} characters.` : message) :
+				(!message && isPassword ? 'Check Passwords.' : message);
 		
 		if (filterType.has(elementType))
 			valid_right = target.includesClass('form-control-sm') ? multiplyPadding(validationIconRight, paddingMultiplier.validDate$sm) : multiplyPadding(validationIconRight, paddingMultiplier.validDate);
@@ -91,18 +93,18 @@ Object.prototype.validate = function ({context, message = null, isPassword = fal
 		return target;
 	}
 	return [];
-}
+}*/
 
 /**
  * Check if the form field element should be validated.
  *
  * @returns {boolean|boolean}
  */
-Object.prototype.needsValidation = function () {
-	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
-		? Array.from(this) : (Array.isArray(this) ? this : [this]);
-	return target[0] ? (!!target[0].dataset['fbValidate'] ? parseBool(target[0].dataset['fbValidate']) : true) : false;
-}
+// Object.prototype.needsValidation = function () {
+// 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
+// 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
+// 	return target[0] ? (!!target[0].dataset['fbValidate'] ? parseBool(target[0].dataset['fbValidate']) : true) : false;
+// }
 
 /**
  * Set CSS styles to the given element using KeyValue Pairs.
@@ -166,38 +168,40 @@ Object.prototype.needsValidation = function () {
  * @param className {string}
  * @returns {boolean|undefined}
  */
+/*
 Object.prototype.includesClass = function (className) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
 	return target ? (target[0].classList.contains(className)) : undefined;
 }
+*/
 
 /**
  * Adds padding to the right of the element via the {padding_right} variable.
  *
  * @returns {[HTMLElement]}
  */
-Object.prototype.addValidationPadding = function () {
+/*Object.prototype.addValidationPadding = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
 	target[0].attribute('type') && (target[0].attribute('type').toLowerCase() !== 'date') && target.touchCssValue({paddingRight: padding_right});
 	return target;
-}
+}*/
 
 /**
  * Resets the value of the padding-right CSS property to the value of the padding-left CSS property of the element.
  *
  * @returns {[HTMLElement]}
  */
-Object.prototype.removeValidationPadding = function () {
+/*Object.prototype.removeValidationPadding = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
 	target[0].attribute('type') && (target[0].attribute('type').toLowerCase() !== 'date') && target.touchCssValue({paddingRight: target.getCssValue('padding-left')});
 	return target;
-}
+}*/
 
 /**
  * Checks if the target element has the given element.
@@ -207,7 +211,7 @@ Object.prototype.removeValidationPadding = function () {
  * @param element {NodeList|HTMLElement|[HTMLElement]}
  * @returns {*[]}
  */
-Object.prototype.nodeContains = function (element) {
+/*Object.prototype.nodeContains = function (element) {
 	const data = [];
 	const contains = [];
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
@@ -216,7 +220,7 @@ Object.prototype.nodeContains = function (element) {
 	target.forEach(group => data.push(group.innerHTML.trim()));
 	!!element ? data.some(group => group.includes(element.outerHTML) && contains.push(element)) : contains.push();
 	return contains;
-}
+}*/
 
 /**
  * Returns the Previous sibling of the target element.
@@ -226,7 +230,7 @@ Object.prototype.nodeContains = function (element) {
  * @param selector
  * @returns {HTMLElement|Element|*}
  */
-Object.prototype.previousSiblings = function (selector) {
+/*Object.prototype.previousSiblings = function (selector) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -242,7 +246,7 @@ Object.prototype.previousSiblings = function (selector) {
 		sibling = sibling.previousElementSibling
 	}
 	return sibling;
-}
+}*/
 
 /**
  * Returns an array of the elements siblings.
@@ -251,6 +255,7 @@ Object.prototype.previousSiblings = function (selector) {
  *
  * @returns {*[]}
  */
+/*
 Object.prototype.siblings = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -259,6 +264,7 @@ Object.prototype.siblings = function () {
 		return child !== target[0];
 	});
 }
+*/
 
 /**
  * Checks the status of given CSS Pseudo selector on the target element.
@@ -266,18 +272,18 @@ Object.prototype.siblings = function () {
  * @param selector
  * @returns {boolean}
  */
-Object.prototype.selectorMatches = function (selector) {
+/*Object.prototype.selectorMatches = function (selector) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	return (target[0].matches || target[0].matchesSelector || target[0].msMatchesSelector || target[0].mozMatchesSelector || target[0].webkitMatchesSelector || target[0].oMatchesSelector).call(target[0], selector);
-}
+}*/
 
 /**
  * Checks if the mouse cursor is over the element.
  *
  * @returns {Promise<boolean>}
  */
-Object.prototype.mouseIsOver = async function () {
+/*Object.prototype.mouseIsOver = async function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -286,33 +292,33 @@ Object.prototype.mouseIsOver = async function () {
 			resolve(element.selectorMatches(':hover'))
 		})
 	});
-}
+}*/
 
 /**
  * Checks if the given form field element is a Phone number field.
  *
  * @returns {boolean}
  */
-Object.prototype.isPhoneField = function () {
+/*Object.prototype.isPhoneField = function () {
 	const target = this;
 	const fbRole = target.dataset['fbRole'] && target.dataset['fbRole'].toLowerCase();
 	const elementId = target.attribute('id') && target.id.toLowerCase();
 	const elementType = target.attribute('type') && target.type.toLowerCase();
 	return !!(elementType === 'tel' || fbRole === 'phone' || elementId.match(/phone/gi));
-}
+}*/
 
 /**
  * Checks if the given form field element is a Password field.
  *
  * @returns {boolean}
  */
-Object.prototype.isPasswordField = function (passwordId) {
+/*Object.prototype.isPasswordField = function (passwordId) {
 	const target = this;
 	const elementId = target.attribute('id') && target.id.toLowerCase();
 	const elementName = target.attribute('name') && target.name.toLowerCase();
 	const elementType = target.attribute('type') && target.type.toLowerCase();
 	return !!((elementType && elementType.toLowerCase() === 'password') || (elementId && elementId.toLowerCase().includes(passwordId))) || (elementName && elementName.toLowerCase().includes(passwordId));
-}
+}*/
 
 /**
  * Validates the given form field element using the given RegExp.
@@ -323,7 +329,7 @@ Object.prototype.isPasswordField = function (passwordId) {
  * @param customValidation
  * @returns {*[]|[HTMLElement]}
  */
-Object.prototype.regExpValidate = function ({regExp, context, message, customValidation} = {}) {
+/*Object.prototype.regExpValidate = function ({regExp, context, message, customValidation} = {}) {
 	if (this) {
 		const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 			? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -334,7 +340,7 @@ Object.prototype.regExpValidate = function ({regExp, context, message, customVal
 		return target;
 	}
 	return [];
-}
+}*/
 
 /**
  * Validates the given input field as an E-Mail field with the given RegExp.
@@ -343,9 +349,9 @@ Object.prototype.regExpValidate = function ({regExp, context, message, customVal
  * @param context {HTMLElement|[HTMLElement]|undefined}
  * @returns {unknown[]|Object.regExpValidate|Object.regExpValidate[]|[]|*[]}
  */
-Object.prototype.emailValidate = function (regExp, context) {
+/*Object.prototype.emailValidate = function (regExp, context) {
 	return this ? this.regExpValidate({regExp: regExp, context: context, message: 'Please input a valid E-Mail Address format:<br> (eg. johndoe@mail.com)'}) : [];
-}
+}*/
 
 /**
  * Validates the given input field as a Name field with the given RegExp.
@@ -354,9 +360,9 @@ Object.prototype.emailValidate = function (regExp, context) {
  * @param context {HTMLElement|[HTMLElement]|undefined}
  * @returns {unknown[]|Object.regExpValidate|Object.regExpValidate[]|[]|*[]}
  */
-Object.prototype.nameValidate = function (regExp, context) {
+/*Object.prototype.nameValidate = function (regExp, context) {
 	return this ? this.regExpValidate({regExp: regExp, context: context, message: 'Please input a valid Name format:<br> (eg. John Doe, John Wood Doe)'}) : [];
-}
+}*/
 
 /**
  * Validates the given input field as a Phone Number field with the given RegExp.
@@ -365,9 +371,9 @@ Object.prototype.nameValidate = function (regExp, context) {
  * @param context {HTMLElement|[HTMLElement]|undefined}
  * @returns {unknown[]|Object.regExpValidate|Object.regExpValidate[]|[]|*[]}
  */
-Object.prototype.phoneValidate = function (regExp, context) {
+/*Object.prototype.phoneValidate = function (regExp, context) {
 	return this ? this.regExpValidate({regExp: regExp, context: context, message: 'Please input a valid Phone Number format:<br> (eg. +234 8076899243, +1 211 1041)'}) : [];
-}
+}*/
 
 /**
  * Validates the given input field as a Card CVV field with the given RegExp.
@@ -376,9 +382,9 @@ Object.prototype.phoneValidate = function (regExp, context) {
  * @param context {HTMLElement|[HTMLElement]|undefined}
  * @returns {unknown[]|Object.regExpValidate|Object.regExpValidate[]|[]|*[]}
  */
-Object.prototype.cardCvvValidate = function (regExp, context) {
+/*Object.prototype.cardCvvValidate = function (regExp, context) {
 	return this ? this.regExpValidate({regExp: regExp, context: context, message: 'Please input a valid CVV'}) : [];
-}
+}*/
 
 /**
  * Validates the given input field as a Card Number field with the given RegExp.
@@ -387,7 +393,7 @@ Object.prototype.cardCvvValidate = function (regExp, context) {
  * @param context {HTMLElement|[HTMLElement]|undefined}
  * @returns {unknown[]|Object.regExpValidate|Object.regExpValidate[]|[]|*[]}
  */
-Object.prototype.cardNumberValidate = function (regExp, context) {
+/*Object.prototype.cardNumberValidate = function (regExp, context) {
 	return this ? this.regExpValidate({
 		customValidation: () =>
 			this[0].value.length ? (this[0].value.match(regExp) ? (checkLuhn(this[0].value) ? this.validate({context: context}) : this.validate({context: context, message: 'Please check card number and try again.', isError: true})) : this.validate({
@@ -396,7 +402,7 @@ Object.prototype.cardNumberValidate = function (regExp, context) {
 				isError: true
 			})) : checkValidate(this, context)
 	}) : [];
-}
+}*/
 
 /**
  * Validates the given input field as a Username field with the given RegExp.
@@ -405,7 +411,7 @@ Object.prototype.cardNumberValidate = function (regExp, context) {
  * @param context {HTMLElement|[HTMLElement]|undefined}
  * @returns {unknown[]|Object.regExpValidate|Object.regExpValidate[]|[]|*[]}
  */
-Object.prototype.usernameValidate = function (regExp, context) {
+/*Object.prototype.usernameValidate = function (regExp, context) {
 	return this ? this.regExpValidate({
 		customValidation: () =>
 			this[0].value.length ? (this[0].value.length > 2 ? (this[0].value.match(regExp) ? this.validate({context: context}) : this.validate({context: context, message: 'Please input a valid Username format:<br> (ie. Username must start and end with an alphabet, and must contain only alphabets, and underscore.)', isError: true})) : this.validate({
@@ -414,14 +420,14 @@ Object.prototype.usernameValidate = function (regExp, context) {
 				isError: true
 			})) : checkValidate(this, context)
 	}) : [];
-}
-
-/**
+}*/
+/*
+/!**
  * Inserts given HTML string in the target element (inner HTML).
  *
  * @param value {string|null}
  * @returns {[HTMLElement]}
- */
+ *!/
 Object.prototype.insertHTML = function (value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -429,12 +435,12 @@ Object.prototype.insertHTML = function (value) {
 	return target;
 }
 
-/**
+/!**
  * Inserts given HTML string after the beginning of the target element.
  *
  * @param value {string}
  * @returns {[HTMLElement]}
- */
+ *!/
 Object.prototype.prependHTML = function (value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -442,12 +448,12 @@ Object.prototype.prependHTML = function (value) {
 	return target;
 }
 
-/**
+/!**
  * Inserts given HTML string just at the end of the target element.
  *
  * @param value
  * @returns {[HTMLElement]}
- */
+ *!/
 Object.prototype.appendHTML = function (value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -455,13 +461,13 @@ Object.prototype.appendHTML = function (value) {
 	return target;
 }
 
-/**
+/!**
  * Inserts given HTML string before the beginning of the target element (Before element).
  *
  * @param value {string}
  * @returns {[HTMLElement]}
  * @constructor
- */
+ *!/
 Object.prototype.HTMLBefore = function (value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
@@ -469,19 +475,19 @@ Object.prototype.HTMLBefore = function (value) {
 	return target;
 }
 
-/**
+/!**
  * Inserts given HTML string after the end of the target element (After element).
  *
  * @param value {string}
  * @returns {[HTMLElement]}
  * @constructor
- */
+ *!/
 Object.prototype.HTMLAfter = function (value) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => element.insertAdjacentHTML('afterend', value));
 	return target;
-}
+}*/
 
 /**
  * Add fadein Animation to target element.
@@ -827,7 +833,7 @@ Object.prototype.HTMLAfter = function (value) {
  * @param wait {boolean} Toggle displaying wait message
  * @returns {Object} target element
  */
-Object.prototype.renderMessage = function (bsAlert, faIcon, message, id, context = null, dismissible = false, wait = false) {
+/*Object.prototype.renderMessage = function (bsAlert, faIcon, message, id, context = null, dismissible = false, wait = false) {
 	const target = this;
 	const alert = dismissible ? `${bsAlert} alert-dismissible` : bsAlert;
 	const waitHTML = wait ? '<br><i class="fa fa-1x fa-spin fa-spinner"></i> Please Wait...' : '';
@@ -844,7 +850,7 @@ Object.prototype.renderMessage = function (bsAlert, faIcon, message, id, context
 		</div>\n\
 	`);
 	return this
-}
+}*/
 
 /**
  * Check if the target form element has errors.
@@ -874,7 +880,7 @@ Object.prototype.hasErrors = function () {
  * @param callback
  * @returns {[HTMLElement]}
  */
-Object.prototype.displayValidationErrors = function (errors, message, callback) {
+/*Object.prototype.displayValidationErrors = function (errors, message, callback) {
 	let target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 			? Array.from(this) : (Array.isArray(this) ? this : [this])),
 		elements = $el(target[0]).allElements();
@@ -892,7 +898,7 @@ Object.prototype.displayValidationErrors = function (errors, message, callback) 
 	typeof callback === 'function' && callback();
 	
 	return target
-}
+}*/
 
 /**
  * Remove validation errors from target element(s).
@@ -932,6 +938,7 @@ Object.prototype.removeValidationMessage = function ({context, removeAlert = fal
  * @param showIcon {boolean}
  * @returns {[HTMLElement]|*[]}
  */
+/*
 Object.prototype.showError = function ({context, message, showIcon = true} = {}) {
 	if (this) {
 		const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
@@ -948,6 +955,7 @@ Object.prototype.showError = function ({context, message, showIcon = true} = {})
 	}
 	return [];
 }
+*/
 
 /**
  * Display validation success for the target element.
@@ -956,22 +964,22 @@ Object.prototype.showError = function ({context, message, showIcon = true} = {})
  * @param showIcon {boolean}
  * @returns {[HTMLElement]|*[]}
  */
-Object.prototype.showSuccess = function ({context, message, showIcon = true} = {}) {
-	if (this) {
-		const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
-			? Array.from(this) : (Array.isArray(this) ? this : [this]));
-		const validationProps = target.getValidationProps();
-		delete errorBag[target[0].form.id][target[0].id];
-		errorCount[target[0].form.id] = Object.keys(errorBag[target[0].form.id]).length;
-		toggleValidationIcon({show: validationProps.validIcon, hide: validationProps.invalidIcon}, target, showIcon);
-		
-		message ? validationProps.validationField.renderMessage(alert_s, fa_check, message, validationProps.id, context, true) : validationProps.validationField.insertHTML(null);
-		target.classListRemove('border-danger').classListAdd('border-success');
-		errorCount[target[0].form.id] = Object.keys(errorBag[target[0].form.id]).length;
-		return target;
-	}
-	return [];
-}
+// Object.prototype.showSuccess = function ({context, message, showIcon = true} = {}) {
+// 	if (this) {
+// 		const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
+// 			? Array.from(this) : (Array.isArray(this) ? this : [this]));
+// 		const validationProps = target.getValidationProps();
+// 		delete errorBag[target[0].form.id][target[0].id];
+// 		errorCount[target[0].form.id] = Object.keys(errorBag[target[0].form.id]).length;
+// 		toggleValidationIcon({show: validationProps.validIcon, hide: validationProps.invalidIcon}, target, showIcon);
+//
+// 		message ? validationProps.validationField.renderMessage(alert_s, fa_check, message, validationProps.id, context, true) : validationProps.validationField.insertHTML(null);
+// 		target.classListRemove('border-danger').classListAdd('border-success');
+// 		errorCount[target[0].form.id] = Object.keys(errorBag[target[0].form.id]).length;
+// 		return target;
+// 	}
+// 	return [];
+// }
 
 /**
  * Get the Validation properties for the target element.
@@ -1001,22 +1009,22 @@ Object.prototype.getValidationProps = function () {
  *
  * @returns {*}
  */
-Object.prototype.waitText = function () {
+/*Object.prototype.waitText = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	return $el(wait, target[0])[0].innerHTML;
-}
+}*/
 
 /**
  * Get the validation message element for the target form.
  *
  * @returns {*[]|NodeListOf<*>|boolean}
  */
-Object.prototype.messageTag = function () {
+/*Object.prototype.messageTag = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	return $el(_response, target[0]);
-}
+}*/
 
 /**
  * Returns the value of the elements' action attribute or data-action attribute.
@@ -1024,22 +1032,24 @@ Object.prototype.messageTag = function () {
  *
  * @returns {string|*}
  */
-Object.prototype.getAction = function () {
+/*Object.prototype.getAction = function () {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	const tag = target[0].tagName.toLowerCase();
 	return tag === 'form' ? (target[0].action ?? target[0].attribute('action')) : target[0].dataAttribute('action');
-}
+}*/
 
 /**
  * Return all elements of the target form element.
  * Returns an error on the console if the target element is not a form.
  * @returns {void|*}
  */
+/*
 Object.prototype.allElements = function () {
 	const target = Array.isArray(this) ? this[0] : this
 	return ((target.tagName && target.tagName.toLowerCase() !== 'form') ? console.error(`function 'allElements()' expects 'form element' but '${target.tagName.toLowerCase()} element' was given`) : target.elements);
 }
+*/
 
 /**
  * Disable or Enable the target element.
@@ -1047,7 +1057,7 @@ Object.prototype.allElements = function () {
  * @param option {boolean}
  * @returns {[HTMLElement]}
  */
-Object.prototype.disable = function (option = true) {
+/*Object.prototype.disable = function (option = true) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.forEach(element => {
@@ -1057,7 +1067,7 @@ Object.prototype.disable = function (option = true) {
 			((!option) ? element.classListRemove('disabled') : element.classListAdd('disabled'));
 	});
 	return target;
-}
+}*/
 
 /**
  * Load the given modal with a callback.
@@ -1066,13 +1076,13 @@ Object.prototype.disable = function (option = true) {
  * @param callback {function}
  * @returns {[HTMLElement]}
  */
-Object.prototype.onModalLoad = function (options, callback) {
+/*Object.prototype.onModalLoad = function (options, callback) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	target.upon('show.bs.modal', (e) => typeof callback === 'function' ? callback(e) : (typeof options === 'function' && options(e)));
 	newBsModal(target[0], typeof options === 'object' ? options : null).show();
 	return target;
-}
+}*/
 
 /**
  * Dispose the given modal with a callback.
@@ -1099,7 +1109,7 @@ Object.prototype.onModalClose = function (callback) {
  * @param onError
  * @returns {Promise<unknown>}
  */
-Object.prototype.handleFormSubmit = function ({uri = '', method = 'get', data = null, dataType = 'json', onSuccess, onError}) {
+Object.prototype./*handleFormSubmit = function ({uri = '', method = 'get', data = null, dataType = 'json', onSuccess, onError}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -1141,10 +1151,10 @@ Object.prototype.handleFormSubmit = function ({uri = '', method = 'get', data = 
 								if (status === 308 && dataType === 'json') {
 									if (_messageTag.length) {
 										_messageTag.renderMessage(alert_s, fa_check_c, response.message, null, form, false, true);
-										_messageTag === messageTag ? setTimeout(() => _messageTag.fadeout({timeout: 800, toggleDisplay: true, callback: () => setTimeout(() => '/*location.href = response.redirect*/', 2000)}), 1000) :
+										_messageTag === messageTag ? setTimeout(() => _messageTag.fadeout({timeout: 800, toggleDisplay: true, callback: () => setTimeout(() => '/!*location.href = response.redirect*!/', 2000)}), 1000) :
 											_messageTag === _globalMessageTag && _messageTag.slideInDown({
 												timeout: 800,
-												callback: (target) => setTimeout(() => target.slideOutUp({timeout: 800, callback: () => '/*location.href = response.redirect*/'}), 2000)
+												callback: (target) => setTimeout(() => target.slideOutUp({timeout: 800, callback: () => '/!*location.href = response.redirect*!/'}), 2000)
 											});
 									}
 								} else
@@ -1175,7 +1185,7 @@ Object.prototype.handleFormSubmit = function ({uri = '', method = 'get', data = 
 			}
 		});
 	});
-}
+}*/
 
 /**
  * Loads specified Page/HTML into the target element from given URI.
@@ -1272,7 +1282,7 @@ window.$fb = {
 	 * @param onSuccess
 	 * @param onError
 	 */
-	fetchReq({uri = '', method = 'get', data = null, dataType = 'json', beforeSend, onComplete, onSuccess, onError}) {
+	/*fetchReq({uri = '', method = 'get', data = null, dataType = 'json', beforeSend, onComplete, onSuccess, onError}) {
 		const allowedErrorStatuses = new Set([401, 402, 422, 423, 426, 451, 511]);
 		let status,
 			statusText,
@@ -1300,7 +1310,7 @@ window.$fb = {
 			status > 199 && status < 300 && typeof onSuccess === 'function' && onSuccess(responseData, status, statusText)
 			typeof onComplete === 'function' && onComplete(responseData, status, statusText);
 		}).catch(err => (typeof onError === 'function') && onError(err, status, statusText));
-	},
+	},*/
 	/**
 	 * Toggle the disabled state (property) of button.
 	 *
@@ -1309,7 +1319,7 @@ window.$fb = {
 	 * @param buttonElement
 	 * @param processIsDone {boolean}
 	 */
-	toggleButtonState(buttonElement, processIsDone = false) {
+	/*toggleButtonState(buttonElement, processIsDone = false) {
 		const target = ((buttonElement.constructor.name.toUpperCase() === 'NODELIST' || buttonElement.constructor.name.toUpperCase() === 'S')
 			? Array.from(buttonElement) : (Array.isArray(buttonElement) ? buttonElement : [buttonElement]))[0];
 		const buttonLoaderElement = $el(buttonLoader, target);
@@ -1325,7 +1335,7 @@ window.$fb = {
 				target.disable(false);
 			}
 		}
-	},
+	},*/
 	/**
 	 * Manipulate the buttons state.
 	 *
@@ -1334,12 +1344,12 @@ window.$fb = {
 	 * @param form
 	 * @param processIsDone
 	 */
-	manipulateButton(form, processIsDone = false) {
+	/*manipulateButton(form, processIsDone = false) {
 		const target = ((form.constructor.name.toUpperCase() === 'NODELIST' || form.constructor.name.toUpperCase() === 'S')
 			? Array.from(form) : (Array.isArray(form) ? form : [form]))[0];
 		const submitButton = $el('button[type="submit"]', target).length ? $el('button[type="submit"]', target) : $el(`button[form="${target.id}"]`);
 		this.toggleButtonState(submitButton, processIsDone);
-	},
+	},*/
 	/**
 	 * Returns true if the string is a JSON string and can be parsed to a JSON Object.
 	 *
@@ -1348,14 +1358,14 @@ window.$fb = {
 	 * @param JSONString
 	 * @returns {boolean}
 	 */
-	canParseJSON(JSONString) {
+	/*canParseJSON(JSONString) {
 		try {
 			JSON.parse(JSONString)
 			return true
 		} catch (e) {
 			return false
 		}
-	}
+	}*/
 }
 
 
@@ -1452,7 +1462,7 @@ function onAlertClose(context) {
  * @param numberInput {number|string}
  * @returns {boolean}
  */
-function checkLuhn(numberInput) {
+/*function checkLuhn(numberInput) {
 	const sumDigit = (c) => (c < 10) ? c :
 		sumDigit(Math.trunc(c / 10) + (c % 10));
 	
@@ -1460,7 +1470,7 @@ function checkLuhn(numberInput) {
 		.map(Number)
 		.map((c, i) => i % 2 !== 0 ? sumDigit(c * 2) : c)
 		.reduce((acc, v) => acc + v) % 10 === 0;
-}
+}*/
 
 /**
  * Parse the input and return the boolean equivalent.

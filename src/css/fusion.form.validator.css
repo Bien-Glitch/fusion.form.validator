@@ -66,10 +66,18 @@ body {
 /** Custom **/
 .validation-icon,
 .password-toggler-icon {
+  position: absolute;
   opacity: 0;
   top: 50%;
-  right: 8px;
+  right: 0;
   transform: translateY(-50%);
+}
+
+.password-toggler-icon {
+  display: none;
+}
+.password-toggler-icon.shown {
+  display: block;
 }
 
 .input-group-text-append,
@@ -125,7 +133,10 @@ body {
   border: 1px solid transparent;
   border-radius: 0.25rem;
 }
-.valid-text .capslock-alert {
+.valid-text.capslock-alert {
+  display: flex !important;
+}
+.valid-text.capslock-alert > *:first-child {
   display: none;
   padding: 0.5rem;
   margin-top: 0.3rem !important;
