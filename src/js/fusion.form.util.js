@@ -1202,7 +1202,7 @@ Object.prototype./*handleFormSubmit = function ({uri = '', method = 'get', data 
  * @param callback
  * @returns {Promise<unknown>}
  */
-Object.prototype.loadPageData = async function ({uri, selector = null, data = null, overlay = null, dataType = 'text', slug = 'Page', beforeSend, callback}) {
+/*Object.prototype.loadPageData = async function ({uri, selector = null, data = null, overlay = null, dataType = 'text', slug = 'Page', beforeSend, callback}) {
 	const target = (this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]);
 	
@@ -1232,7 +1232,7 @@ Object.prototype.loadPageData = async function ({uri, selector = null, data = nu
 			});
 		});
 	});
-}
+}*/
 
 /**
  * Check if the target element has a scrollbar in the given direction.
@@ -1242,7 +1242,7 @@ Object.prototype.loadPageData = async function ({uri, selector = null, data = nu
  * @param direction {string}
  * @returns {boolean|Error}
  */
-Object.prototype.hasScrollBar = function (direction = 'vertical') {
+/*Object.prototype.hasScrollBar = function (direction = 'vertical') {
 	const target = ((this.constructor.name.toUpperCase() === 'NODELIST' || this.constructor.name.toUpperCase() === 'S')
 		? Array.from(this) : (Array.isArray(this) ? this : [this]))[0];
 	let scrollType = direction === 'vertical' ? 'scrollHeight' : 'scrollWidth',
@@ -1253,7 +1253,7 @@ Object.prototype.hasScrollBar = function (direction = 'vertical') {
 			target[scrollType] > target[clientType] :
 			new Error(`Specified direction [${direction}] does not meet required arguments: 'vertical' or 'horizontal'`)) :
 		new Error('Scroll direction not specified!');
-}
+}*/
 
 /**
  * Create a new instance of Fusion Form Validator using the target element.
@@ -1375,7 +1375,7 @@ window.$fb = {
  * @param element
  * @returns {Alert}
  */
-const newBsAlert = (element) => new bootstrap.Alert(element);
+/*const newBsAlert = (element) => new bootstrap.Alert(element);*/
 
 /**
  * Creates a new instance of Bootstrap Modal on the given element.
@@ -1384,14 +1384,14 @@ const newBsAlert = (element) => new bootstrap.Alert(element);
  * @param options
  * @returns {Modal}
  */
-const newBsModal = (element, options) => new bootstrap.Modal(element, options);
+/*const newBsModal = (element, options) => new bootstrap.Modal(element, options);*/
 
 /**
  *
  * @param number {number|string}
  * @returns {string}
  */
-window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractionDigits: 2});
+/*window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractionDigits: 2});*/
 
 /**
  *
@@ -1400,25 +1400,25 @@ window.formatNumber = (number) => number.toLocaleString('en-US', {minimumFractio
  * @param target {NodeList|HTMLElement|Object|Array}
  * @param showIcon {boolean}
  */
-window.toggleValidationIcon = ({show, hide}, target, showIcon) => {
+/*window.toggleValidationIcon = ({show, hide}, target, showIcon) => {
 	if (showIcon) {
 		hide.fadeout({timeout: 10});
 		target.addValidationPadding();
 		show.touchCssValue({right: valid_right}).fadein({timeout: 10, toggleDisplay: true});
 	} else
 		target.removeValidationPadding();
-}
+}*/
 
 /**
  *
  * @param value {string}
  * @returns {string}
  */
-window.spaceToComma = (value) => {
+/*window.spaceToComma = (value) => {
 	return value.trim().split(/[ ,]+/g).filter((val) => {
 		return val !== '';
 	}).join(', ');
-};
+};*/
 
 /**
  * Multiply the values using the CSS calc() function
@@ -1437,24 +1437,24 @@ function multiplyPadding(pad1, pad2) {
  * @param element
  * @param target
  */
-function checkValidate(element, target) {
+/*function checkValidate(element, target) {
 	element[0].needsValidation() ?
 		element.validate({context: target}) :
 		element.removeValidationMessage({context: target, removeAlert: true});
-}
+}*/
 
 /**
  * Remove all corresponding validation elements when the targets' validation alert is closed.
  *
  * @param context
  */
-function onAlertClose(context) {
+/*function onAlertClose(context) {
 	$el('.alert').upon('close.bs.alert', function (e) {
 		const target = e.currentTarget;
 		const formElementId = target.dataset['alertId']
 		context && (formElementId && formElementId.length) && $el(formElementId).removeValidationMessage({context: context});
 	});
-}
+}*/
 
 /**
  * Checks the validity of the Card Number (Payment Card) using Luhn's Algorithm.
@@ -1478,7 +1478,7 @@ function onAlertClose(context) {
  * @param value
  * @returns {boolean}
  */
-function parseBool(value) {
+/*function parseBool(value) {
 	switch (value) {
 		case true:
 		case 'true':
@@ -1490,7 +1490,7 @@ function parseBool(value) {
 		default:
 			return false;
 	}
-}
+}*/
 
 
 /**

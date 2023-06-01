@@ -153,13 +153,20 @@ body {
   }
 
   &.capslock-alert {
+    left: 50%;
+    position: absolute;
     display: flex !important;
+    transform: translate(-50%, -25%);
 
     > *:first-child {
       display: none;
       padding: .5rem;
       margin-top: .3rem !important;
       margin-bottom: .2rem !important;
+
+      &.shown {
+        display: block;
+      }
     }
   }
 }

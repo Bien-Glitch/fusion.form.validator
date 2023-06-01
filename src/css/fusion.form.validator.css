@@ -134,13 +134,19 @@ body {
   border-radius: 0.25rem;
 }
 .valid-text.capslock-alert {
+  left: 50%;
+  position: absolute;
   display: flex !important;
+  transform: translate(-50%, -25%);
 }
 .valid-text.capslock-alert > *:first-child {
   display: none;
   padding: 0.5rem;
   margin-top: 0.3rem !important;
   margin-bottom: 0.2rem !important;
+}
+.valid-text.capslock-alert > *:first-child.shown {
+  display: block;
 }
 
 .response-text .alert {

@@ -2,18 +2,18 @@ let currentAnimation,
 	buttonLoader = '.button-loader',
 	globalMessageTag = '#global-message-wrapper';
 
-export const alert_d = 'alert-danger';
-export const alert_i = 'alert-info';
-export const alert_s = 'alert-success';
+const alert_d = 'alert-danger';
+const alert_i = 'alert-info';
+const alert_s = 'alert-success';
 
-export const fa_check = 'far fa-1x fa-check';
-export const fa_check_c = 'far fa-1x fa-check-circle';
-export const fa_check_d = 'far fa-1x fa-check-double';
-export const fa_exc = 'far fa-1x fa-exclamation';
-export const fa_exc_c = 'far fa-1x fa-exclamation-circle';
-export const fa_info = 'far fa-1x fa-info';
-export const fa_info_c = 'far fa-1x fa-info-circle';
-export const fa_wifi_s = 'far fa-1x fa-wifi-slash';
+const fa_check = 'far fa-1x fa-check';
+const fa_check_c = 'far fa-1x fa-check-circle';
+const fa_check_d = 'far fa-1x fa-check-double';
+const fa_exc = 'far fa-1x fa-exclamation';
+const fa_exc_c = 'far fa-1x fa-exclamation-circle';
+const fa_info = 'far fa-1x fa-info';
+const fa_info_c = 'far fa-1x fa-info-circle';
+const fa_wifi_s = 'far fa-1x fa-wifi-slash';
 
 const errorBag = {}, errorCount = {};
 
@@ -22,32 +22,54 @@ const errorBag = {}, errorCount = {};
  * Creates new FBUtil Object with selected element.
  *
  * _Returns an empty Object if the element is not found_
- * @param selector {string|Iterable} HTMLString or Iterable
- * @param context {string|Iterable|null} The Element context to select from. Accepts HTMLString or Iterable
+ * @param selector {string|Iterable|Object} HTMLString or Iterable
+ * @param context {string|Iterable|Object|null} The Element context to select from. Accepts HTMLString or Iterable
  * @return {FBUtil<HTMLElement>} A new FBUtil Object
  */
 const $fs = (selector, context = null) => new FBUtil(selector, context);
 
 /**
  * Checks if the given Value is a function
- * @param value
+ * @param value {*}
  * @return {boolean}
  */
 const isFunction = (value) => (typeof value).toUpperCase() === 'FUNCTION';
 
 /**
  * Checks id the given Value is a String
- * @param value
+ * @param value {*}
  * @return {boolean}
  */
 const isString = (value) => (typeof value).toUpperCase() === 'STRING';
 
 /**
+ * Creates a new instance of Bootstrap Alert on the given element.
+ * @param element
+ * @returns {Alert}
+ */
+const newBsAlert = (element) => new bootstrap.Alert(element);
+
+/**
+ * Creates a new instance of Bootstrap Modal on the given element.
+ * @param element
+ * @param options
+ * @returns {Modal}
+ */
+const newBsModal = (element, options) => new bootstrap.Modal(element, options);
+
+/**
  * Checks if the given value is an Object
- * @param object
+ * @param object {*}
  * @return {boolean}
  */
 const isObject = (object) => (typeof object).toUpperCase() === 'OBJECT' || object.constructor && (object.constructor.name.toUpperCase() === 'OBJECT');
+
+/**
+ *
+ * @param number {number}
+ * @return {string}
+ */
+const formatNumber = (number) => number.toLocaleString('en-US', {minimumFractionDigits: 2})
 
 const checkLuhn = (input) => {
 	const sumDigit = (c) => (c < 10) ? c :
@@ -60,8 +82,12 @@ const checkLuhn = (input) => {
 }
 
 /**
+ * Parses the given value as a boolean returns true if the value is any of:
  *
- * @param value
+ * _[true, 'true', 1, '1', 'on', 'yes']_;
+ *
+ * Returns false otherwise.
+ * @param value {*}
  * @return {boolean}
  */
 const parseBool = (value) => {
@@ -78,6 +104,11 @@ const parseBool = (value) => {
 	}
 }
 
+/**
+ * Converts spaces to commas in a string.
+ * @param value {string}
+ * @return {string}
+ */
 const spaceToComma = (value) => {
 	return value.trim().split(/[ ,]+/g).filter((val) => {
 		return val !== '';
@@ -105,8 +136,8 @@ const titleCase = (value, regExpReplace = /[-_]/gi) => {
 }
 
 /**
- * Checks if the given string is JSON Parsable
- * @param JSONString {string}
+ * Checks if the given string or Response is JSON Parsable
+ * @param JSONString {string|Response}
  * @return {boolean}
  */
 const canParseJSON = (JSONString) => {
@@ -120,6 +151,8 @@ const canParseJSON = (JSONString) => {
 
 /**
  * Perform a fetch request using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
+ *
+ *
  * @param uri {string}
  * @param method {string}
  * @param data {Object|null}
@@ -161,6 +194,12 @@ const fetchReq = ({uri = '', method = 'get', data = null, dataType = 'json', bef
 
 /*classes*/
 class FBBase {
+	/**
+	 *
+	 * @param selector {string|Iterable|Object|null}
+	 * @param context {string|Iterable|Object|null}
+	 * @return {FBBase}
+	 */
 	constructor(selector, context) {
 		const _this = this;
 		const target = _init();
@@ -251,7 +290,7 @@ class FBBase {
 	}
 	
 	/**
-	 *
+	 * Converts the given data to an array.
 	 * @return {unknown[] | [*] | [*]}
 	 */
 	get target() {
@@ -267,7 +306,7 @@ class FBBase {
 	}
 	
 	/**
-	 *
+	 * Returns the previously selected Object
 	 * @return {*|{}}
 	 */
 	prevObject() {
@@ -287,19 +326,23 @@ class FBBase {
 	}
 	
 	/**
-	 * Plugin Current Version
+	 * Plugins Current Version
 	 * @return {string}
 	 */
-	get version() {
+	static VERSION() {
 		return '2.0.0';
+	}
+	
+	static NAME() {
+		return 'FB Util & Validator';
 	}
 }
 
 class FBUtil extends FBBase {
 	/**
 	 *
-	 * @param selector
-	 * @param context
+	 * @param selector {string|Iterable|Object|null}
+	 * @param context {string|Iterable|Object|null}
 	 */
 	constructor(selector, context) {
 		super(selector, context)
@@ -323,14 +366,30 @@ class FBUtil extends FBBase {
 	
 	/**
 	 *
+	 * @return {FBBSModal}
+	 */
+	get modal() {
+		return new FBBSModal(this);
+	}
+	
+	/**
+	 *
 	 * @return {FBValidator}
 	 */
 	get validator() {
 		return new FBValidator(this);
 	}
 	
+	static NAME() {
+		return 'FB Util';
+	}
+	
 	/**
+	 * Returns the specified action for the element.
 	 *
+	 * _Makes use of the action attribute of the element if available;_
+	 *
+	 * _Makes use of the [data-action] attribute otherwise_
 	 * @return {string|void}
 	 */
 	get action() {
@@ -352,16 +411,18 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 *
-	 * @param element
+	 * Returns true if the given element is a Form element. Returns false otherwise.
+	 * @param element {HTMLElement|null}
 	 * @return {boolean}
 	 */
-	isFormElement(element) {
-		return element.tagName.toUpperCase() === 'FORM';
+	isFormElement(element = null) {
+		return !!element ?
+			element.tagName.toUpperCase() === 'FORM' :
+			this[0].tagName.toUpperCase() === 'FORM';
 	}
 	
 	/**
-	 *
+	 * Checks if the given form field element is an Email field.
 	 * @return {boolean|void}
 	 */
 	isEmailField() {
@@ -374,7 +435,7 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 *
+	 * Checks if the given form field element is a Name field.
 	 * @return {boolean|void}
 	 */
 	isNameField() {
@@ -387,7 +448,7 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 *
+	 * Checks if the given form field element is a Password field.
 	 * @param passwordId
 	 * @return {boolean|void}
 	 */
@@ -401,7 +462,7 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 *
+	 * Checks if the given form field element is a Phone number field.
 	 * @return {boolean|void}
 	 */
 	isPhoneField() {
@@ -414,7 +475,7 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 *
+	 * Checks if the given form field element is a Username field.
 	 * @return {boolean|void}
 	 */
 	isUsernameField() {
@@ -456,7 +517,6 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 *
 	 * @param event
 	 * @param prefix
 	 * @param callback
@@ -672,66 +732,66 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 *
-	 * @param timeout
-	 * @param iterations
-	 * @param callback
-	 * @returns {Promise<FBUtil>}
+	 * Add fadein Animation to target element.
+	 * @param timeout {number} The animations duration
+	 * @param iterations {number} Number of times to run the animation
+	 * @param callback {function|null} Optional Callback
+	 * @returns {Promise<FBUtil>} Returns a promise after the animation is done.
 	 */
 	fadein(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('fadeInAnim', timeout, iterations, callback);
 	}
 	
 	/**
-	 *
-	 * @param timeout
-	 * @param iterations
-	 * @param callback
-	 * @returns {Promise<FBUtil>}
+	 * Add fadeout Animation to target element.
+	 * @param timeout {number} The animations duration
+	 * @param iterations {number} Number of times to run the animation
+	 * @param callback {function|null} Optional Callback
+	 * @returns {Promise<FBUtil>} Returns a promise after the animation is done.
 	 */
 	fadeout(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('fadeOutAnim', timeout, iterations, callback);
 	}
 	
 	/**
-	 *
-	 * @param timeout
-	 * @param iterations
-	 * @param callback
-	 * @returns {Promise<FBUtil>}
+	 * Add SlideIn-up Animation to target element.
+	 * @param timeout {number} The animations duration
+	 * @param iterations {number} Number of times to run the animation
+	 * @param callback {function|null} Optional Callback
+	 * @returns {Promise<FBUtil>} Returns a promise after the animation is done.
 	 */
 	slideInUp(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideInUpAnim', timeout, iterations, callback);
 	}
 	
 	/**
-	 *
-	 * @param timeout
-	 * @param iterations
-	 * @param callback
-	 * @returns {Promise<FBUtil>}
+	 * Add SlideIn-down Animation to target element.
+	 * @param timeout {number} The animations duration
+	 * @param iterations {number} Number of times to run the animation
+	 * @param callback {function|null} Optional Callback
+	 * @returns {Promise<FBUtil>} Returns a promise after the animation is done.
 	 */
 	slideInDown(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideInDownAnim', timeout, iterations, callback);
 	}
 	
 	/**
-	 *
-	 * @param timeout
-	 * @param iterations
-	 * @param callback
-	 * @returns {Promise<FBUtil>}
+	 * Add SlideOut-up Animation to target element.
+	 * @param timeout {number} The animations duration
+	 * @param iterations {number} Number of times to run the animation
+	 * @param callback {function|null} Optional Callback
+	 * @returns {Promise<FBUtil>} Returns a promise after the animation is done.
 	 */
 	slideOutUp(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideOutUpAnim', timeout, iterations, callback);
 	}
 	
 	/**
-	 *
-	 * @param timeout
-	 * @param iterations
-	 * @param callback
-	 * @returns {Promise<FBUtil>}
+	 * Add SlideOut-down Animation to target element.
+	 * @param timeout {number} The animations duration
+	 * @param iterations {number} Number of times to run the animation
+	 * @param callback {function|null} Optional Callback
+	 * @returns {Promise<FBUtil>} Returns a promise after the animation is done.
 	 */
 	slideOutDown(timeout = 300, iterations = 1, callback = null) {
 		return this.#_callAnimation('slideOutDownAnim', timeout, iterations, callback);
@@ -775,9 +835,14 @@ class FBUtil extends FBBase {
 		return this;
 	}
 	
-	removeAttribute(name) {
+	/**
+	 * Removes the given attributes from the element.
+	 * @param name {...string}
+	 * @return {FBUtil}
+	 */
+	removeAttribute(...name) {
 		const target = this.#_getTarget();
-		(target.length && name) && target.forEach(element => element.removeAttribute(name));
+		(target.length && name) && name.forEach(attribute => target.forEach(element => element.removeAttribute(attribute)));
 		return this;
 	}
 	
@@ -820,13 +885,13 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
-	 * Get or set the given data-* attribute(s) value of the target element (If a String is passed to the name param).
+	 * Get or set the given [data-*] attribute(s) value of the target element (If a String is passed to the name param).
 	 *
-	 * _Gets the given data-* attribute if only the name is given as a String._
+	 * _Gets the given [data-*] attribute if only the name is given as a String._
 	 *
-	 * _Sets the given data-* attribute if name and value is given as a String._
+	 * _Sets the given [data-*] attribute if name and value is given as a String._
 	 *
-	 * _Sets the given data-* attributes if name given as a plain Object (Key-Value Pair)._
+	 * _Sets the given [data-*] attributes if name given as a plain Object (Key-Value Pair)._
 	 * @param name {string|Object}
 	 * @param value
 	 * @returns {FB<touchDataAttribute>|string}
@@ -919,6 +984,11 @@ class FBUtil extends FBBase {
 		return window.getComputedStyle(target[0], pseudoElement);
 	}
 	
+	/**
+	 * Disables the element.
+	 * @param enable {boolean}
+	 * @return {FBUtil}
+	 */
 	disable(enable = false) {
 		const _target = this, target = _target.target;
 		
@@ -956,25 +1026,22 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
+	 * Returns the direct descendants (Children) of the target element.
 	 *
-	 * @param selector
+	 * _Returns the child that matches the selector if the selector is given else the direct previous sibling is returned._
+	 * @param selector {string|null}
 	 * @return {FBUtil<HTMLElement>}
 	 */
 	children(selector = null) {
 		const target = this.#_getTarget(), children = [];
-		// this.#_setPrevObject();
 		
-		$fs(target[0].children).target.forEach((child, idx) => {
-			if (selector) {
+		$fs(target[0].children).target.forEach(child => {
+			if (isString(selector)) {
 				if ($fs(child).selectorMatches(selector)) {
 					children.push(child)
-					/*this[this.length] = child;
-					this.length++;*/
 				}
 			} else {
 				children.push(child)
-				/*this[this.length] = child;
-				this.length++;*/
 			}
 		});
 		const _children = $fs(children);
@@ -983,24 +1050,23 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
+	 * Returns the elements siblings.
 	 *
-	 * @param selector
+	 * _Returns the sibling that matches the selector if the selector is given else the direct previous sibling is returned._
+	 * @param selector {string|null}
 	 * @return {FBUtil<HTMLElement>}
 	 */
 	siblings(selector = null) {
 		const target = this.#_getTarget(), siblings = [];
-		/*this.#_setPrevObject();*/
 		
 		$fs(target[0].parentNode.children).target.filter(sibling => {
-			if (selector) {
+			if (isString(selector)) {
 				if (sibling !== target[0] && $fs(sibling).selectorMatches(selector)) {
 					siblings.push(sibling)
 				}
 			} else {
 				if (sibling !== target[0]) {
 					siblings.push(sibling)
-					/*this[this.length] = sibling;
-					this.length++;*/
 				}
 			}
 		});
@@ -1010,18 +1076,19 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
+	 * Returns the Previous siblings of the target element.
 	 *
-	 * @param selector
+	 * _Returns the sibling that matches the selector if the selector is given else the direct previous sibling is returned._
+	 * @param selector {string|null}
 	 * @return {FBUtil<HTMLElement>}
 	 */
 	prevSiblings(selector = null) {
 		const prevSiblings = [], target = this.#_getTarget();
-		// this.#_setPrevObject();
 		
 		let _prevSibling = target[0].previousElementSibling;
 		
 		while (_prevSibling) {
-			if (selector) {
+			if (isString(selector)) {
 				if ($fs(_prevSibling).selectorMatches(selector)) {
 					prevSiblings.push(_prevSibling);
 					break;
@@ -1032,41 +1099,31 @@ class FBUtil extends FBBase {
 			}
 			_prevSibling = _prevSibling.previousElementSibling;
 		}
-		
-		/*prevSiblings.forEach(prevSibling => {
-			this[this.length] = prevSibling;
-			this.length++;
-		});
-		return this;*/
 		const _prevSiblings = $fs(prevSiblings);
 		_prevSiblings.#_setPrevObject(this);
 		return _prevSiblings;
 	}
 	
 	/**
+	 * Returns all descendants of the target element.
 	 *
-	 * @param selector
+	 * _Returns the descendant that matches the selector if the selector is given else the direct previous sibling is returned._
+	 * @param selector {string|null}
 	 * @return {FBUtil<HTMLElement>}
 	 */
 	descendants(selector = null) {
 		const target = this.#_getTarget(), descendants = [];
-		// this.#_setPrevObject();
 		
 		$fs('*', target[0]).target.forEach(descendant => {
-			if (selector) {
+			if (isString(selector)) {
 				if ($fs(descendant).selectorMatches(selector)) {
-					/*this[this.length] = descendant;
-					this.length++;*/
 					descendants.push(descendant);
 				}
 			} else {
-				/*this[this.length] = descendant;
-				this.length++;*/
 				descendants.push(descendant);
 			}
 		});
 		
-		// return this;
 		const _descendants = $fs(descendants);
 		_descendants.#_setPrevObject(this);
 		return _descendants;
@@ -1076,12 +1133,11 @@ class FBUtil extends FBBase {
 	 * Checks if the target element has the given element.
 	 *
 	 * _Returns the element if true else an empty array Object returned._
-	 * @param selector
+	 * @param selector {string|null}
 	 * @return {FBUtil}
 	 */
 	has(selector) {
 		const target = this.#_getTarget(), matches = [];
-		// this.#_setPrevObject();
 		
 		$fs('*', target[0]).target.forEach(node => {
 			if (isString(selector)) {
@@ -1142,6 +1198,25 @@ class FBUtil extends FBBase {
 	}
 	
 	/**
+	 * Check if the target element has a scrollbar in the given direction.
+	 *
+	 * Default direction is vertical.
+	 * @param direction
+	 * @return {boolean|Error}
+	 */
+	hasScrollBar(direction = 'vertical') {
+		const _target = this, target = _target.#_getTarget();
+		let scrollType = direction === 'vertical' ? 'scrollHeight' : 'scrollWidth',
+			clientType = scrollType === 'scrollHeight' ? 'clientHeight' : 'clientWidth';
+		
+		return !!direction ?
+			(direction === 'vertical' || direction === 'horizontal' ?
+				target[0][scrollType] > target[0][clientType] :
+				new Error(`Specified direction [${direction}] does not meet required arguments: 'vertical' or 'horizontal'`)) :
+			new Error('Scroll direction not specified!');
+	}
+	
+	/**
 	 * Toggle the disabled state (property) of button.
 	 *
 	 * _Also toggle the button loader if available._
@@ -1192,9 +1267,9 @@ class FBUtil extends FBBase {
 		if (target.length) {
 			_target.upon('show.bs.modal', isFunction(callback) ? callback : (isFunction(options) && options));
 			if (target.length > 1)
-				target.forEach(element => new bootstrap.Modal(element, isObject(options) ? options : null).show());
+				target.forEach(element => newBsModal(element, isObject(options) ? options : null).show());
 			else
-				new bootstrap.Modal(target[0], isObject(options) ? options : null).show();
+				newBsModal(target[0], isObject(options) ? options : null).show();
 			return this;
 		}
 		return console.error('ReferenceError: Element is undefined.');
@@ -1209,9 +1284,9 @@ class FBUtil extends FBBase {
 		if (target.length) {
 			_target.upon('hide.bs.modal', function (e) {
 				if (target.length > 1)
-					target.forEach(element => new bootstrap.Modal(element).hide());
+					target.forEach(element => newBsModal(element).hide());
 				else
-					new bootstrap.Modal(target[0]).hide();
+					newBsModal(target[0]).hide();
 				isFunction(callback) && callback(e);
 			});
 		}
@@ -1350,15 +1425,24 @@ class FBUtil extends FBBase {
 	}
 }
 
-class FBClassList extends FBBase {
+class FBClassList extends FBUtil {
 	constructor(selector, context) {
 		super(selector, context);
+	}
+	
+	static NAME() {
+		return 'FB Classlist';
 	}
 	
 	#_classList() {
 		return this.target[0].classList;
 	}
 	
+	/**
+	 * Performs the specified action for each item in the elements classlist.
+	 * @param callback {function} A function that accepts upto two arguments. _the class and the index position of the class in the list_
+	 * @return {*|void}
+	 */
 	each(callback) {
 		return this.#_classList().length ?
 			this.#_classList().forEach((value, idx) => callback(value, idx)) :
@@ -1410,12 +1494,19 @@ class FBClassList extends FBBase {
 		return this;
 	}
 	
+	/**
+	 * Return an array of all classes in the elements classlist
+	 * @return {*[]}
+	 */
 	get collect() {
 		const classList = [];
 		this.#_classList() && this.each(value => classList.push(value))
 		return classList;
 	}
 	
+	/**
+	 * Logs an array of all classes in the elements classlist to the console
+	 */
 	get log() {
 		console.log(this.collect);
 	}
@@ -1426,46 +1517,103 @@ class FBHtml extends FBUtil {
 		super(selector, context);
 	}
 	
-	get classList() {
-		return new FBClassList(this);
+	static NAME() {
+		return 'FB HTML';
 	}
 	
+	/**
+	 * Inserts given HTML string to the target element (inner HTML).
+	 * @param value
+	 * @return {FBHtml}
+	 */
 	insert(value) {
 		const target = this.target
 		target.forEach(element => element.innerHTML = value);
 		return this;
 	}
 	
+	/**
+	 * Inserts given HTML string just at the end of the target element.
+	 * @param value
+	 * @return {FBHtml}
+	 */
 	affix(value) {
 		const target = this.target;
 		target.forEach(element => element.insertAdjacentHTML('beforeend', value));
 		return this;
 	}
 	
+	/**
+	 * Inserts given HTML string after the beginning of the target element.
+	 * @param value
+	 * @return {FBHtml}
+	 */
 	prefix(value) {
 		const target = this.target;
 		target.forEach(element => element.insertAdjacentHTML('afterbegin', value));
 		return this;
 	}
 	
+	/**
+	 * Inserts given HTML string before the beginning of the target element (Before element).
+	 * @param value
+	 * @return {FBHtml}
+	 */
 	insertBefore(value) {
 		const target = this.target;
 		target.forEach(element => element.insertAdjacentHTML('beforebegin', value));
 		return this;
 	}
 	
+	/**
+	 * Inserts given HTML string after the end of the target element (After element).
+	 * @param value
+	 * @return {FBHtml}
+	 */
 	insertAfter(value) {
 		const target = this.target;
 		target.forEach(element => element.insertAdjacentHTML('afterend', value));
 		return this;
 	}
 	
+	/**
+	 * Returns the HTML content of the element.
+	 * @return {string|string|*|string}
+	 */
 	get collect() {
 		return this[0].innerHTML;
 	}
 	
+	/**
+	 * Logs the HTML content of the element to the console.
+	 */
 	get log() {
 		console.log(this.collect);
+	}
+}
+
+class FBBSModal extends FBUtil {
+	constructor(selector, context) {
+		super(selector, context);
+	}
+	
+	static NAME() {
+		return 'FB BS-Modal';
+	}
+	
+	onClickOpen({beforeOpen, afterOpen, options} = {}) {
+		const _target = this;
+		
+		if (_target.length)
+			return new Promise(resolve => {
+				_target.upon('click', function (e) {
+					e.preventDefault();
+					let target = this,
+						route = $fs(target).dataAttribute('target-route'),
+						targetModal = $fs(target).dataAttribute('bs-target');
+					
+				})
+			})
 	}
 }
 
@@ -1511,16 +1659,34 @@ class FBValidator extends FBUtil {
 		super(selector, context);
 	}
 	
+	static NAME() {
+		return 'FB Validator';
+	}
+	
+	/**
+	 * Returns the error bag of the given form.
+	 * @return {*|null}
+	 */
 	get errorBag() {
-		return (this.length && this[0].tagName && this[0].tagName.toLowerCase() === 'form' && Object.keys(errorBag[this[0].id])) ? errorBag[this[0].id] : null;
+		return (this.length && this.isFormElement() && Object.keys(errorBag[this[0].id])) ? errorBag[this[0].id] : null;
 	}
 	
+	/**
+	 * Returns the error count of the given form.
+	 * @return {*|number}
+	 */
 	get errorCount() {
-		return (this.length && this[0].tagName && this[0].tagName.toLowerCase() === 'form' && Object.keys(errorCount[this[0].id])) ? errorCount[this[0].id] : 0;
+		return (this.length && this.isFormElement() && Object.keys(errorCount[this[0].id])) ? errorCount[this[0].id] : 0;
 	}
 	
+	/**
+	 * Returns the Forms Response message element created by this plugin.
+	 *
+	 * _Make sure to initialize the validator._
+	 * @return {void|FBValidator}
+	 */
 	get messageTag() {
-		if (this.length && this.isFormElement(this[0])) {
+		if (this.length && this.isFormElement()) {
 			const messageTag = $fs('.form-message .response-text', this);
 			messageTag.length && this.#_resetFBObject(messageTag);
 			return this;
@@ -1528,10 +1694,16 @@ class FBValidator extends FBUtil {
 		return console.error('ReferenceError: Non Form Element given.', this);
 	}
 	
+	/**
+	 * Returns the Forms Submission process text element created by this plugin.
+	 *
+	 * _Make sure to initialize the validator._
+	 * @return {string|*|string|void}
+	 */
 	get waitText() {
-		if (this.length && this.isFormElement(this[0])) {
+		if (this.length && this.isFormElement()) {
 			const waitTextWrapper = $fs('.form-message .waiting-text', this);
-			return waitTextWrapper.length ? waitTextWrapper[0].innerHTML : 'Please Wait...';
+			return waitTextWrapper.length ? waitTextWrapper.html.collect : 'Please Wait...';
 		}
 		return console.error('ReferenceError: Non Form Element given.', this);
 	}
@@ -1545,7 +1717,7 @@ class FBValidator extends FBUtil {
 	}
 	
 	/**
-	 *
+	 * Returns an Object containing both errors and error count of the given form element(s).
 	 * @return {{}|{count: (number), errors: (Object)}|void}
 	 */
 	get getErrors() {
@@ -1573,6 +1745,10 @@ class FBValidator extends FBUtil {
 		return console.warn('ReferenceError: Element is undefined.');
 	}
 	
+	/**
+	 * Returns the Validation configuration for the form element.
+	 * @return {{texts: {capslock: string}, icons: {passwordToggleIcon: string, invalidIcon: string, validIcon: string, passwordCapslockAlertIcon: string}, config: {nativeValidation: boolean, passwordId: string, passwordConfirmId: string, validatePassword: boolean, initWrapper: string, showPassword: boolean, validatePhone: boolean, validateUsername: boolean, validateCard: boolean, capslockAlert: boolean, validateName: boolean, validateEmail: boolean}, regExp: {cardCVV: RegExp, phone: RegExp, name: RegExp, email: RegExp, cardNumber: RegExp, username: RegExp}}|void}
+	 */
 	get validatorConfig() {
 		return this.#_fbValidatorConfig;
 	}
@@ -1700,7 +1876,6 @@ class FBValidator extends FBUtil {
 		
 		responseTextWrapper.classList.add('response-text', 'small');
 		waitingText.classList.add('text-primary');
-		waitingText.classList.add('text-primary');
 		waitingText.innerText = 'Please Wait...';
 		waitingIcon.classList.add('fa', 'fa-1x', 'fa-exclamation-circle', 'text-danger');
 		waitingTextWrapper.classList.add('waiting-text', 'd-none');
@@ -1718,7 +1893,6 @@ class FBValidator extends FBUtil {
 	}
 	
 	#_formValidate(forms) {
-		// this.#_resetFBObject($fs(forms));
 		this.#_init = true;
 		
 		forms.forEach(form => {
@@ -1737,8 +1911,6 @@ class FBValidator extends FBUtil {
 			if (form.attribute('id')) {
 				let formId = form.attribute('id'),
 					selector = `#${formId} ${config.initWrapper}`;
-				/*this.#_errorBag[formId] = {};
-				this.#_errorCount[formId] = {};*/
 				errorBag[formId] = {};
 				errorCount[formId] = 0;
 				
@@ -1826,7 +1998,7 @@ class FBValidator extends FBUtil {
 								},
 								blur: (e) => {
 									this.#_resetFBObject(_inputElement);
-									const dimensions = this.getFieldDimensions();
+									const dimensions = this.#_getFieldDimensions();
 									const _toggler = $fs(toggler, $fs(target));
 									
 									if (this.isPasswordField(config.passwordId)) {
@@ -1901,11 +2073,18 @@ class FBValidator extends FBUtil {
 								},
 								keyup: (e) => {
 									this.#_resetFBObject(_inputElement);
-									const dimensions = this.getFieldDimensions();
+									const dimensions = this.#_getFieldDimensions();
+									const capslockIsOn = e.getModifierState('CapsLock');
 									const _toggler = $fs(toggler, $fs(target));
+									const _capslockAlert = $fs(`.${FBValidator.passwordCapslockAlertClass()}`, form);
 									
 									if (_inputElement.length) {
 										if (this.isPasswordField(config.passwordId)) {
+											if (config.capslockAlert && _capslockAlert.length)
+												capslockIsOn ?
+													$fs('*:first-child', _capslockAlert).classlist.put('shown') :
+													$fs('*:first-child', _capslockAlert).classlist.remove('shown');
+											
 											if (config.showPassword && _toggler.length) {
 												if (requireRefill)
 													if (!_inputElement[0].value.length) {
@@ -1987,7 +2166,7 @@ class FBValidator extends FBUtil {
 				
 				form.upon('reset', (e) => {
 					const target = e.currentTarget;
-					$fs('.alert', $fs(target)).target.forEach(alert => new bootstrap.Alert(alert).close());
+					$fs('.alert', $fs(target)).target.forEach(alert => newBsAlert(alert).close());
 					$fs('input, textarea, select', $fs(target)).classlist.remove('border-danger').remove('border-success');
 					$fs('.validation-icon', $fs(target)).fadeout(0).then(icon => icon.touchStyle({opacity: 0}));
 				});
@@ -2138,6 +2317,55 @@ class FBValidator extends FBUtil {
 			return console.error('ReferenceError: Undefined target', target);
 	}
 	
+	#_getFieldDimensions() {
+		const _target = this, target = _target.target;
+		
+		if (target.length) {
+			const tagName = target[0].tagName.toLowerCase();
+			const elementType = target[0].type && target[0].type.toLowerCase();
+			const filterType = new Set(['date', 'month', 'datetime', 'datetime-local']);
+			const validationIcons = this.validationProps().validationIcon;
+			
+			let paddingRight,
+				_paddingRight,
+				validationIconRight,
+				passwordIconRight = 0,
+				targetPaddingLeft = parseInt(_target.style('padding-left').replace('px', '')),
+				currentIcon = validationIcons.target.filter(icon => $fs(icon).classlist.has('on')).length ?
+					validationIcons.target.filter(icon => $fs(icon).classlist.has('on'))[0] : validationIcons[0],
+				iconWidth = currentIcon.getBoundingClientRect().width,
+				_targetPaddingLeft = targetPaddingLeft;
+			
+			if (tagName === 'select'/* || filterType.has(elementType)*/)
+				_targetPaddingLeft = targetPaddingLeft * 4.5;
+			
+			validationIconRight = (tagName === 'select' || filterType.has(elementType)) ? _targetPaddingLeft : targetPaddingLeft;
+			paddingRight = validationIconRight + iconWidth + targetPaddingLeft;
+			_paddingRight = paddingRight
+			
+			if (this.#_isPasswordField(target) && this.validatorConfig.config.showPassword && this.#_init) {
+				let togglerIcon = $fs(`#${target[0].id}_group .password-toggler-icon`)[0],
+					togglerIconWidth = togglerIcon.getBoundingClientRect().width;
+				passwordIconRight = paddingRight;
+				paddingRight = passwordIconRight + togglerIconWidth + targetPaddingLeft;
+			}
+			
+			return {
+				paddingRight: paddingRight,
+				_paddingRight: _paddingRight,
+				paddingLeft: targetPaddingLeft,
+				iconRight: validationIconRight,
+				togglerRight: passwordIconRight,
+			}
+		}
+		return console.warn('ReferenceError: Element is Undefined.');
+	}
+	
+	/**
+	 * Initialize FBValidator's Validation on the form element(s).
+	 * @param config {Object|null} An Object defining the configuration for the validation
+	 * @return {FBValidator|void}
+	 */
 	initFormValidation(config = null) {
 		const _forms = this.target;
 		let notForms = _forms.filter(form => !this.isFormElement(form)),
@@ -2156,6 +2384,11 @@ class FBValidator extends FBUtil {
 		
 	}
 	
+	/**
+	 * Validates the field if validation is required. Removes already added validation otherwise.
+	 * @param context {string|Iterable|Object|null}
+	 * @return {FBValidator|void}
+	 */
 	toggleValidation(context) {
 		const _target = this, target = _target.target;
 		
@@ -2167,6 +2400,10 @@ class FBValidator extends FBUtil {
 		return console.warn('ReferenceError: Element is Undefined');
 	}
 	
+	/**
+	 * Returns All form elements of the given form
+	 * @return {{}|void|*}
+	 */
 	fieldElements() {
 		const _target = this, target = _target.target;
 		if (target.length) {
@@ -2186,6 +2423,14 @@ class FBValidator extends FBUtil {
 		return console.warn('ReferenceError: Element is Undefined');
 	}
 	
+	/**
+	 * Validates the given form field element using the given RegExp.
+	 * @param regex
+	 * @param context {string|Iterable|Object|null}
+	 * @param message
+	 * @param customValidation
+	 * @return {*|FBValidator|void}
+	 */
 	regexValidate({regex, context = null, message = null, customValidation = null} = {}) {
 		const _target = this, target = _target.target;
 		
@@ -2197,27 +2442,61 @@ class FBValidator extends FBUtil {
 		return console.warn('ReferenceError: Element is Undefined');
 	}
 	
+	/**
+	 * Validates the given input field as a Card CVV field with the given RegExp.
+	 * @param regex
+	 * @param context {string|Iterable|Object|null}
+	 * @return {*|FBValidator|void}
+	 */
 	cardCVVValidate(regex, context = null) {
 		return this.length ?
 			this.regexValidate({regex: regex, context: context, message: `Please input a valid CVV`}) : this;
 	}
 	
+	/**
+	 * Validates the given input field as an E-Mail field with the given RegExp.
+	 * @param regex
+	 * @param context {string|Iterable|Object|null}
+	 * @param customFormatEx
+	 * @return {*|FBValidator|void}
+	 */
 	emailValidate(regex, context = null, customFormatEx = null) {
 		console.log(true)
 		return this.length ?
 			this.regexValidate({regex: regex, context: context, message: `Please input a valid E-Mail Address format:<br> (eg. ${customFormatEx ?? 'johndoe@mail.com'})`}) : this;
 	}
 	
+	/**
+	 * Validates the given input field as a name field with the given RegExp.
+	 * @param regex
+	 * @param context {string|Iterable|Object|null}
+	 * @param customFormatEx
+	 * @return {*|FBValidator|void}
+	 */
 	nameValidate(regex, context = null, customFormatEx = null) {
 		return this.length ?
 			this.regexValidate({regex: regex, context: context, message: `Please input a valid Name format:<br> (eg. ${customFormatEx ?? 'John Doe, John Wood Doe'})`}) : this;
 	}
 	
+	/**
+	 * Validates the given input field as a phone field with the given RegExp.
+	 * @param regex
+	 * @param context {string|Iterable|Object|null}
+	 * @param customFormatEx
+	 * @return {*|FBValidator|void}
+	 */
 	phoneValidate(regex, context = null, customFormatEx = null) {
 		return this.length ?
 			this.regexValidate({regex: regex, context: context, message: `Please input a valid Phone Number format:<br> (eg. ${customFormatEx ?? '+234 8076899243, +1 211 1041'})`}) : this;
 	}
 	
+	/**
+	 * Validates the given input field as a Card Number field with the given RegExp.
+	 * @param regex
+	 * @param context {string|Iterable|Object|null}
+	 * @param customMessage
+	 * @return {*|FBValidator|void}
+	 */
 	cardNumberValidate(regex, context = null, customMessage = null) {
 		return this.length ? this.regexValidate({
 			customValidation: () =>
@@ -2231,6 +2510,15 @@ class FBValidator extends FBUtil {
 		}) : this;
 	}
 	
+	/**
+	 * Validates the given input field as a Username field with the given RegExp.
+	 * @param regex
+	 * @param context {string|Iterable|Object|null}
+	 * @param minlength
+	 * @param customFormatEx
+	 * @param customMessage
+	 * @return {*|FBValidator|void}
+	 */
 	usernameValidate(regex, context = null, minlength = 2, customFormatEx = null, customMessage = null) {
 		return this.length ? this.regexValidate({
 			customValidation: () =>
@@ -2244,6 +2532,14 @@ class FBValidator extends FBUtil {
 		}) : this;
 	}
 	
+	/**
+	 * Validate the given form field element.
+	 * @param context {string|Iterable|Object|null}
+	 * @param message {string|null}
+	 * @param isError {boolean}
+	 * @param isPasswordField {boolean}
+	 * @return {void|FBValidator}
+	 */
 	validateField({context, message = null, isError = false, isPasswordField = false} = {}) {
 		const _target = this, target = _target.target;
 		
@@ -2319,55 +2615,11 @@ class FBValidator extends FBUtil {
 		return console.error('ReferenceError: Element is Undefined');
 	}
 	
-	getFieldDimensions() {
-		const _target = this, target = _target.target;
-		
-		if (target.length) {
-			const tagName = target[0].tagName.toLowerCase();
-			const elementType = target[0].type && target[0].type.toLowerCase();
-			const filterType = new Set(['date', 'month', 'datetime', 'datetime-local']);
-			const validationIcons = this.validationProps().validationIcon;
-			
-			let paddingRight,
-				_paddingRight,
-				validationIconRight,
-				passwordIconRight = 0,
-				targetPaddingLeft = parseInt(_target.style('padding-left').replace('px', '')),
-				currentIcon = validationIcons.target.filter(icon => $fs(icon).classlist.has('on')).length ?
-					validationIcons.target.filter(icon => $fs(icon).classlist.has('on'))[0] : validationIcons[0],
-				iconWidth = currentIcon.getBoundingClientRect().width,
-				_targetPaddingLeft = targetPaddingLeft;
-			
-			if (tagName === 'select'/* || filterType.has(elementType)*/)
-				_targetPaddingLeft = targetPaddingLeft * 4.5;
-			
-			validationIconRight = (tagName === 'select' || filterType.has(elementType)) ? _targetPaddingLeft : targetPaddingLeft;
-			paddingRight = validationIconRight + iconWidth + targetPaddingLeft;
-			_paddingRight = paddingRight
-			
-			if (this.#_isPasswordField(target) && this.validatorConfig.config.showPassword && this.#_init) {
-				let togglerIcon = $fs(`#${target[0].id}_group .password-toggler-icon`)[0],
-					togglerIconWidth = togglerIcon.getBoundingClientRect().width;
-				passwordIconRight = paddingRight;
-				paddingRight = passwordIconRight + togglerIconWidth + targetPaddingLeft;
-			}
-			
-			return {
-				paddingRight: paddingRight,
-				_paddingRight: _paddingRight,
-				paddingLeft: targetPaddingLeft,
-				iconRight: validationIconRight,
-				togglerRight: passwordIconRight,
-			}
-		}
-		return console.warn('ReferenceError: Element is Undefined.');
-	}
-	
 	/**
-	 *
-	 * @param context
-	 * @param message
-	 * @param showIcon
+	 * Display validation error for the target element.
+	 * @param context {string|Iterable|Object|null}
+	 * @param message {string|null}
+	 * @param showIcon {boolean}
 	 * @return {void|FBValidator}
 	 */
 	showError({context, message, showIcon = true} = {}) {
@@ -2392,10 +2644,10 @@ class FBValidator extends FBUtil {
 	}
 	
 	/**
-	 *
-	 * @param context
-	 * @param message
-	 * @param showIcon
+	 * Display validation success for the target element.
+	 * @param context {string|Iterable|Object|null}
+	 * @param message {string|null}
+	 * @param showIcon {boolean}
 	 * @return {void|FBValidator}
 	 */
 	showSuccess({context, message, showIcon = true} = {}) {
@@ -2418,6 +2670,13 @@ class FBValidator extends FBUtil {
 		return console.warn('ReferenceError: Element is Undefined');
 	}
 	
+	/**
+	 * Display validation errors for the target form.
+	 * @param errors {Object} An Object of errors.
+	 * @param message {string|null} Optional Validation message.
+	 * @param callback {function|null} Optional Callback.
+	 * @return {void|FBValidator}
+	 */
 	renderValidationErrors(errors, message = null, callback = null) {
 		const _target = this, target = _target.target;
 		
@@ -2448,13 +2707,13 @@ class FBValidator extends FBUtil {
 	}
 	
 	/**
-	 *
+	 * Toggles the validation icon for the given field element
 	 * @param oldIcon {FBUtil}
 	 * @param newIcon {FBUtil}
-	 * @param showIcon
+	 * @param showIcon {boolean}
 	 */
 	toggleValidationIcon({oldIcon, newIcon, showIcon = true}) {
-		const dimensions = this.getFieldDimensions();
+		const dimensions = this.#_getFieldDimensions();
 		if (showIcon) {
 			oldIcon.fadeout(0).then(icon => icon.touchStyle({opacity: 0}).classlist.remove('on'));
 			this.addFieldValidationPadding();
@@ -2463,8 +2722,12 @@ class FBValidator extends FBUtil {
 			this.removeFieldValidationPadding();
 	}
 	
+	/**
+	 * Adds padding to the right of the field element based on the validation icons on the field element.
+	 * @return {FBValidator}
+	 */
 	addFieldValidationPadding() {
-		const dimensions = this.getFieldDimensions();
+		const dimensions = this.#_getFieldDimensions();
 		if (this.isPasswordField(this.validatorConfig.config.passwordId) && !this.validatorConfig.config.showPassword) {
 			this.touchStyle({paddingRight: `${dimensions.paddingRight}px`});
 		} else {
@@ -2476,17 +2739,29 @@ class FBValidator extends FBUtil {
 		return this;
 	}
 	
+	/**
+	 * Resets the value of the padding-right CSS property to the value of the padding-left CSS property of the element.
+	 * @return {FBValidator}
+	 */
 	removeFieldValidationPadding() {
-		const dimensions = this.getFieldDimensions();
+		const dimensions = this.#_getFieldDimensions();
 		this.touchStyle({paddingRight: `${dimensions.paddingLeft}px`});
 		return this;
 	}
 	
+	/**
+	 * Check if the form field element should be validated.
+	 * @return {boolean|boolean}
+	 */
 	needsValidation() {
 		const target = this.target
 		return target.length ? (this.dataAttribute('fb-validate') ? parseBool(this.dataAttribute('fb-validate').toLowerCase()) : true) : false;
 	}
 	
+	/**
+	 * Get the Validation properties for the target element.
+	 * @return {{formGroup: FBUtil<HTMLElement>, validationField: FBUtil<HTMLElement>, invalidIcon: FBUtil<HTMLElement>, id: string, validIcon: FBUtil<HTMLElement>, validationIcon: FBUtil<HTMLElement>}|void}
+	 */
 	validationProps() {
 		const _target = this, target = _target.target;
 		if (target.length) {
@@ -2509,8 +2784,8 @@ class FBValidator extends FBUtil {
 	}
 	
 	/**
-	 *
-	 * @param context
+	 * Remove validation errors from target element(s).
+	 * @param context {string|Iterable|Object|null}
 	 * @param removeAlert
 	 * @param destroyValidation
 	 * @param originals
@@ -2520,7 +2795,7 @@ class FBValidator extends FBUtil {
 		const _target = this, target = _target.target;
 		
 		if (target.length) {
-			const formId = target[0].form.id, elementId = target[0].id, fieldName = titleCase(elementId.toLowerCase()), validationProps = _target.validationProps();
+			const formId = target[0].form.id, elementId = target[0].id, validationProps = _target.validationProps();
 			
 			if (destroyValidation) {
 				delete errorBag[formId][elementId];
@@ -2533,7 +2808,7 @@ class FBValidator extends FBUtil {
 				this.#_init && _target.removeFieldValidationPadding();
 			});
 			
-			removeAlert && $fs(`${validationProps.validationField[0].id} > .alert`, context).target.forEach(alert => new bootstrap.Alert(alert).close());
+			removeAlert && $fs(`${validationProps.validationField[0].id} > .alert`, context).target.forEach(alert => newBsAlert(alert).close());
 			
 			if (Object.keys(originals).length) {
 				if (Object.keys(originals[elementId]).length) {
@@ -2550,14 +2825,14 @@ class FBValidator extends FBUtil {
 	}
 	
 	/**
-	 *
-	 * @param icon
-	 * @param bsAlert
-	 * @param message
-	 * @param id
-	 * @param context
-	 * @param dismissible
-	 * @param wait
+	 * Displays validation message.
+	 * @param icon {string}
+	 * @param bsAlert {string} Bootstrap alert class
+	 * @param message {string} Custom Message
+	 * @param id {string|null} Related form field Id
+	 * @param context {string|Iterable|Object|null}
+	 * @param dismissible {boolean} Toggle dismissible message
+	 * @param wait {boolean} Toggle displaying wait message
 	 * @return {void|FBValidator}
 	 */
 	renderMessage(icon, bsAlert, message, id = null, context = null, dismissible = false, wait = false) {
@@ -2594,7 +2869,7 @@ Object.defineProperties(Object.prototype, {
 });
 
 /**
- *
+ * Checks if any part of the given value is in the array.
  * @param value {String}
  * @return {boolean}
  */
@@ -2602,9 +2877,7 @@ Array.prototype.deepIncludes = function (value) {
 	return !!this.filter(val => value.includes(val)).length;
 }
 
-window.isFunction = isFunction;
+/*window.isFunction = isFunction;
 window.isString = isString;
 window.isObject = isObject;
-window.parseBool = parseBool;
-
-export {$fs, isFunction, isString, isObject, parseBool};
+window.parseBool = parseBool;*/
