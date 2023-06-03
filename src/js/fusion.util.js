@@ -1,6 +1,7 @@
 let currentAnimation,
 	buttonLoader = '.button-loader',
-	globalMessageTag = '#global-message-wrapper';
+	globalMessageTag = '#global-message-wrapper',
+	globalModalWrapper = '#global-modal-wrapper';
 
 const alert_d = 'alert-danger';
 const alert_i = 'alert-info';
@@ -62,7 +63,7 @@ const newBsModal = (element, options) => new bootstrap.Modal(element, options);
  * @param object {*}
  * @return {boolean}
  */
-const isObject = (object) => (typeof object).toUpperCase() === 'OBJECT' || object.constructor && (object.constructor.name.toUpperCase() === 'OBJECT');
+const isObject = (object) => !!object && ((typeof object).toUpperCase() === 'OBJECT' || object.constructor && (object.constructor.name.toUpperCase() === 'OBJECT'));
 
 /**
  *
@@ -79,6 +80,14 @@ const checkLuhn = (input) => {
 		.map(Number)
 		.map((c, i) => i % 2 !== 0 ? sumDigit(c * 2) : c)
 		.reduce((acc, v) => acc + v) % 10 === 0;
+}
+
+const modalCallback = (callback) => {
+	$fs('.modal').target.forEach(modal => {
+		let _target = $fs(modal),
+			id = _target.attribute('id');
+		callback(_target, id);
+	});
 }
 
 /**
@@ -193,6 +202,11 @@ const fetchReq = ({uri = '', method = 'get', data = null, dataType = 'json', bef
 }
 
 /*classes*/
+/**
+ * Base
+ *
+ * _Base Component_
+ */
 class FBBase {
 	/**
 	 *
@@ -200,7 +214,7 @@ class FBBase {
 	 * @param context {string|Iterable|Object|null}
 	 * @return {FBBase}
 	 */
-	constructor(selector, context) {
+	constructor(selector, context = null) {
 		const _this = this;
 		const target = _init();
 		const initDocumentArray = this.#_initToArray(document);
@@ -237,11 +251,9 @@ class FBBase {
 							
 							_this.#_createTemporalContext(target); // Create Temp context for targets
 							_this.internal.forEach(element => element.classList.add('fb-init-mark')); // mark targets;*/
-							/*_this.classList.put('fb-init-mark') // mark targets;*/
 							
 							const selected = _context.querySelectorAll('.fb-init-mark'); // select marked targets
 							_this.internal.forEach(element => element.classList.remove('fb-init-mark')); // unmark targets*/
-							/*_this.classList.remove('fb-init-mark'); // unmark targets*/
 							_this.#_deleteTemporalContext(); // Delete created Temp context
 							
 							return selected;
@@ -314,15 +326,18 @@ class FBBase {
 	}
 	
 	/**
-	 *
-	 * @return {{role: (""|string), id: (""|string), type: (""|string)}}
+	 * Returns the {id and type} attributes and [data-fb-role] attribute of a field
+	 * @return {{role: (""|string), id: (""|string), type: (""|string)}|void}
 	 */
 	getFieldAttribute() {
-		return {
-			id: this.util.attribute('id') && this.util.attribute('id').toLowerCase(),
-			type: this.util.attribute('type') && this.util.attribute('type').toLowerCase(),
-			role: this.util.dataAttribute('fb-role') && this.util.dataAttribute('fb-role').toLowerCase(),
+		if (this.length) {
+			return {
+				id: this.util.attribute('id') && this.util.attribute('id').toLowerCase(),
+				type: this.util.attribute('type') && this.util.attribute('type').toLowerCase(),
+				role: this.util.dataAttribute('fb-role') && this.util.dataAttribute('fb-role').toLowerCase(),
+			}
 		}
+		return console.error('ReferenceError: Element is undefined');
 	}
 	
 	/**
@@ -338,13 +353,18 @@ class FBBase {
 	}
 }
 
+/**
+ * Util
+ *
+ * _Util Components_
+ */
 class FBUtil extends FBBase {
 	/**
 	 *
 	 * @param selector {string|Iterable|Object|null}
 	 * @param context {string|Iterable|Object|null}
 	 */
-	constructor(selector, context) {
+	constructor(selector, context = null) {
 		super(selector, context)
 	}
 	
@@ -1258,14 +1278,14 @@ class FBUtil extends FBBase {
 	
 	/**
 	 * Load the given modal with a callback.
-	 * @param options {Object}
-	 * @param callback {function}
+	 * @param options {Object|function|null}
+	 * @param callback {function|null}
 	 * @return {void|FBUtil}
 	 */
-	onBSModalLoad(options, callback) {
+	onBSModalLoad(options, callback = null) {
 		const _target = this, target = _target.target;
 		if (target.length) {
-			_target.upon('show.bs.modal', isFunction(callback) ? callback : (isFunction(options) && options));
+			_target[0].addEventListener('show.bs.modal', isFunction(callback) ? callback : (isFunction(options) && options));
 			if (target.length > 1)
 				target.forEach(element => newBsModal(element, isObject(options) ? options : null).show());
 			else
@@ -1299,14 +1319,14 @@ class FBUtil extends FBBase {
 	 * @param uri {string}
 	 * @param selector {string|null}
 	 * @param data {Object|null}
-	 * @param overlay {string|null}
+	 * @param overlay
 	 * @param dataType {string}
 	 * @param slug {string|null}
 	 * @param beforeSend {function|null}
 	 * @param callback {function|null}
 	 * @return {Promise<unknown>}
 	 */
-	async loadPageData({uri = '', selector = null, data = null, overlay = null, dataType = 'text', slug = 'Page', beforeSend, callback}) {
+	loadPageData({uri = '', selector = null, data = null, overlay = null, dataType = 'text', slug = 'Page', beforeSend, callback} = {}) {
 		const _target = this, target = _target.target;
 		
 		const requestType = !data ? 'get' : 'post';
@@ -1329,9 +1349,35 @@ class FBUtil extends FBBase {
 						reject(err);
 					},
 					onSuccess: (data) => {
-						_element.html.insert(!selector ? data : new XMLSerializer().serializeToString(new DOMParser().parseFromString(data.responseText, "text/html").querySelector(selector)));
-						typeof callback === 'function' && callback();
-						resolve({response: data.responseText, status: data.status});
+						let error,
+							newData,
+							hasError = false;
+						
+						if (selector) {
+							try {
+								newData = (new XMLSerializer().serializeToString(new DOMParser().parseFromString(data.responseText, "text/html").querySelector(selector)));
+							} catch (e) {
+								try {
+									// newData = (new XMLSerializer().serializeToString(new DOMParser().parseFromString(data.responseText, "text/html").querySelector(selector)));
+									newData = (new XMLSerializer().serializeToString(new DOMParser().parseFromString(data.responseText.replaceAll(/(\\")+/gi, '"').replaceAll(/(\\r)+(\\n)+(\\t)+/gi, ''), "text/html").querySelector(selector)));
+									hasError = false;
+								} catch (e) {
+									error = e;
+									hasError = true
+								}
+							}
+							
+							if (!hasError) {
+								_element.html.insert(newData);
+								typeof callback === 'function' && callback();
+								resolve({response: data.responseText, status: data.status});
+							}
+							reject(error)
+						} else {
+							_element.html.insert(data);
+							typeof callback === 'function' && callback();
+							resolve({response: data.responseText, status: data.status});
+						}
 					}
 				});
 			});
@@ -1425,6 +1471,11 @@ class FBUtil extends FBBase {
 	}
 }
 
+/**
+ * Classlist
+ *
+ * _Manipulate DOMElements Classlist_
+ */
 class FBClassList extends FBUtil {
 	constructor(selector, context) {
 		super(selector, context);
@@ -1451,10 +1502,10 @@ class FBClassList extends FBUtil {
 	
 	/**
 	 * Returns true if the element has the given class, else returns false.
-	 * @param token
+	 * @param token {string}
 	 * @return {Boolean}
 	 */
-	has(token) {
+	includes(token) {
 		return this.#_classList().contains(token);
 	}
 	
@@ -1512,6 +1563,11 @@ class FBClassList extends FBUtil {
 	}
 }
 
+/**
+ * Element HTML
+ *
+ * _Insert HTML at different positions_
+ */
 class FBHtml extends FBUtil {
 	constructor(selector, context) {
 		super(selector, context);
@@ -1592,6 +1648,11 @@ class FBHtml extends FBUtil {
 	}
 }
 
+/**
+ * Modal
+ *
+ * _Load Modals Asynchronously_
+ */
 class FBBSModal extends FBUtil {
 	constructor(selector, context) {
 		super(selector, context);
@@ -1601,22 +1662,55 @@ class FBBSModal extends FBUtil {
 		return 'FB BS-Modal';
 	}
 	
-	onClickOpen({beforeOpen, afterOpen, options} = {}) {
+	/**
+	 *
+	 * @param route
+	 * @param modal
+	 * @param options
+	 * @param beforeOpen
+	 * @param onComplete
+	 */
+	loadModal({route, modal, options, beforeOpen, onComplete}) {
 		const _target = this;
 		
 		if (_target.length)
-			return new Promise(resolve => {
-				_target.upon('click', function (e) {
-					e.preventDefault();
-					let target = this,
-						route = $fs(target).dataAttribute('target-route'),
-						targetModal = $fs(target).dataAttribute('bs-target');
-					
-				})
-			})
+			_target.length && _target.loadPageData({
+				uri: route, selector: modal, beforeSend: beforeOpen, callback: () => {
+					$fs(modal).onBSModalLoad(options, function (e) {
+						onComplete({response: $fs(modal), status: 'success'});
+					});
+				}
+			}).catch(r => onComplete({response: r, status: 'failed'}));
+	}
+	
+	/**
+	 *
+	 * @param beforeOpen {function|null}
+	 * @param onComplete {function|null}
+	 * @param options {Object|null}
+	 * @return {Promise<unknown>}
+	 */
+	async onClickOpen({beforeOpen = null, options = null, onComplete = null} = {}) {
+		const _target = this;
+		
+		if (_target.length)
+			await _target.upon('click', function (e) {
+				e.preventDefault();
+				let target = this,
+					route = $fs(target).dataAttribute('modal-route'),
+					targetModal = $fs(target).dataAttribute('modal-target'),
+					targetWrapper = $fs(target).dataAttribute('modal-wrapper'),
+					_targetWrapper = $fs(targetWrapper);
+				_targetWrapper.length && _targetWrapper.modal.loadModal({route: route, modal: targetModal, beforeOpen: beforeOpen, onComplete: onComplete});
+			});
 	}
 }
 
+/**
+ * Validator
+ *
+ * _Validate Forms_
+ */
 class FBValidator extends FBUtil {
 	#_formFieldGroup = '.form-field-group';
 	#_fbValidatorConfig = {
@@ -1929,8 +2023,8 @@ class FBValidator extends FBUtil {
 						const originalField = $fs(target).has('*:not(label):not(option)');
 						
 						// Get element user options
-						const isOptional = $fs(target).classlist.has('optional');
-						const hasFloatingLabel = $fs(target).classlist.has('floating-label');
+						const isOptional = $fs(target).classlist.includes('optional');
+						const hasFloatingLabel = $fs(target).classlist.includes('floating-label');
 						
 						// Create base elements
 						const inputGroup = document.createElement('div')
@@ -2331,8 +2425,8 @@ class FBValidator extends FBUtil {
 				validationIconRight,
 				passwordIconRight = 0,
 				targetPaddingLeft = parseInt(_target.style('padding-left').replace('px', '')),
-				currentIcon = validationIcons.target.filter(icon => $fs(icon).classlist.has('on')).length ?
-					validationIcons.target.filter(icon => $fs(icon).classlist.has('on'))[0] : validationIcons[0],
+				currentIcon = validationIcons.target.filter(icon => $fs(icon).classlist.includes('on')).length ?
+					validationIcons.target.filter(icon => $fs(icon).classlist.includes('on'))[0] : validationIcons[0],
 				iconWidth = currentIcon.getBoundingClientRect().width,
 				_targetPaddingLeft = targetPaddingLeft;
 			
@@ -2377,7 +2471,7 @@ class FBValidator extends FBUtil {
 			config && this.#_touchConfig(config);
 			
 			return (forms.length) ?
-				/*forms.forEach(form =>*/ this.#_formValidate(/*$fs(*/forms/*)*/)/*)*/ :
+				this.#_formValidate(forms) :
 				console.error('Non Form Element passed to validator:', notForms);
 		} else
 			console.error('Given Elements failed to load in document:', _forms);
@@ -2731,7 +2825,7 @@ class FBValidator extends FBUtil {
 		if (this.isPasswordField(this.validatorConfig.config.passwordId) && !this.validatorConfig.config.showPassword) {
 			this.touchStyle({paddingRight: `${dimensions.paddingRight}px`});
 		} else {
-			if (this.isPasswordField(this.validatorConfig.config.passwordId) && !this.classlist.has('toggler-active'))
+			if (this.isPasswordField(this.validatorConfig.config.passwordId) && !this.classlist.includes('toggler-active'))
 				this.touchStyle({paddingRight: `${dimensions._paddingRight}px`});
 			else
 				this.touchStyle({paddingRight: `${dimensions.paddingRight}px`});
@@ -2877,7 +2971,4 @@ Array.prototype.deepIncludes = function (value) {
 	return !!this.filter(val => value.includes(val)).length;
 }
 
-/*window.isFunction = isFunction;
-window.isString = isString;
-window.isObject = isObject;
-window.parseBool = parseBool;*/
+window.FB = $fs;
