@@ -80,10 +80,19 @@ body {
 
 .validation-icon,
 .password-toggler-icon {
+  position: absolute;
   opacity: 0;
   top: 50%;
-  right: 8px;
+  right: 0;
   transform: translateY(-50%);
+}
+
+.password-toggler-icon {
+  display: none;
+
+  &.shown {
+    display: block;
+  }
 }
 
 .input-group-text-append,
@@ -143,11 +152,22 @@ body {
 
   }
 
-  .capslock-alert {
-    display: none;
-    padding: .5rem;
-    margin-top: .3rem !important;
-    margin-bottom: .2rem !important;
+  &.capslock-alert {
+    left: 50%;
+    position: absolute;
+    display: flex !important;
+    transform: translate(-50%, -25%);
+
+    > *:first-child {
+      display: none;
+      padding: .5rem;
+      margin-top: .3rem !important;
+      margin-bottom: .2rem !important;
+
+      &.shown {
+        display: block;
+      }
+    }
   }
 }
 
