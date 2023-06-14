@@ -1,6 +1,6 @@
 # Fusion Form Validator and Utilities
 
-> #### Form Validation plugin with fluent chainable utility methods.
+> #### Form Validation plugin and fluent chainable DOM manipulation utility methods.
 
 ---
 
@@ -24,11 +24,12 @@
 
 [Bootstrap](https://getbootstrap.com/) ^5.x, and [Fontawesome](https://fontawesome.com/) ^6.x are required.
 
-No worries, the above requirements are shipped along with the Fusion Form Validator package.Simply head over to the [latest release page](https://github.com/Bien-Glitch/fusion.form.validator/releases/latest) and download the assets to stay up to date.
+No worries, the above requirements are shipped along with the Fusion Form Validator package; <br> 
+Simply head over to the [latest release page](https://github.com/Bien-Glitch/fusion.form.validator/releases/latest) and download the assets to stay up to date.
 
-> ### Once the Fusion Form Validator asset has been downloaded:
+> ### Once the Fusion Utility asset has been downloaded:
 >
-> - The ***Fusion Form Validator*** can be found in the `src` folder.
+> - The ***Fusion Utility*** can be found in the `src\js` folder.
 > - The dependencies ***(Bootstrap & Fontawesome)*** can be found in the `plugins` folder.
 > - Copy the files / folders in the `src` and `plugins` folder to wherever you like in the root of your Web-Project.
 
@@ -47,7 +48,7 @@ Assuming you copied them into plugins folder; the structure in your project shou
 |   |   +-- \css
 |   |   +-- \js
 |   |
-|   +-- \fb-formvalidator*
+|   +-- \fb-validator-util*
 |   |   +-- \css
 |   |   +-- \fonts
 |   |   +-- \js
@@ -63,30 +64,30 @@ Now all that is left is to add them into your document as so:
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Title</title>
+	<title>Fusion Form Util</title>
 	
 	<!-- [Stylesheets] -->
-	<!-- Bootstrap -->
+	<!-- Bootstrap CSS -->
 	<link rel="stylesheet" href="plugins/bootstrap/css/bootstrap.css">
 	
 	<!-- Fontawesome -->
 	<link rel="stylesheet" href="plugins/fontawesome/css/all.css">
 	
-	<!-- FB-Formvalidator -->
-	<link rel="stylesheet" href="plugins/fb-formvalidator/css/fusion.form.validator.css">
+	<!-- FB-Formvalidator CSS -->
+	<link rel="stylesheet" href="plugins/fb-validator-util/css/fusion.form.util.css">
+	
+	<!--[ Scripts ]-->
+	<!-- Bootstrap JS -->
+	<script defer src="plugins/bootstrap/js/bootstrap.bundle.js"></script>
+	
+	<!-- FB-Formvalidator JS -->
+	<script defer src="plugins/fb-validator-util/js/fusion.form.util.js"></script>
+	<script defer src="plugins/fb-validator-util/js/init.js"></script>
 </head>
 
 <body>
 	<!-- Your content goes here -->
 </body>
-
-<!-- Bootstrap -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.js"></script>
-
-<!-- FB-Formvalidator -->
-<script src="plugins/fb-fomvalidator/js/fusion.form.util.js"></script>
-<script src="plugins/fb-fomvalidator/js/fusion.form.validator.js"></script>
-<script src="plugins/fb-fomvalidator/js/init.js"></script>
 </html>
 ```
 
@@ -94,25 +95,26 @@ Now all that is left is to add them into your document as so:
 >
 > #### To avoid errors:
 >
-> - The `fusion.form.validator.css` must come after `bootstrap css`, and `fontawesome css`.
-> - The same goes for the `fusion.form.validator.js`, it must come after `jQuery js (If available)`, `bootstrap js`, and `fusion.form.util.js`.
+> - As dependencies, the `bootstrap css` and `fontawesome css` must come before `fusion.form.util.css`.
+> - The same goes for `bootstrap js` and `fontawesome js (if available)`; They should come before the `fusion.form.util.js`.
 
 ## Usage
 
 *Firstly, ensure the stylesheets and scripts are linked in the correct hierarchy as in the above example. If you have problems getting it correctly, just copy the code in the example above and edit.*
 
-Out of the box, Fusion Form Validator ships with `init.js` file, so you can initialize, configure, and use the fusion form validator without messing up your other JS codes.
+Out of the box, Fusion Form Validator ships with `init.js` file, so you can initialize, configure, and use the fusion form validator without messing up your other JS codes.<br>
 **N.B:** You can still use the validator in another JS file.
 
-[comment]:
-To initialize and configure the validator on a form, you need an instance of the form.
+To initialize and configure the validator on a form, you need an `<FBUtil>` instance of the form.
 A utility function is available for getting elements. Other methods could still be used too.
 
-Built-in function `$el(selector)` can be used to fetch an element or fetch elements. The `selector` argument is either the elements tag name, or a CSS selector `eg. '#login-form'` as a string.
+Built-in function `$fs(selector, context)` is used to select  or fetch the element(s).
+- The `selector` argument selects the element(s) and it accepts either jQuery element Object, NodeList, HTML Element, HTML Collection, the elements tag name, or a CSS selector `eg. '#login-form'`; as a parameter.
+- The `context` argument is an optional element context from which to select the element(s),  jQuery element Object, NodeList, HTML Element, HTML Collection, the elements tag name, or a CSS selector as a parameter.
 
 ### Initializing:
 
-The form elements must follow the below structure
+Previously, the form elements had to follow the below structure:
 Assuming the form has id `login-form` i.e.
 
 ```html
@@ -236,6 +238,29 @@ Putting it all together we would have:
 </html>
 ```
 
+But we've made it easier, thus you'd have:
+
+```html
+<form action="" method="post" id="login-form">
+	<div class="form-group">
+		<input type="email" id="email" class="form-control" placeholder="E-Mail Address">
+		<label for="email">E-Mail Address</label>
+	</div>
+	
+	<div class="form-group">
+		<input minlength="8" type="password" id="password" class="form-control" placeholder="Password">
+		<label for="password">Password</label>
+	</div>
+	
+	<div class="mb-2">
+		<button type="submit" class="btn btn-sm btn-primary">
+			Submit
+			<!--<i class="ms-1 fa fa-1x fa-spin fa-spinner-third button-loader"></i>-->
+		</button>
+		<div class="form-message"></div>
+	</div>
+</form>
+```
 Instantiating and initializing the validator (in your JS file):
 
 ```javascript

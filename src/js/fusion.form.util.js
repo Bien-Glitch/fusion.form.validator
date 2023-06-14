@@ -2025,7 +2025,7 @@ class FBValidator extends FBUtil {
 		});
 	}
 	
-	#_placeBaseElements(target, originalLabel, originalField, fieldGroup, inputGroup, fieldId, fieldValidation, hasFloatingLabel) {
+	#_placeBaseElements(target, originalIcon, originalLabel, originalField, fieldGroup, inputGroup, fieldId, fieldValidation, hasFloatingLabel) {
 		fieldValidation.classList.add('valid-text');
 		fieldValidation.setAttribute('id', `${fieldId}Valid`);
 		
@@ -2041,6 +2041,8 @@ class FBValidator extends FBUtil {
 			});
 		}
 		
+		originalIcon.length && inputGroup.append(originalIcon[0]);
+		
 		hasFloatingLabel ?
 			fieldGroup.append(originalField[0], originalLabel[0]) :
 			fieldGroup.append(originalField[0]);
@@ -2051,7 +2053,8 @@ class FBValidator extends FBUtil {
 		
 	}
 	
-	#_defineBaseElements(target, fieldId, fieldGroup, fieldValidation) {
+	#_defineBaseElements(target, originalIcon, fieldId, fieldGroup, fieldValidation) {
+		let flexDiv;
 		const _originalChildren = $fs(target).children();
 		
 		fieldValidation.classList.add('valid-text');
@@ -2059,7 +2062,16 @@ class FBValidator extends FBUtil {
 		
 		$fs(target).children().target.forEach(child => target.removeChild(child));
 		_originalChildren.target.forEach(child => fieldGroup.append(child));
-		target.append(fieldGroup, fieldValidation);
+		
+		if (originalIcon.length) {
+			flexDiv = document.createElement('div');
+			flexDiv.classList.add('d-flex', 'flex-nowrap', 'align-items-stretch')
+			flexDiv.append(originalIcon[0], fieldGroup);
+		}
+		
+		originalIcon.length ?
+			target.append(flexDiv, fieldValidation) :
+			target.append(fieldGroup, fieldValidation);
 	}
 	
 	#_placeResponseMessageWrapper(form) {
@@ -2121,8 +2133,9 @@ class FBValidator extends FBUtil {
 					if ($fs(target).has($fs(element)).length) {
 						/*---- Prepare Elements ----*/
 						// Get Original Elements (User created)
+						const originalIcon = $fs(target).has('.icon');
 						const originalLabel = $fs(target).has('label');
-						const originalField = $fs(target).has('*:not(label):not(option)');
+						const originalField = $fs(target).has('*:not(label):not(option):not(.icon)');
 						
 						// Get element user options
 						const isOptional = $fs(target).classlist.includes('optional');
@@ -2137,12 +2150,12 @@ class FBValidator extends FBUtil {
 						inputGroup.classList.add('input-group', 'align-items-stretch', 'flex-nowrap');
 						fieldGroup.classList.add('form-field-group', 'w-100');
 						
+						originalIcon.length && (originalIcon.classlist.put('m-auto', 'pe-2'));
 						
 						!isOptional && hasFloatingLabel ?
 							fieldGroup.classList.add('form-label-group', 'required') :
 							(!isOptional ? fieldGroup.classList.add('required') : (hasFloatingLabel && fieldGroup.classList.add('form-label-group')));
 						isOptional && (originalField.touchDataAttribute({fbValidate: false}));
-						
 						
 						if (originalLabel.length && originalField.length) {
 							const elementId = originalField[0].id;
@@ -2150,6 +2163,7 @@ class FBValidator extends FBUtil {
 							const fieldValidation = document.createElement('div');
 							config.useDefaultStyling ? this.#_placeBaseElements(
 								target,
+								originalIcon,
 								originalLabel,
 								originalField,
 								fieldGroup,
@@ -2158,7 +2172,7 @@ class FBValidator extends FBUtil {
 								fieldValidation,
 								hasFloatingLabel,
 								config.useDefaultStyling
-							) : this.#_defineBaseElements(target, elementId, fieldGroup, fieldValidation);
+							) : this.#_defineBaseElements(target, originalIcon, elementId, fieldGroup, fieldValidation);
 							
 							if (!elementId)
 								console.error('ReferenceError: Field does not have an id.\r\nValidation will not be performed on this field:', originalField);
