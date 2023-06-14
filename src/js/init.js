@@ -1,8 +1,13 @@
-const test = $fs('form'); // Select forms
+const _test = $fs('form'); // Select forms
 
 // Init Validate Forms
-test.validator.initFormValidation({
+_test.validator.initFormValidation({
 	config: {
 		validateEmail: true
 	}
+});
+
+_test.upon('submit', function (e) {
+	e.preventDefault();
+	_test.handleFormSubmit().then(value => console.log(value)).catch(error => console.log(error))
 });
