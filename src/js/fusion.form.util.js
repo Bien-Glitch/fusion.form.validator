@@ -416,8 +416,22 @@ class FBUtil extends FBBase {
 		const _target = this, target = _target.target;
 		if (target.length) {
 			return this.isFormElement(target[0]) ?
-				(target[0].action ?? _target.attribute('action')) :
+				(_target.attribute('action') || target[0].action) :
 				_target.dataAttribute('action')
+		}
+		return console.error('ReferenceError: Element is Undefined.', this);
+	}
+	
+	/**
+	 * Returns the submission method of the given form.
+	 * @return {string|void}
+	 */
+	get formMethod() {
+		const _target = this, target = _target.target;
+		if (target.length) {
+			return this.isFormElement(target[0]) ?
+				(target[0].method ?? _target.attribute('method')) :
+				console.error('ReferenceError: Non Form element given.', this);
 		}
 		return console.error('ReferenceError: Element is Undefined.', this);
 	}
@@ -547,11 +561,13 @@ class FBUtil extends FBBase {
 			'onblur',
 			'onchange',
 			'onclick',
+			'ondomcontentloaded',
 			'onfocus',
 			'oninput',
 			'onkeydown',
 			'onkeypress',
 			'onkeyup',
+			'onload',
 			'onmouseenter',
 			'onmouseleave',
 			'onmouseover',
@@ -588,6 +604,7 @@ class FBUtil extends FBBase {
 		 * @returns {FBUtil}
 		 */
 		const fadein = (callback) => {
+			let animationsFinished = 0;
 			ongoingAnim = `fadein`;
 			defaultKeyframe = [{opacity: 0}, {opacity: 0.3333333333333333}, {opacity: 0.6666666666666667}, {opacity: 1}];
 			
@@ -596,16 +613,23 @@ class FBUtil extends FBBase {
 				timing: {duration: timeout, iterations: iterations}
 			};
 			
-			target.forEach(element => {
-				const elementDisplay = window.getComputedStyle(element).display;
-				
-				// elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
-				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
-				currentAnimation.id = ongoingAnim;
-				
-				currentAnimation.finished.then(() => isFunction(callback) && callback(element));
+			return new Promise(resolve => {
+				target.forEach(element => {
+					const elementDisplay = window.getComputedStyle(element).display;
+					
+					// elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
+					currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
+					currentAnimation.id = ongoingAnim;
+					currentAnimation.finished.then(() => {
+						animationsFinished += 1;
+						if (animationsFinished === target.length) {
+							// element.style.display = 'none';
+							isFunction(callback) && callback(element);
+							resolve(this);
+						}
+					});
+				});
 			});
-			return this
 		}
 		
 		/**
@@ -614,6 +638,7 @@ class FBUtil extends FBBase {
 		 * @returns {FBUtil}
 		 */
 		const fadeout = (callback) => {
+			let animationsFinished = 0;
 			ongoingAnim = `fadeout`;
 			defaultKeyframe = [{opacity: 1}, {opacity: 0.6666666666666667}, {opacity: 0.3333333333333333}, {opacity: 0}];
 			
@@ -622,19 +647,23 @@ class FBUtil extends FBBase {
 				timing: {duration: timeout, iterations: iterations}
 			};
 			
-			target.forEach(element => {
-				const elementDisplay = window.getComputedStyle(element).display;
-				
-				// elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
-				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
-				currentAnimation.id = ongoingAnim;
-				
-				currentAnimation.finished.then(() => {
-					// element.style.display = 'none';
-					isFunction(callback) && callback(element)
+			return new Promise(resolve => {
+				target.forEach(element => {
+					const elementDisplay = window.getComputedStyle(element).display;
+					
+					// elementDisplay.toLowerCase() === 'none' && (element.style.display = 'block');
+					currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
+					currentAnimation.id = ongoingAnim;
+					currentAnimation.finished.then(() => {
+						animationsFinished += 1;
+						if (animationsFinished === target.length) {
+							// element.style.display = 'none';
+							isFunction(callback) && callback(element);
+							resolve(this);
+						}
+					});
 				});
 			});
-			return this
 		}
 		
 		/**
@@ -643,6 +672,7 @@ class FBUtil extends FBBase {
 		 * @returns {FBUtil}
 		 */
 		const slideInDown = (callback) => {
+			let animationsFinished = 0;
 			ongoingAnim = `slideInDown`;
 			defaultKeyframe = [{transform: 'translateY(-100vh)'}, {transform: 'translateY(-66.66666666666667vh)'}, {transform: 'translateY(-33.33333333333333vh)'}, {transform: 'translateY(0)'}];
 			
@@ -651,12 +681,19 @@ class FBUtil extends FBBase {
 				timing: {duration: timeout, iterations: iterations}
 			};
 			
-			target.forEach(element => {
-				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
-				currentAnimation.id = ongoingAnim;
-				currentAnimation.finished.then(() => isFunction(callback) && callback(element));
+			return new Promise(resolve => {
+				target.forEach(element => {
+					currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
+					currentAnimation.id = ongoingAnim;
+					currentAnimation.finished.then(() => {
+						animationsFinished += 1;
+						if (animationsFinished === target.length) {
+							isFunction(callback) && callback(element);
+							resolve(this);
+						}
+					});
+				});
 			});
-			return this
 		}
 		
 		/**
@@ -665,6 +702,7 @@ class FBUtil extends FBBase {
 		 * @returns {FBUtil}
 		 */
 		const slideInUp = (callback) => {
+			let animationsFinished = 0;
 			ongoingAnim = `slideInUp`;
 			defaultKeyframe = [{transform: 'translateY(100vh)'}, {transform: 'translateY(66.66666666666667vh)'}, {transform: 'translateY(33.33333333333333vh)'}, {transform: 'translateY(0)'}];
 			
@@ -673,12 +711,19 @@ class FBUtil extends FBBase {
 				timing: {duration: timeout, iterations: iterations}
 			};
 			
-			target.forEach(element => {
-				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
-				currentAnimation.id = ongoingAnim;
-				currentAnimation.finished.then(() => isFunction(callback) && callback(element));
+			return new Promise(resolve => {
+				target.forEach(element => {
+					currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
+					currentAnimation.id = ongoingAnim;
+					currentAnimation.finished.then(() => {
+						animationsFinished += 1;
+						if (animationsFinished === target.length) {
+							isFunction(callback) && callback(element);
+							resolve(this);
+						}
+					});
+				});
 			});
-			return this;
 		};
 		
 		/**
@@ -687,6 +732,7 @@ class FBUtil extends FBBase {
 		 * @returns {FBUtil}
 		 */
 		const slideOutUp = (callback) => {
+			let animationsFinished = 0;
 			ongoingAnim = `slideOutUp`;
 			defaultKeyframe = [{transform: 'translateY(0)'}, {transform: 'translateY(-33.33333333333333vh)'}, {transform: 'translateY(-66.66666666666667vh)'}, {transform: 'translateY(-100vh)'}];
 			
@@ -695,12 +741,19 @@ class FBUtil extends FBBase {
 				timing: {duration: timeout, iterations: iterations}
 			};
 			
-			target.forEach(element => {
-				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
-				currentAnimation.id = ongoingAnim;
-				currentAnimation.finished.then(() => isFunction(callback) && callback(element));
+			return new Promise(resolve => {
+				target.forEach(element => {
+					currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
+					currentAnimation.id = ongoingAnim;
+					currentAnimation.finished.then(() => {
+						animationsFinished += 1;
+						if (animationsFinished === target.length) {
+							isFunction(callback) && callback(element);
+							resolve(this);
+						}
+					});
+				});
 			});
-			return this
 		}
 		
 		/**
@@ -709,6 +762,7 @@ class FBUtil extends FBBase {
 		 * @returns {FBUtil}
 		 */
 		const slideOutDown = (callback) => {
+			let animationsFinished = 0;
 			ongoingAnim = `slideOutDown`;
 			defaultKeyframe = [{transform: 'translateY(0)'}, {transform: 'translateY(33.33333333333333vh)'}, {transform: 'translateY(66.66666666666667vh)'}, {transform: 'translateY(100vh)'}];
 			
@@ -717,12 +771,19 @@ class FBUtil extends FBBase {
 				timing: {duration: timeout, iterations: iterations}
 			};
 			
-			target.forEach(element => {
-				currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
-				currentAnimation.id = ongoingAnim;
-				currentAnimation.finished.then(() => isFunction(callback) && callback(element));
+			return new Promise(resolve => {
+				target.forEach(element => {
+					currentAnimation = element.animate(keyframesRule.keyFrames, keyframesRule.timing);
+					currentAnimation.id = ongoingAnim;
+					currentAnimation.finished.then(() => {
+						animationsFinished += 1;
+						if (animationsFinished === target.length) {
+							isFunction(callback) && callback(element);
+							resolve(this);
+						}
+					});
+				});
 			});
-			return this
 		}
 		
 		const target = this.#_getTarget(), animations = {
@@ -1185,7 +1246,7 @@ class FBUtil extends FBBase {
 		return new Promise(async resolve => {
 			await target.forEach(element => {
 				resolve($fs(element).selectorMatches(':hover'))
-			})
+			});
 		});
 	}
 	
@@ -1215,6 +1276,15 @@ class FBUtil extends FBBase {
 				(isFunction(callback) ? element.addEventListener(events, this.#_handleEvent({event: events, prefix: 'on', callback: callback}), option) : console.error(`Argument 2 [callback] expects Function. ${typeof callback} given.`));
 		});
 		return this;
+	}
+	
+	step(event) {
+		const _target = this, target = _target.#_getTarget();
+		const newEvent = new Event(event, {
+			bubbles: true,
+			cancelable: true
+		});
+		target.forEach(element => element.dispatchEvent(newEvent));
 	}
 	
 	/**
@@ -1392,9 +1462,10 @@ class FBUtil extends FBBase {
 	 * @param method {string}
 	 * @param data {Object|null}
 	 * @param dataType {string}
+	 * @param beforeSend {function|null}
 	 * @return {Promise<unknown>}
 	 */
-	handleFormSubmit({uri = '', method = 'get', data = null, dataType = 'json'} = {}) {
+	handleFormSubmit({uri = '', method = 'get', data = null, dataType = 'json', beforeSend = null} = {}) {
 		const _target = this, target = _target.target, _globalMessageTag = $fs(globalMessageTag);
 		
 		return new Promise((resolve, reject) => {
@@ -1430,18 +1501,21 @@ class FBUtil extends FBBase {
 							let response = xhr.responseJSON,
 								responseText = xhr.responseText,
 								status = xhr.status;
-							console.log(xhr)
+							
 							setTimeout(() => {
 								if ((status > 199 && status < 300 || status === 308)) {
 									if (status === 308 && dataType === 'json') {
 										if (_messageTag.length) {
 											_messageTag.renderMessage(fa_check_c, alert_s, response.message, null, element, false, true);
 											_messageTag === messageTag ?
-												setTimeout(() => _messageTag.fadeout().then(() => setTimeout(() => '/*location.href = response.redirect*/', 2000)), 1000) :
-												_messageTag === _globalMessageTag && _messageTag.slideInDown().then(target => setTimeout(() => target.slideOutUp().then(() => '/*location.href = response.redirect*/'), 1500));
+												setTimeout(() => _messageTag.fadeout().then(() => setTimeout(() => location.href = response.redirect, 2000)), 1000) :
+												_messageTag === _globalMessageTag && _messageTag.slideInDown().then(target => setTimeout(() => target.slideOutUp().then(() => location.href = response.redirect), 1500));
 										}
-									} else
+									} else {
+										_messageTag.renderMessage(fa_check_c, alert_s, response.message, null, element, true);
+										// _element.toggleSubmitButtonState(true);
 										resolve({JSON: response, text: responseText, form: element, messageTag: _messageTag});
+									}
 								} else {
 									if (dataType === 'json') {
 										if (status === 419)
@@ -1677,10 +1751,10 @@ class FBBSModal extends FBUtil {
 			_target.length && _target.loadPageData({
 				uri: route, selector: modal, beforeSend: beforeOpen, callback: () => {
 					$fs(modal).onBSModalLoad(options, function (e) {
-						onComplete({response: $fs(modal), status: 'success'});
+						isFunction(onComplete) && onComplete({target: e, response: $fs(modal), status: 'success'});
 					});
 				}
-			}).catch(r => onComplete({response: r, status: 'failed'}));
+			}).catch(r => isFunction(onComplete) && onComplete({response: r, status: 'failed'}));
 	}
 	
 	/**
@@ -1688,13 +1762,12 @@ class FBBSModal extends FBUtil {
 	 * @param beforeOpen {function|null}
 	 * @param onComplete {function|null}
 	 * @param options {Object|null}
-	 * @return {Promise<unknown>}
 	 */
-	async onClickOpen({beforeOpen = null, options = null, onComplete = null} = {}) {
+	onClickOpen({beforeOpen = null, options = null, onComplete = null} = {}) {
 		const _target = this;
 		
 		if (_target.length)
-			await _target.upon('click', function (e) {
+			_target.upon('click', function (e) {
 				e.preventDefault();
 				let target = this,
 					route = $fs(target).dataAttribute('modal-route'),
@@ -1713,7 +1786,7 @@ class FBBSModal extends FBUtil {
  */
 class FBValidator extends FBUtil {
 	#_formFieldGroup = '.form-field-group';
-	#_fbValidatorConfig = {
+	_defaultConfig = {
 		regExp: {
 			name: /^([a-zA-Z]{2,255})(\s[a-zA-Z]{2,255}){1,2}$/gi,
 			username: /^[a-zA-Z]+(_?[a-zA-Z]){2,255}$/gi,
@@ -1729,6 +1802,7 @@ class FBValidator extends FBUtil {
 			passwordCapslockAlertIcon: '<i class="far fa-exclamation-triangle"></i>',
 		},
 		config: {
+			showIcons: false,
 			showPassword: true,
 			capslockAlert: true,
 			validateCard: false,
@@ -1738,6 +1812,7 @@ class FBValidator extends FBUtil {
 			validatePassword: true,
 			validateUsername: false,
 			nativeValidation: false,
+			useDefaultStyling: false,
 			passwordId: 'password',
 			passwordConfirmId: 'password_confirmation',
 			initWrapper: '.form-group',
@@ -1748,6 +1823,7 @@ class FBValidator extends FBUtil {
 	};
 	#_init = false;
 	#_originals = {};
+	#_fbValidatorConfig = this._defaultConfig
 	
 	constructor(selector, context) {
 		super(selector, context);
@@ -1841,10 +1917,18 @@ class FBValidator extends FBUtil {
 	
 	/**
 	 * Returns the Validation configuration for the form element.
-	 * @return {{texts: {capslock: string}, icons: {passwordToggleIcon: string, invalidIcon: string, validIcon: string, passwordCapslockAlertIcon: string}, config: {nativeValidation: boolean, passwordId: string, passwordConfirmId: string, validatePassword: boolean, initWrapper: string, showPassword: boolean, validatePhone: boolean, validateUsername: boolean, validateCard: boolean, capslockAlert: boolean, validateName: boolean, validateEmail: boolean}, regExp: {cardCVV: RegExp, phone: RegExp, name: RegExp, email: RegExp, cardNumber: RegExp, username: RegExp}}|void}
+	 * @return {{texts: {capslock: string}, icons: {passwordToggleIcon: string, invalidIcon: string, validIcon: string, passwordCapslockAlertIcon: string}, config: {passwordConfirmId: string, initWrapper: string, validateUsername: boolean, validateCard: boolean, validateName: boolean, validateEmail: boolean, nativeValidation: boolean, passwordId: string, validatePassword: boolean, showPassword: boolean, validatePhone: boolean, useDefaultStyling: boolean, showIcons: boolean, capslockAlert: boolean}, regExp: {cardCVV: RegExp, phone: RegExp, name: RegExp, email: RegExp, cardNumber: RegExp, username: RegExp}}}
 	 */
 	get validatorConfig() {
 		return this.#_fbValidatorConfig;
+	}
+	
+	/**
+	 *
+	 * @return {{texts: {capslock: string}, icons: {passwordToggleIcon: string, invalidIcon: string, validIcon: string, passwordCapslockAlertIcon: string}, config: {passwordConfirmId: string, initWrapper: string, validateUsername: boolean, validateCard: boolean, validateName: boolean, validateEmail: boolean, nativeValidation: boolean, passwordId: string, validatePassword: boolean, showPassword: boolean, validatePhone: boolean, useDefaultStyling: boolean, showIcons: boolean, capslockAlert: boolean}, regExp: {cardCVV: RegExp, phone: RegExp, name: RegExp, email: RegExp, cardNumber: RegExp, username: RegExp}}}
+	 */
+	get defaultValidatorConfig() {
+		return new FBValidator()._defaultConfig;
 	}
 	
 	#_passwordCapslockWrapper(icon, text) {
@@ -1947,7 +2031,14 @@ class FBValidator extends FBUtil {
 		
 		if ($fs(target).has(originalField).length) {
 			originalLabel.target.forEach(child => target.removeChild(child));
-			originalField.target.forEach(child => target.removeChild(child));
+			originalField.target.forEach(child => {
+				if ($fs(child, target).length && !$fs(child).classlist.collect.deepIncludes('dropify'))
+					try {
+						target.removeChild(child)
+					} catch (e) {
+						console.log(e, child, $fs(child, target).length)
+					}
+			});
 		}
 		
 		hasFloatingLabel ?
@@ -1958,6 +2049,17 @@ class FBValidator extends FBUtil {
 			target.append(inputGroup, fieldValidation) :
 			target.append(originalLabel[0], inputGroup, fieldValidation);
 		
+	}
+	
+	#_defineBaseElements(target, fieldId, fieldGroup, fieldValidation) {
+		const _originalChildren = $fs(target).children();
+		
+		fieldValidation.classList.add('valid-text');
+		fieldValidation.setAttribute('id', `${fieldId}Valid`);
+		
+		$fs(target).children().target.forEach(child => target.removeChild(child));
+		_originalChildren.target.forEach(child => fieldGroup.append(child));
+		target.append(fieldGroup, fieldValidation);
 	}
 	
 	#_placeResponseMessageWrapper(form) {
@@ -2046,7 +2148,7 @@ class FBValidator extends FBUtil {
 							const elementId = originalField[0].id;
 							const element_groupId = `${elementId}_group`;
 							const fieldValidation = document.createElement('div');
-							this.#_placeBaseElements(
+							config.useDefaultStyling ? this.#_placeBaseElements(
 								target,
 								originalLabel,
 								originalField,
@@ -2054,8 +2156,9 @@ class FBValidator extends FBUtil {
 								inputGroup,
 								elementId,
 								fieldValidation,
-								hasFloatingLabel
-							);
+								hasFloatingLabel,
+								config.useDefaultStyling
+							) : this.#_defineBaseElements(target, elementId, fieldGroup, fieldValidation);
 							
 							if (!elementId)
 								console.error('ReferenceError: Field does not have an id.\r\nValidation will not be performed on this field:', originalField);
@@ -2636,7 +2739,7 @@ class FBValidator extends FBUtil {
 	 */
 	validateField({context, message = null, isError = false, isPasswordField = false} = {}) {
 		const _target = this, target = _target.target;
-		
+		console.log(_target, target)
 		if (target.length) {
 			target.forEach(element => {
 				this.#_resetFBObject($fs(element));
@@ -2725,7 +2828,7 @@ class FBValidator extends FBUtil {
 				const elementId = target[0].id, fieldName = titleCase(elementId.toLowerCase()), validationProps = _target.validationProps();
 				const finalMessage = message ?? `The ${fieldName} field is required`;
 				Object.keys(errorBag).length && (errorBag[formId][elementId] = finalMessage);
-				this.toggleValidationIcon({oldIcon: validationProps.validIcon, newIcon: validationProps.invalidIcon, showIcon: showIcon});
+				this.validatorConfig.config.showIcons && this.toggleValidationIcon({oldIcon: validationProps.validIcon, newIcon: validationProps.invalidIcon, showIcon: showIcon});
 				
 				finalMessage ? validationProps.validationField.validator.renderMessage(fa_exc_c, alert_d, finalMessage, validationProps.id, context, true) : validationProps.validationField.html.insert(null);
 				_target.classlist.replace('border-success', 'border-danger');
@@ -2752,7 +2855,7 @@ class FBValidator extends FBUtil {
 			if (formId) {
 				const elementId = target[0].id, validationProps = _target.validationProps();
 				Object.keys(errorBag).length && delete errorBag[formId][elementId];
-				this.toggleValidationIcon({oldIcon: validationProps.invalidIcon, newIcon: validationProps.validIcon, showIcon: showIcon});
+				this.validatorConfig.config.showIcons && this.toggleValidationIcon({oldIcon: validationProps.invalidIcon, newIcon: validationProps.validIcon, showIcon: showIcon});
 				
 				message ? validationProps.validationField.validator.renderMessage(fa_check, alert_s, message, validationProps.id, context, true) : validationProps.validationField.html.insert(null);
 				_target.classlist.replace('border-danger', 'border-success');
