@@ -74,14 +74,14 @@ Now all that is left is to add them into your document as so:
 	<!-- Fontawesome -->
 	<link rel="stylesheet" href="plugins/fontawesome/css/all.css">
 	
-	<!-- FB-Formvalidator CSS -->
+	<!-- FB-ValidatorUtil CSS -->
 	<link rel="stylesheet" href="plugins/fb-validator-util/css/fusion.form.util.css">
 	
 	<!--[ Scripts ]-->
 	<!-- Bootstrap JS -->
 	<script defer src="plugins/bootstrap/js/bootstrap.bundle.js"></script>
 	
-	<!-- FB-Formvalidator JS -->
+	<!-- FB-FValidatorUtil JS -->
 	<script defer src="plugins/fb-validator-util/js/fusion.form.util.js"></script>
 	<script defer src="plugins/fb-validator-util/js/init.js"></script>
 </head>
@@ -103,7 +103,7 @@ Now all that is left is to add them into your document as so:
 
 *Firstly, ensure the stylesheets and scripts are linked in the correct hierarchy as in the above example. If you have problems getting it correctly, just copy the code in the example above and edit.*
 
-Out of the box, Fusion Form Validator ships with `init.js` file, so you can initialize, configure, and use the fusion form validator without messing up your other JS codes.<br>
+Out of the box, Fusion Utility and Form Validator ships with `init.js` file, so you can initialize, configure, and using the Fusion Utility and Form Validator without messing up your other JS codes.<br>
 **N.B:** _You can still use the validator in another JS file._
 
 To initialize and configure the validator on a form, you need an `<FBUtil>` instance of the form.<br>
@@ -165,7 +165,7 @@ Assuming the form has id `login-form` i.e.
 </form>
 ```
 
-Putting it all together we would have:
+Putting it all together we had:
 
 ```html
 <!DOCTYPE html>
@@ -240,7 +240,7 @@ Putting it all together we would have:
 </html>
 ```
 
-But we've made it easier, thus you'd have:
+But we've made it easier, thus it is now:
 
 ```html
 
@@ -268,7 +268,7 @@ But we've made it easier, thus you'd have:
 </form>
 ```
 
-Now putting it all together we would have:
+Putting it all together we now have:
 
 ```html
 <!DOCTYPE html>
@@ -284,14 +284,14 @@ Now putting it all together we would have:
 	<!-- Fontawesome -->
 	<link rel="stylesheet" href="plugins/fontawesome/css/all.css">
 	
-	<!-- FB-Formvalidator CSS -->
+	<!-- FB-ValidatorUtil CSS -->
 	<link rel="stylesheet" href="plugins/fb-validator-util/css/fusion.form.util.css">
 	
 	<!--[ Scripts ]-->
 	<!-- Bootstrap JS -->
 	<script defer src="plugins/bootstrap/js/bootstrap.bundle.js"></script>
 	
-	<!-- FB-Formvalidator JS -->
+	<!-- FB-FValidatorUtil JS -->
 	<script defer src="plugins/fb-validator-util/js/fusion.form.util.js"></script>
 	<script defer src="plugins/fb-validator-util/js/init.js"></script>
 </head>
@@ -505,7 +505,7 @@ Thanks to God Almighty for making this project a possible. Also, a huge thanks t
 
 ## Feedback
 
-If you discover a vulnerability or bug within the Fusion Form Validator, or have an improvement,
+If you discover a vulnerability or bug within the Fusion Utility and Form Validator, or have an improvement,
 Please [open an issue on the GitHub page](https://github.com/Bien-Glitch/fusion.form.validator/issues) or send an e-mail to Bien Nwinate via [fusionboltinc@gmail.com](mailto:fusionboltinc@gmail.com).
 All issues will be promptly addressed.
 
