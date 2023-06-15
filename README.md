@@ -104,10 +104,10 @@ Now all that is left is to add them into your document as so:
 *Firstly, ensure the stylesheets and scripts are linked in the correct hierarchy as in the above example. If you have problems getting it correctly, just copy the code in the example above and edit.*
 
 Out of the box, Fusion Form Validator ships with `init.js` file, so you can initialize, configure, and use the fusion form validator without messing up your other JS codes.<br>
-**N.B:** You can still use the validator in another JS file.
+**N.B:** _You can still use the validator in another JS file._
 
-To initialize and configure the validator on a form, you need an `<FBUtil>` instance of the form.
-A utility function is available for getting elements. Other methods could still be used too.
+To initialize and configure the validator on a form, you need an `<FBUtil>` instance of the form.<br>
+A utility function is available for getting the `<FBUtil>` instance of elements.
 
 Built-in function `$fs(selector, context)` is used to select or fetch the element(s).
 
