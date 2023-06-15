@@ -1802,7 +1802,7 @@ class FBValidator extends FBUtil {
 			passwordCapslockAlertIcon: '<i class="far fa-exclamation-triangle"></i>',
 		},
 		config: {
-			showIcons: false,
+			showIcons: true,
 			showPassword: true,
 			capslockAlert: true,
 			validateCard: false,
@@ -1812,7 +1812,7 @@ class FBValidator extends FBUtil {
 			validatePassword: true,
 			validateUsername: false,
 			nativeValidation: false,
-			useDefaultStyling: false,
+			useDefaultStyling: true,
 			passwordId: 'password',
 			passwordConfirmId: 'password_confirmation',
 			initWrapper: '.form-group',
