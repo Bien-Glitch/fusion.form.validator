@@ -483,7 +483,11 @@ Read through this documentation on how to set it up, and you're ready to go. It'
 	<a href="https://github.com/Ben-Chanan008" title="Great Ben">
 		<img alt="Ben-Chanan" title="Great Ben" src="https://avatars.githubusercontent.com/u/119743454?v=4" style="border-radius: 50%;height: 45px;width: 45px;object-fit: cover">
 	</a>
-	<span style="display: flex;flex-direction: column">Team member: <a href="https://github.com/scaletfoxltd">ScaletFox ltd</a></span>
+	<div style="display: flex;flex-direction: column">Team member:
+		<ul>
+			<li><a href="https://github.com/scaletfoxltd">ScaletFox ltd</a></li>
+		</ul>
+	</div>
 </div>
 </div>
 
