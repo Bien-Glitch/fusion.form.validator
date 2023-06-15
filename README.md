@@ -422,7 +422,7 @@ _loginForm.validator.initFormValidation(loginFormConfig).upon('submit', function
 >
 > <br>
 >
-> #### Field Validation `config` config options; For toggling validation state of form field elements and Base state of Validator.
+> #### Field Validation and validator `config` config options; For toggling validation state of form field elements and Base state of Validator.
 >
 >
 > | Key                 | Configurable Values                  | Default Value             | Description                                                                                                                   |
