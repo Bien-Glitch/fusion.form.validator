@@ -111,8 +111,8 @@ A utility function is available for getting the `<FBUtil>` instance of elements.
 
 Built-in function `$fs(selector, context)` is used to select or fetch the element(s).
 
-- The `selector` argument selects the element(s) and it accepts either jQuery element Object, NodeList, HTML Element, HTML Collection, the elements tag name, or a CSS selector `eg. '#login-form'`; as a parameter.
-- The `context` argument is an optional element context from which to select the element(s), jQuery element Object, NodeList, HTML Element, HTML Collection, the elements tag name, or a CSS selector as a parameter.
+- The `selector` parameter selects the element(s) and it accepts either jQuery element Object, NodeList, HTML Element, HTML Collection, the elements tag name, or a CSS selector `eg. '#login-form'`; as an argument.
+- The `context` parameter is an optional element context from which to select the element(s), jQuery element Object, NodeList, HTML Element, HTML Collection, the elements tag name, or a CSS selector as an argument.
 
 ### Initializing:
 
