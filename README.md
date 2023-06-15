@@ -332,7 +332,7 @@ You can now do both and also perform an onSubmit event action all at once. An il
 const _loginForm = $fs('#login-form');
 
 // Set config Options
-// N.B. Config options can by reference via variables, or can be passed directly as an anonymous object.
+// N.B. Config options can be passed by reference via variables, or can be passed directly as an anonymous object.
 const loginFormConfig = {
 	config: {
 		showIcons: true,
