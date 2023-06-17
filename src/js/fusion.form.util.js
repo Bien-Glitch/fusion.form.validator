@@ -483,14 +483,14 @@ class FBUtil extends FBBase {
 	
 	/**
 	 * Checks if the given form field element is a Password field.
-	 * @param passwordId
+	 * @param passwordId {string|null}
 	 * @return {boolean|void}
 	 */
-	isPasswordField(passwordId) {
+	isPasswordField(passwordId = null) {
 		const target = this.target;
 		if (target.length) {
 			const attributes = this.getFieldAttribute();
-			return !!(attributes.type === 'password' || (attributes.id && attributes.id.includes(passwordId.toLowerCase())));
+			return !!(attributes.type === 'password' || (passwordId && (attributes.id && attributes.id.includes(passwordId.toLowerCase()))));
 		}
 		return console.warn('ReferenceError: Element is Undefined');
 	}
@@ -1214,7 +1214,7 @@ class FBUtil extends FBBase {
 	 * Checks if the target element has the given element.
 	 *
 	 * _Returns the element if true else an empty array Object returned._
-	 * @param selector {string|null}
+	 * @param selector {FBUtil|string|null}
 	 * @return {FBUtil}
 	 */
 	has(selector) {
@@ -2036,7 +2036,7 @@ class FBValidator extends FBUtil {
 					try {
 						target.removeChild(child)
 					} catch (e) {
-						console.log(e, child, $fs(child, target).length)
+						console.error(e, child, $fs(child, target).length)
 					}
 			});
 		}
@@ -2053,14 +2053,15 @@ class FBValidator extends FBUtil {
 		
 	}
 	
-	#_defineBaseElements(target, originalIcon, fieldId, fieldGroup, fieldValidation) {
+	#_defineBaseElements(target, originalIcon, fieldId, fieldGroup, fieldValidation, hasFloatingLabel) {
 		let flexDiv;
 		const _originalChildren = $fs(target).children();
+		const _originalLabel = $fs('label', target);
 		
 		fieldValidation.classList.add('valid-text');
 		fieldValidation.setAttribute('id', `${fieldId}Valid`);
 		
-		$fs(target).children().target.forEach(child => target.removeChild(child));
+		$fs(target).children().target.forEach(child => $fs(child, target).length ? target.removeChild(child) : null);
 		_originalChildren.target.forEach(child => fieldGroup.append(child));
 		
 		if (originalIcon.length) {
@@ -2142,8 +2143,8 @@ class FBValidator extends FBUtil {
 						const hasFloatingLabel = $fs(target).classlist.includes('floating-label');
 						
 						// Create base elements
-						const inputGroup = document.createElement('div')
-						const fieldGroup = document.createElement('div')
+						const inputGroup = document.createElement('div');
+						const fieldGroup = document.createElement('div');
 						
 						// Add and remove appropriate classes to base elements (Using user options also)
 						target.classList.remove('floating-label', 'required');
@@ -2172,7 +2173,7 @@ class FBValidator extends FBUtil {
 								fieldValidation,
 								hasFloatingLabel,
 								config.useDefaultStyling
-							) : this.#_defineBaseElements(target, originalIcon, elementId, fieldGroup, fieldValidation);
+							) : this.#_defineBaseElements(target, originalIcon, elementId, fieldGroup, fieldValidation, hasFloatingLabel);
 							
 							if (!elementId)
 								console.error('ReferenceError: Field does not have an id.\r\nValidation will not be performed on this field:', originalField);
@@ -2183,12 +2184,19 @@ class FBValidator extends FBUtil {
 								_inputElement = $fs(inputElement, target),
 								_selectElement = $fs(selectElement, target),
 								_textAreaElement = $fs(textAreaElement, target),
-								_fieldGroup = $fs(this.#_formFieldGroup, target);
+								_fieldGroup = $fs(this.#_formFieldGroup, target),
+								_capslockAlert = $fs(`.${FBValidator.passwordCapslockAlertClass()}`, form),
+								fieldGroupRect = _fieldGroup[0].getBoundingClientRect();
 							
 							target.setAttribute('id', element_groupId);
 							this.#_isPasswordField(_inputElement) && (config.showPassword && _fieldGroup.html.affix(togglerWrapper(icons.passwordToggleIcon)));
 							_fieldGroup.html.affix(validWrapper(icons.validIcon)).affix(invalidWrapper(icons.invalidIcon));
-							((this.#_isDefaultPasswordField(_inputElement, config.passwordId) || $fs(target).has(`#${config.passwordId}`).length) && config.capslockAlert) && $fs(target).html.prefix(capslockWrapper(icons.passwordCapslockAlertIcon, texts.capslock));
+							((this.#_isDefaultPasswordField(_inputElement, config.passwordId) || $fs(target).has(`#${config.passwordId}`).length) && config.capslockAlert) && _fieldGroup.html.prefix(capslockWrapper(icons.passwordCapslockAlertIcon, texts.capslock));
+							$fs('.validation-icon, .password-toggler-icon').touchStyle({top: `${fieldGroupRect.height / 2}px`});
+							
+							if (_capslockAlert.length)
+								_capslockAlert.touchStyle({top: `-${(fieldGroupRect.height / 2) / 2}px`});
+							
 							
 							_inputElement.upon({
 								focus: (e) => {
@@ -2216,7 +2224,7 @@ class FBValidator extends FBUtil {
 										if (config.showPassword && _toggler.length) {
 											_toggler.mouseIsOver().then(isOver => {
 												if (!isOver && _inputElement[0].value.length)
-													_toggler.fadeout(0).then(icon => {
+													_inputElement.isPasswordField() && _toggler.fadeout(0).then(icon => {
 														_inputElement.touchStyle({paddingRight: `${dimensions._paddingRight}px`});
 														icon.touchStyle({opacity: 0}).dataAttribute('require-refill', 'true');
 														requireRefill = parseBool(icon.dataAttribute('require-refill'));
@@ -2291,10 +2299,10 @@ class FBValidator extends FBUtil {
 									
 									if (_inputElement.length) {
 										if (this.isPasswordField(config.passwordId)) {
-											if (config.capslockAlert && _capslockAlert.length)
+											/*if (config.capslockAlert && _capslockAlert.length)
 												capslockIsOn ?
 													$fs('*:first-child', _capslockAlert).classlist.put('shown') :
-													$fs('*:first-child', _capslockAlert).classlist.remove('shown');
+													$fs('*:first-child', _capslockAlert).classlist.remove('shown');*/
 											
 											if (config.showPassword && _toggler.length) {
 												if (requireRefill)
@@ -2307,15 +2315,23 @@ class FBValidator extends FBUtil {
 														icon.touchStyle({opacity: 1, right: `${dimensions.togglerRight}px`}).classlist.put('shown')
 														_inputElement.classlist.put('toggler-active');
 													}) :
-													_toggler.fadeout(0)
-														.then(icon => {
-															_inputElement.touchStyle({paddingRight: `${dimensions._paddingRight}px`}).classlist.remove('toggler-active');
-															icon.touchStyle({opacity: 0, right: 0}).dataAttribute('require-refill', 'false')
-															icon.classlist.remove('shown');
-														});
+													_inputElement.isPasswordField() && _toggler.fadeout(0).then(icon => {
+														_inputElement.touchStyle({paddingRight: `${dimensions._paddingRight}px`}).classlist.remove('toggler-active');
+														icon.touchStyle({opacity: 0, right: 0}).dataAttribute('require-refill', 'false')
+														icon.classlist.remove('shown');
+													});
 											}
 										}
 									}
+								},
+								keydown: (e) => {
+									const capslockIsOn = e.getModifierState('CapsLock');
+									const _capslockAlert = $fs(`.${FBValidator.passwordCapslockAlertClass()}`, form);
+									if (this.isPasswordField(config.passwordId))
+										if (config.capslockAlert && _capslockAlert.length)
+											capslockIsOn ?
+												$fs('*:first-child', _capslockAlert).classlist.put('shown') :
+												$fs('*:first-child', _capslockAlert).classlist.remove('shown');
 								}
 							});
 							
@@ -2672,7 +2688,6 @@ class FBValidator extends FBUtil {
 	 * @return {*|FBValidator|void}
 	 */
 	emailValidate(regex, context = null, customFormatEx = null) {
-		console.log(true)
 		return this.length ?
 			this.regexValidate({regex: regex, context: context, message: `Please input a valid E-Mail Address format:<br> (eg. ${customFormatEx ?? 'johndoe@mail.com'})`}) : this;
 	}
@@ -2753,7 +2768,7 @@ class FBValidator extends FBUtil {
 	 */
 	validateField({context, message = null, isError = false, isPasswordField = false} = {}) {
 		const _target = this, target = _target.target;
-		console.log(_target, target)
+		
 		if (target.length) {
 			target.forEach(element => {
 				this.#_resetFBObject($fs(element));
