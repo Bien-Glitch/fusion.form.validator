@@ -82,7 +82,7 @@ body {
 .password-toggler-icon {
   position: absolute;
   opacity: 0;
-  top: 50%;
+  //top: 50%;
   right: 0;
   transform: translateY(-50%);
 }
@@ -154,9 +154,10 @@ body {
 
   &.capslock-alert {
     left: 50%;
+    z-index: 1;
     position: absolute;
     display: flex !important;
-    transform: translate(-50%, -25%);
+    transform: translate(-50%, -50%);
 
     > *:first-child {
       display: none;

@@ -3,7 +3,9 @@ const _test = $fs('form'); // Select forms
 // Init Validate Forms
 _test.validator.initFormValidation({
 	config: {
-		showIcons: true
+		validateEmail: true,
+		showIcons: true,
+		useDefaultStyling: false,
 	}
 });
 

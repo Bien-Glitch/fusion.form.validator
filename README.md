@@ -12,6 +12,7 @@
 - [Installation - Note](#note)
 - [Usage](#usage)
 - [Configuration Options](#available-config-options)
+- [Utilities](#utilities)
 - [About](#about)
 - [Creator](#creator)
 - [Contributors](#contributors)
@@ -454,6 +455,11 @@ _loginForm.validator.initFormValidation(loginFormConfig).upon('submit', function
 >   }
 > }
 > ```
+
+## Utilities
+
+The Fusion Utility & Form Validator also provides you with Utilities for manipulating DOM elements, handling events, AJAX requests, and other common web development tasks, thereby simplifying and streamlining your development process.
+
 
 ## About
 
