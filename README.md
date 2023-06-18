@@ -474,9 +474,9 @@ Read through this documentation on how to set it up, and you're ready to go. It'
 	<img alt="Bien Nwinate" title="Bien Nwinate" src="https://avatars.githubusercontent.com/u/51288549?s=96&v=4" style="border-radius: 50%;height: 45px;width: 45px;object-fit: cover">
 </a>
 
-- https://twitter.com/nwinate
-- https://www.linkedin.com/in/nwinate-bien-609ab9175/
-- https://www.facebook.com/moses.bien
+- [Twitter](https://twitter.com/nwinate)
+- [Linkedin](https://www.linkedin.com/in/nwinate-bien-609ab9175/)
+- [Facebook](https://www.facebook.com/moses.bien)
 - Team member:
 	- [Loop DevOps LLC](https://github.com/officialLoopDevOps)
 	- [ScaletFox ltd](https://github.com/scaletfoxltd)
