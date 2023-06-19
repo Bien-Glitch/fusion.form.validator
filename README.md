@@ -11,8 +11,8 @@
 - [Installation - Getting started](#installation)
 - [Installation - Note](#note)
 - [Usage](#usage)
-- [Configuration Options](#available-config-options)
 - [Utilities](#utilities)
+- [Configuration Options](#available-config-options)
 - [About](#about)
 - [Creator](#creator)
 - [Contributors](#contributors)
@@ -351,6 +351,270 @@ _loginForm.validator.initFormValidation(loginFormConfig).upon('submit', function
 });
 ```
 
+## Utilities
+
+The Fusion Utility & Form Validator also provides you with Utilities (Functions & Methods) for manipulating DOM elements, handling events, AJAX requests, and other common web development tasks, thereby simplifying and streamlining your development process.
+<p>Each of these functions and methods have specific functionalities and are outlined in this section of the documentation.</p>
+
+> ### Utility Functions:
+> 
+> - ### `$fs(selector, context)`: 
+>   This function creates a new FBUtil object with a selected element (i.e. Selects the element and wraps it in the FBUtil Wrapper for manipulation with available methods).<br> 
+>   It takes two parameters:
+>   - `selector (required)`: It can be a string, an iterable object, or an object. It represents the HTML string or iterable used to select the element.
+>   - `context (optional)`: It can be a string, an iterable object, an object, or null. It represents the element context to select from. If not provided, the context is set to null.
+>
+>   <br> 
+>   If the element is found, the function returns a new FBUtil object that wraps the selected element; otherwise, It returns an empty object.
+>
+>   ```javascript
+>    // Usage example:
+>    $fs('#login-form'); //
+>   ```
+>   
+> <br>
+>
+> - ### `isFunction(value)`:
+>   This function checks whether the given value is a function.<br> 
+>   It takes one parameter:
+>   - `value (required)`: It represents the value that needs to be checked if it is a function.
+>
+>   <br> 
+>   It returns a boolean value indicating whether the given value is a function. If the value is a function, it returns true; otherwise, it returns false.
+>
+>   ```javascript
+>    // Usage example:
+>    const myFunc = () => console.log('My Function');
+>   
+>    console.log(isFunction(myFunc)); // Logs `true` to the console
+>   ```
+>   
+> <br>
+>
+> - ### `isString(value)`:
+>   This function checks whether the given value is a string.<br> 
+>   It takes one parameter:
+>   - `value (required)`: It represents the value that needs to be checked if it is a string.
+>
+>   <br> 
+>   It returns a boolean value indicating whether the given value is a string. If the value is a string, it returns true; otherwise, it returns false.
+>
+>   ```javascript
+>    // Usage example:
+>    const name = 'John Doe';
+>   
+>    console.log(isString(name)); // Logs `true` to the console
+>   ```
+>   
+> <br>
+>
+> - ### `isObject(value)`:
+>   This function checks whether the given value is an object.<br> 
+>   It takes one parameter:
+>   - `value (required)`: It represents the value that needs to be checked if it is an object.
+>
+>   <br> 
+>   It returns a boolean value indicating whether the given value is an object. If the value is an object, it returns true; otherwise, it returns false.
+>
+>   ```javascript
+>    // Usage example:
+>    const user_details = {
+>        name: 'John Doe',
+>        email: 'johndoe@gmail.com',
+>        phone: '+234 805 000 0000'
+>    };
+>   
+>    console.log(isObject(user_details)); // Logs `true` to the console
+>   ```
+>   
+> <br>
+>
+> - ### `formatNumber(number)`:
+>   This function formats a given number to two decimal places.<br> 
+>   It takes one parameter:
+>   - `number (required)`: It represents the number that needs to be formatted.
+>
+>   <br> 
+>   It returns the formatted number as a string.
+>
+>   ```javascript
+>    // Usage example:
+>    const num = formatNumber(2);
+>   
+>    console.log(num); // Logs `2.00` to the console
+>   ```
+>   
+> <br>
+>
+> - ### `checkLuhn(input)`:
+>   This function checks if a given input string passes the Luhn algorithm validation; The Luhn algorithm is commonly used to validate credit card numbers and other identification numbers.<br> 
+>   It takes one parameter:
+>   - `input (required)`: It represents the input string to be checked using the Luhn algorithm.
+>
+>   <br> 
+>   It returns a boolean value indicating whether the given input passes the Luhn Algorithm validation. If it passes, it returns true; otherwise, it returns false.
+>
+>   ```javascript
+>    // Usage example:
+>    const cardNumber = '452619383218234';
+>    const cardNumberIsValid = checkLuhn(cardNumber);
+>   
+>    console.log(cardNumberIsValid); // Logs `true` to the console if the input is valid; otherwise it logs `false`
+>   ```
+>   
+> <br>
+>
+> - ### `parseBool(value)`:
+>   This function parses a given value as a boolean.<br> 
+>   It takes one parameter:
+>   - `value (required)`: It represents the value that needs to be parsed as a boolean.
+>
+>   <br> 
+>   It returns the boolean value.
+>
+>   ```javascript
+>    // Usage example:
+>    const bool = parseBool('yes');
+>   
+>    console.log(bool); // Logs `true` to the console
+>   ```
+>   
+> <br>
+>
+> - ### `spaceToComma(value)`:
+>   This function converts spaces to commas in a given string.<br> 
+>   It takes one parameter:
+>   - `value (required)`: It represents the string in which spaces should be converted to commas.
+>
+>   <br> 
+>   It returns the resulting string with spaces converted to commas.
+>
+>   ```javascript
+>    // Usage example:
+>    const tagsInput = 'plugin validator fuse boss';
+>    const tags = spaceToComma(tagsInput);
+>   
+>    console.log(tags); // Logs `plugin, validator, fuse, boss` to the console
+>   ```
+>   
+> <br>
+>
+> - ### `titleCase(value)`:
+>   This function converts spaces to commas in a given string.<br> 
+>   It takes two parameters:
+>   - `value (required)`: It represents the string to be converted to Title Case.
+>   - `regExpReplace (optional)`: It represents the regular expression used for string replacement. By default, it is set to `/[-_]/gi`, which matches hyphens and underscores.
+>
+>   <br> 
+>   It returns the replaced string, which represents the converted string in Title Case.
+>
+>   ```javascript
+>    // Usage example:
+>    const word = 'convert-this_word';
+>    const wordTitle = titleCase(word);
+>   
+>    console.log(wordTitle); // Logs `convertThisWord` to the console
+>   ```
+>   
+> <br>
+>
+> - ### `canParseJSON(JSONString)`:
+>   This function checks if a given string or Response object can be parsed as JSON.<br> 
+>   It takes one parameters:
+>   - `JSONString (required)`: It represents the string or Response object to be checked for JSON parsability.
+>
+>   <br> 
+>   It returns a boolean value indicating whether the given string is valid JSON. If it is, it returns true; otherwise, it returns false.
+>
+>   ```javascript
+>   // Usage example:
+>    const jsonString = "[{word: 'parse me.'}]";
+>    const isValidJSON = canParseJSON(jsonString);
+>   
+>    console.log(isValidJSON); // Logs `true` to the console
+>   ```
+> 
+> <br>
+>
+> - ### `newBSAlert(element)`:
+>   This function creates a new instance of a Bootstrap Modal on the given element with the provided options.<br> 
+>   It takes two parameters:
+>   - `element (required)`: It represents the element on which the Bootstrap Modal should be instantiated.
+>   - `options (optional)`: It represents the options or configuration for the Bootstrap Modal. This parameter is an object containing various settings such as animation, backdrop behavior, etc. [Read More](https://getbootstrap.com/docs/5.2/components/modal/#via-javascript)
+>
+>   <br> 
+>   It returns the newly created instance of the Modal class, allowing the user to interact with the Bootstrap Modal functionality.
+>
+>   ```javascript
+>   // Usage example:
+>    const modalElement = document.querySelector('#example-modal');
+>    newBsModal(modalElement).show() // Manually opens the Modal
+>   // Read the JS trigers section on the bootstrap site: https://getbootstrap.com/docs/5.2/components/modal/#via-javascript
+>   ```
+> 
+> <br>
+>
+> - ### `newBSModal(element, options)`:
+>   This function creates a new instance of a Bootstrap Alert on the given element.<br> 
+>   It takes one parameters:
+>   - `element (required)`: It represents the element on which the Bootstrap Alert should be instantiated.
+>
+>   <br> 
+>   It returns the newly created instance of the Alert class, allowing the you to interact with the Bootstrap Alert functionality.
+>
+>   ```javascript
+>   // Usage example:
+>    const alertElement = document.querySelector('#alert-div');
+>    newBsAlert(alertElement).close() // Dismisses the alert
+>   // Read the JS trigers section on the bootstrap site: https://getbootstrap.com/docs/5.2/components/alerts/#javascript-behavior
+>   ```
+>   
+> <br>
+>
+> - ### `fetchReq(JSONString)`:
+>   This function performs a fetch request using the Fetch API. It provides a convenient way to make fetch requests with various options and callbacks.<br> 
+>   It supports different HTTP methods, request data, response data types, and allows for the execution of custom functions before sending the request, after completion, on success, and on error.<br> 
+>   It takes an Object as its parameter, which contains the following properties:
+>   - `uri`: It represents the URI (Uniform Resource Identifier) or URL of the request.
+>   - `method`: It specifies the HTTP method to be used for the request. The default value is `'get'`.
+>   - `data`: It represents the data to be sent with the request. The default value is `null`.
+>   - `dataType`: It specifies the type of data expected in the response. The default value is `'json'`.
+>   - `beforeSend`: It is an optional function that can be executed before sending the request.
+>   - `onSuccess`: It is an optional function that can be executed when the request is successful.
+>   - `onError`: It is an optional function that can be executed when the request encounters an error.
+>   - `onComplete`: It is an optional function that can be executed when the request is completed, regardless of success or failure.
+>
+>       <br>
+
+>       - The `beforeSend` function is executed before the request is sent.
+>       - The `onSuccess` function is executed if the response status code falls within the range `200-299`, or `401, 402, 422, 423, 426, 451, 511`, and the function is provided.
+>       - The `onError` function is executed if the response status code falls outside the status codes specified in the `onSuccess` function above, and the function is provided.
+>       - The `onComplete` function is executed once the request is completed, regardless of its success or error status.
+>     
+>       <br>
+
+>       **N.B:** 
+>       `onSuccess()`, `onError()`, and `onComplete()` has three arguments.<br> 
+>       `onSuccess()` and `onComplete()` has :- `responseData`, `status`, and `statusText`, while;<br> 
+>       `onError()` has :- `err`, `status`, and `statusText`.
+>   
+>       <br>
+
+>       - The `responseData` argument returns the servers' `respond data` in whatever format is giving while sending the request.
+>       - The `err` argument returns the `err` data if the server returns an error.
+>       - The `status` argument returns the `HTTP status code` of the servers' response.
+>       - The `statusText` argument returns the `HTTP status text` of the servers' response.
+>     
+>   ```javascript
+>    // Usage example:
+>    const openWeatherAPIKey = 'db38c9636975c743bbd8fec2a13b654f', city = 'Port-Harcourt';
+>    fetchReq({
+>    	uri: `https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${openWeatherAPIKey}`,
+>    	beforeSend: () => console.log(`Fetching Weather Report for ${city} city.`),
+>    	onSuccess: (xhr, status, statusText) => console.log(xhr, status, statusText) // Logs the weather report response data, status and status text
+>    });
+>   ```
+
 > ### Available Config Options:
 >
 > #### Regular Expressions `regExp` config options; For validating associated form fields using given Regular Expression.
@@ -455,11 +719,6 @@ _loginForm.validator.initFormValidation(loginFormConfig).upon('submit', function
 >   }
 > }
 > ```
-
-## Utilities
-
-The Fusion Utility & Form Validator also provides you with Utilities for manipulating DOM elements, handling events, AJAX requests, and other common web development tasks, thereby simplifying and streamlining your development process.
-
 
 ## About
 
