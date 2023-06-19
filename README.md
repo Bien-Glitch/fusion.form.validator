@@ -585,21 +585,21 @@ The Fusion Utility & Form Validator also provides you with Utilities (Functions 
 >   - `onComplete`: It is an optional function that can be executed when the request is completed, regardless of success or failure.
 >
 >       <br>
-
+>
 >       - The `beforeSend` function is executed before the request is sent.
 >       - The `onSuccess` function is executed if the response status code falls within the range `200-299`, or `401, 402, 422, 423, 426, 451, 511`, and the function is provided.
 >       - The `onError` function is executed if the response status code falls outside the status codes specified in the `onSuccess` function above, and the function is provided.
 >       - The `onComplete` function is executed once the request is completed, regardless of its success or error status.
 >     
 >       <br>
-
+>
 >       **N.B:** 
 >       `onSuccess()`, `onError()`, and `onComplete()` has three arguments.<br> 
 >       `onSuccess()` and `onComplete()` has :- `responseData`, `status`, and `statusText`, while;<br> 
 >       `onError()` has :- `err`, `status`, and `statusText`.
 >   
 >       <br>
-
+>
 >       - The `responseData` argument returns the servers' `respond data` in whatever format is giving while sending the request.
 >       - The `err` argument returns the `err` data if the server returns an error.
 >       - The `status` argument returns the `HTTP status code` of the servers' response.
@@ -607,7 +607,9 @@ The Fusion Utility & Form Validator also provides you with Utilities (Functions 
 >     
 >   ```javascript
 >    // Usage example:
->    const openWeatherAPIKey = 'db38c9636975c743bbd8fec2a13b654f', city = 'Port-Harcourt';
+>    const openWeatherAPIKey = '{put_your_api_key_here}', city = 'Port-Harcourt';
+>    // Signup on https://openweathermap.org to get you API Key
+>   
 >    fetchReq({
 >    	uri: `https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${openWeatherAPIKey}`,
 >    	beforeSend: () => console.log(`Fetching Weather Report for ${city} city.`),
