@@ -44,6 +44,13 @@ const isFunction = (value) => (typeof value).toUpperCase() === 'FUNCTION';
 const isString = (value) => (typeof value).toUpperCase() === 'STRING';
 
 /**
+ * Checks if the given value is an Object
+ * @param object {*}
+ * @return {boolean}
+ */
+const isObject = (object) => !!object && ((typeof object).toUpperCase() === 'OBJECT' || object.constructor && (object.constructor.name.toUpperCase() === 'OBJECT'));
+
+/**
  * Creates a new instance of Bootstrap Alert on the given element.
  * @param element
  * @returns {Alert}
@@ -57,13 +64,6 @@ const newBsAlert = (element) => new bootstrap.Alert(element);
  * @returns {Modal}
  */
 const newBsModal = (element, options) => new bootstrap.Modal(element, options);
-
-/**
- * Checks if the given value is an Object
- * @param object {*}
- * @return {boolean}
- */
-const isObject = (object) => !!object && ((typeof object).toUpperCase() === 'OBJECT' || object.constructor && (object.constructor.name.toUpperCase() === 'OBJECT'));
 
 /**
  *
@@ -520,26 +520,6 @@ class FBUtil extends FBBase {
 		}
 		return console.warn('ReferenceError: Element is Undefined');
 	}
-	
-	/*#_setPrevObject() {
-		const _this = this.#_getTarget()
-		_this.splice(_this.length, null, [this.prev])
-		
-		Object.keys(this).forEach(idx => delete this[idx]);
-		this.length = 0;
-		this.prev = new FBUtil();
-		this.prev.length = 0;
-		
-		_this.forEach((element, idx) => {
-			if (idx !== (_this.length - 1)) {
-				this.prev[idx] = element
-				this.prev.length++;
-			} else {
-				if (element.length)
-					this.prev.prev = element[0];
-			}
-		});
-	}*/
 	
 	/**
 	 *
@@ -1514,7 +1494,7 @@ class FBUtil extends FBBase {
 									} else {
 										_messageTag.renderMessage(fa_check_c, alert_s, response.message, null, element, true);
 										// _element.toggleSubmitButtonState(true);
-										resolve({JSON: response, text: responseText, form: element, messageTag: _messageTag});
+										resolve({JSON: response, text: responseText, form: _element, messageTag: _messageTag});
 									}
 								} else {
 									if (dataType === 'json') {
