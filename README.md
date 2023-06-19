@@ -607,7 +607,9 @@ The Fusion Utility & Form Validator also provides you with Utilities (Functions 
 >     
 >   ```javascript
 >    // Usage example:
->    const openWeatherAPIKey = 'db38c9636975c743bbd8fec2a13b654f', city = 'Port-Harcourt';
+>    const openWeatherAPIKey = '{put_your_api_key_here}', city = 'Port-Harcourt';
+>    // Signup on https://openweathermap.org to get you API Key
+>   
 >    fetchReq({
 >    	uri: `https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${openWeatherAPIKey}`,
 >    	beforeSend: () => console.log(`Fetching Weather Report for ${city} city.`),
